@@ -1,0 +1,47 @@
+# ==========================================
+# SkillPathAI Root .gitignore
+# Protects secrets, credentials, environments, and local caches
+# ==========================================
+
+# Environment variables & secrets
+.env
+.env.*
+!.env.example
+*.env
+*.pem
+*.key
+*.cert
+firebase-service-account*.json
+*service-account*.json
+
+# Archives & temporary bundles
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Python virtual environments & packages
+venv/
+venv_new/
+.venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+
+# Operating system & IDE files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Testing, temporary & scratch files
+_temp_*
+_test_*
+*.log
+.coverage
+htmlcov/

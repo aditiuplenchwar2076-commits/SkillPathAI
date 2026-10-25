@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillPath AI | Quiz, Practice & Projects</title>
+<link rel="stylesheet" href="dashboard.css">
+<style>
+  .content-wrap { max-width: 800px; }
+  .page-header { margin-bottom: 20px; }
+  .page-header h1 { font-size: 22px; margin-bottom: 4px; }
+  .page-header p { font-size: 13px; color: #888; }
+
+  .tab-switcher { display: flex; gap: 8px; margin-bottom: 20px; }
+  .tab-switcher-btn {
+    background: white;
+    border: 1px solid #eee;
+    color: #888;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .tab-switcher-btn.active {
+    background: linear-gradient(to right, #7c5cff, #a78bfa);
+    color: white;
+    border-color: transparent;
+  }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ===== QUIZ TAB ===== */
+  .quiz-card { background: white; border-radius: 16px; padding: 30px; }
+  .quiz-top { display: flex; justify-content: space-between; font-size: 13px; color: #888; margin-bottom: 15px; }
+  .quiz-progress { height: 8px; background: #eee; border-radius: 10px; overflow: hidden; margin-bottom: 25px; }
+  .quiz-progress-fill { height: 100%; background: linear-gradient(to right, #7c5cff, #a78bfa); border-radius: 10px; transition: width 0.3s; }
+  .quiz-question { font-size: 16px; font-weight: bold; margin-bottom: 20px; }
+  .quiz-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
+  .quiz-option { background: #f8f6ff; border: 2px solid #eee; border-radius: 10px; padding: 12px 16px; font-size: 14px; cursor: pointer; }
+  .quiz-option.selected { border-color: #7c5cff; background: #efe9ff; }
+  .quiz-option.correct { border-color: #22c55e; background: #dcfce7; }
+  .quiz-option.incorrect { border-color: #ef4444; background: #fee2e2; }
+  .quiz-feedback { font-size: 13px; font-weight: bold; margin-bottom: 15px; display: none; }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.good { color: #22c55e; }
+  .quiz-feedback.retry { color: #d97706; }
+  .quiz-next-btn {
+    background: linear-gradient(to right, #7c5cff, #a78bfa);
+    color: white; border: none; padding: 12px 24px; border-radius: 8px;
+    font-size: 13px; font-weight: bold; cursor: pointer;
+  }
+  .quiz-next-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  /* ===== PRACTICE TAB ===== */
+  .practice-card { background: white; border-radius: 16px; padding: 30px; }
+  .practice-card h3 { font-size: 16px; margin-bottom: 10px; }
+  .practice-task { background: #f8f6ff; border-radius: 10px; padding: 18px; font-size: 14px; color: #444; margin-bottom: 18px; line-height: 1.6; }
+  .practice-card textarea {
+    width: 100%; min-height: 160px;
+    border: 1px solid #eee; border-radius: 10px;
+    padding: 14px; font-family: 'Consolas', monospace; font-size: 13px;
+    resize: vertical; margin-bottom: 15px;
+  }
+  .practice-submit-btn {
+    background: linear-gradient(to right, #7c5cff, #a78bfa);
+    color: white; border: none; padding: 12px 24px; border-radius: 8px;
+    font-size: 13px; font-weight: bold; cursor: pointer;
+  }
+
+  /* ===== PROJECTS TAB ===== */
+  .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
+  .project-card { background: white; border-radius: 14px; padding: 20px; border: 1px solid #eee; }
+  .difficulty-badge { display: inline-block; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 20px; margin-bottom: 10px; }
+  .difficulty-badge.beginner { background: #dcfce7; color: #22c55e; }
+  .difficulty-badge.intermediate { background: #dbeafe; color: #3b82f6; }
+  .difficulty-badge.advanced { background: #fee2e2; color: #ef4444; }
+  .project-card h3 { font-size: 15px; margin-bottom: 6px; }
+  .project-card .skills-line { font-size: 11px; color: #999; margin-bottom: 10px; }
+  .project-card p { font-size: 13px; color: #666; margin-bottom: 15px; }
+  .project-start-btn {
+    width: 100%; background: white; border: 1px solid #7c5cff; color: #7c5cff;
+    padding: 10px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer;
+  }
+
+  .topic-notice-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    margin-bottom: 12px;
+  }
+  .topic-notice-badge.linked {
+    background: #eef2ff;
+    color: #4f46e5;
+  }
+  .topic-notice-badge.standalone {
+    background: #fef3c7;
+    color: #92400e;
+  }
+</style>
+</head>
+<body>
+<div class="dashboard-container">
+
+  <aside class="sidebar">
+    <div class="logo">
+      <span class="logo-icon">🚀</span>
+      <div class="logo-text">
+        <h2>SkillPath <span class="highlight-ai">AI</span></h2>
+        <p>Learn. Practice. Get Placed.</p>
+      </div>
+    </div>
+    <button id="menuToggle" class="menu-toggle">☰</button>
+    <nav class="nav-menu">
+      <ul>
+        <li><a href="dashboard.html"><span class="nav-icon">🏠</span> Home</a></li>
+        <li><a href="roadmap.html"><span class="nav-icon">🗺️</span> Roadmap</a></li>
+        <li><a href="practice.html"><span class="nav-icon">📖</span> Learn</a></li>
+        <li class="active"><a href="practice.html"><span class="nav-icon">💻</span> Practice</a></li>
+        <li><a href="progress.html"><span class="nav-icon">📊</span> Progress</a></li>
+        <li><a href="#"><span class="nav-icon">💼</span> Projects</a></li>
+        <li><a href="interview.html"><span class="nav-icon">🎙️</span> Interview Prep</a></li>
+        <li><a href="#"><span class="nav-icon">📚</span> Resources</a></li>
+        <li><a href="#"><span class="nav-icon">👥</span> Community</a></li>
+        <li><a href="#"><span class="nav-icon">🎖️</span> Certificates</a></li>
+        <li><a href="#"><span class="nav-icon">⚙️</span> Settings</a></li>
+      </ul>
+    </nav>
+    <div class="premium-box">
+      <p class="premium-title">👑 Go Premium</p>
+      <p class="premium-text">Unlock all features, AI interviews & premium content.</p>
+      <button class="upgrade-btn">Upgrade Now →</button>
+    </div>
+    <div class="help-box">
+      <span class="help-icon">🤖</span>
+      <div class="help-text">
+        <p class="help-title">Need Help?</p>
+        <p class="help-subtitle">Chat with our AI Assistant</p>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-logo">
+        <span class="topbar-logo-icon">🚀</span>
+        <h2>SkillPath <span class="highlight-ai">AI</span></h2>
+      </div>
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Search topics, skills..." class="search-input">
+      </div>
+      <div class="notification"><span class="bell-icon">🔔</span></div>
+      <div class="user-profile" id="userProfile" tabindex="0" role="button" aria-haspopup="true" aria-expanded="false">
+        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=SkillPathAI" alt="User profile picture" class="user-avatar">
+        <div class="user-info">
+          <p class="user-name" id="userName">Learner</p>
+          <p class="user-plan">Premium Plan</p>
+        </div>
+        <span class="dropdown-arrow" id="dropdownArrow">▾</span>
+        <div class="profile-dropdown-menu" style="display: none;" id="profileDropdownMenu">
+          <div class="dropdown-user-header">
+            <p class="dropdown-user-name" id="dropdownUserName">Learner</p>
+            <p class="dropdown-user-email" id="dropdownUserEmail">user@example.com</p>
+          </div>
+          <hr class="dropdown-divider">
+          <a href="#" class="dropdown-item"><span class="dropdown-icon">&#x128100;</span> Profile</a>
+          <a href="#" class="dropdown-item"><span class="dropdown-icon">&#x2699;</span> Settings</a>
+          <hr class="dropdown-divider">
+          <button type="button" class="dropdown-item logout-item" id="logoutBtn">
+            <span class="dropdown-icon">&#x128682;</span> Log Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-wrap">
+      <div class="page-header">
+        <h1 id="pageHeaderTitle">Quiz, Practice & Projects</h1>
+        <p id="pageHeaderSubtitle">JavaScript Functions • Web Development</p>
+      </div>
+
+      <div id="topicNoticeArea"></div>
+
+      <div class="tab-switcher">
+        <button class="tab-switcher-btn active" data-tab="quiz">Quiz</button>
+        <button class="tab-switcher-btn" data-tab="practice">Practice</button>
+        <button class="tab-switcher-btn" data-tab="projects">Projects</button>
+      </div>
+
+      <!-- ===== QUIZ TAB ===== -->
+      <div class="tab-panel active" id="quiz">
+        <div class="quiz-card" id="quizCardWrap">
+          <div class="quiz-top">
+            <span id="quizTitle">JavaScript Functions Quiz</span>
+            <span id="quizCounter">Question 1 / 4</span>
+          </div>
+          <div class="quiz-progress"><div class="quiz-progress-fill" id="quizProgressFill" style="width:25%;"></div></div>
+          <div class="quiz-question" id="quizQuestionText"></div>
+          <div class="quiz-options" id="quizOptionsWrap"></div>
+          <div class="quiz-feedback" id="quizFeedback"></div>
+          <div id="quizErrorMsg" style="color: #ef4444; font-size: 13px; margin-bottom: 12px; display: none;"></div>
+          <button class="quiz-next-btn" id="quizNextBtn">Check Answer</button>
+        </div>
+      </div>
+
+      <!-- ===== PRACTICE TAB ===== -->
+      <div class="tab-panel" id="practice">
+        <div class="practice-card">
+          <h3>Practice Task</h3>
+          <div class="practice-task" id="practiceTaskDesc">
+            Build a responsive navigation bar using HTML, CSS and JavaScript. It should collapse into a hamburger menu on smaller screens.
+          </div>
+          <textarea placeholder="Write or paste your code here..."></textarea>
+          <button class="practice-submit-btn">Submit Practice</button>
+        </div>
+      </div>
+
+      <!-- ===== PROJECTS TAB ===== -->
+      <div class="tab-panel" id="projects">
+        <div class="project-grid">
+
+          <div class="project-card">
+            <span class="difficulty-badge beginner">Beginner</span>
+            <h3>Personal Portfolio</h3>
+            <p class="skills-line">HTML | CSS</p>
+            <p>Build a simple personal portfolio site to showcase your projects and skills.</p>
+            <button class="project-start-btn">Start Project</button>
+          </div>
+
+          <div class="project-card">
+            <span class="difficulty-badge intermediate">Intermediate</span>
+            <h3>Weather Application</h3>
+            <p class="skills-line">JavaScript | API</p>
+            <p>Build an app that fetches and displays live weather data for any city.</p>
+            <button class="project-start-btn">Start Project</button>
+          </div>
+
+          <div class="project-card">
+            <span class="difficulty-badge advanced">Advanced</span>
+            <h3>Full Stack Application</h3>
+            <p class="skills-line">React | Node | Database | API</p>
+            <p>Build a complete full-stack app with a database, authentication and a REST API.</p>
+            <button class="project-start-btn">Start Project</button>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script type="module">
+  import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+  import { syncUserWithBackend, apiRequest } from "./api.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCQ9YRQV9edVS0D-Lb6ORl9HX6E0oL4ECQ",
+    authDomain: "skillpathai-2e1c7.firebaseapp.com",
+    projectId: "skillpathai-2e1c7",
+    storageBucket: "skillpathai-2e1c7.firebasestorage.app",
+    messagingSenderId: "41899784962",
+    appId: "1:41899784962:web:1fe188cfca7f6fa7d201b"
+  };
+
+  const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // Tab switching
+  const tabButtons = document.querySelectorAll('.tab-switcher-btn');
+  const tabPanels = document.querySelectorAll('.tab-panel');
+
+  tabButtons.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      tabButtons.forEach(function(b) { b.classList.remove('active'); });
+      tabPanels.forEach(function(p) { p.classList.remove('active'); });
+
+      btn.classList.add('active');
+      document.getElementById(btn.getAttribute('data-tab')).classList.add('active');
+    });
+  });
+
+  // Sidebar toggle
+  const menuToggle = document.getElementById("menuToggle");
+  const navMenu = document.querySelector(".nav-menu");
+  if (menuToggle && navMenu) {
+    menuToggle.addEventListener("click", () => navMenu.classList.toggle("show"));
+  }
+
+  // Profile dropdown & logout
+  const userProfileEl = document.getElementById("userProfile");
+  const profileDropdownMenuEl = document.getElementById("profileDropdownMenu");
+  const logoutBtnEl = document.getElementById("logoutBtn");
+
+  if (userProfileEl && profileDropdownMenuEl) {
+    function closeDropdown() {
+      profileDropdownMenuEl.classList.remove("show");
+      profileDropdownMenuEl.style.display = "none";
+      userProfileEl.classList.remove("active");
+    }
+    function openDropdown() {
+      profileDropdownMenuEl.classList.add("show");
+      profileDropdownMenuEl.style.display = "block";
+      userProfileEl.classList.add("active");
+    }
+    userProfileEl.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isOpen = profileDropdownMenuEl.style.display === "block";
+      isOpen ? closeDropdown() : openDropdown();
+    });
+    document.addEventListener("click", (e) => {
+      if (!userProfileEl.contains(e.target)) closeDropdown();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeDropdown();
+    });
+  }
+
+  if (logoutBtnEl) {
+    logoutBtnEl.addEventListener("click", async (e) => {
+      e.preventDefault();
+      try {
+        await signOut(auth);
+        window.location.href = "index.html";
+      } catch (err) {
+        console.error("Sign out error:", err);
+      }
+    });
+  }
+
+  // URL Query Parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const paramTopicId = urlParams.get("topic_id");
+  const paramTopicName = urlParams.get("topic_name");
+
+  let authenticatedUser = null;
+  let targetTopicId = paramTopicId ? parseInt(paramTopicId, 10) : null;
+  if (isNaN(targetTopicId)) targetTopicId = null;
+
+  let topicNameDisplay = paramTopicName || "JavaScript Functions";
+
+  // Question banks by topic keywords
+  const topicQuestionBank = {
+    "functions": [
+      { q: "What keyword is used to declare a function in JavaScript?", options: ["func", "function", "def", "method"], correct: 1 },
+      { q: "What does a function return by default if no return statement is used?", options: ["null", "0", "undefined", "false"], correct: 2 },
+      { q: "Which of these is an arrow function?", options: ["function() {}", "() => {}", "def() {}", "func() {}"], correct: 1 },
+      { q: "What are the inputs to a function called?", options: ["Arguments/Parameters", "Variables", "Loops", "Returns"], correct: 0 }
+    ],
+    "fundamentals": [
+      { q: "Which data type is used to represent true or false in programming?", options: ["String", "Boolean", "Integer", "Float"], correct: 1 },
+      { q: "Which loop guarantees execution of the block at least once?", options: ["for", "while", "do...while", "foreach"], correct: 2 },
+      { q: "What is the result of 5 + '5' in JavaScript?", options: ["10", "'55'", "NaN", "Error"], correct: 1 },
+      { q: "Which keyword defines an immutable variable in modern JavaScript?", options: ["var", "let", "const", "static"], correct: 2 }
+    ],
+    "data structures": [
+      { q: "Which data structure operates on a First-In, First-Out (FIFO) basis?", options: ["Stack", "Queue", "Tree", "Graph"], correct: 1 },
+      { q: "What is the average time complexity for accessing an element in an array by index?", options: ["O(1)", "O(n)", "O(log n)", "O(n^2)"], correct: 0 },
+      { q: "Which data structure consists of nodes where each node points to the next?", options: ["Array", "Linked List", "Queue", "Hash Table"], correct: 1 },
+      { q: "A stack operates on which principle?", options: ["FIFO", "LIFO", "FILO", "Priority"], correct: 1 }
+    ],
+    "algorithms": [
+      { q: "What is the worst-case time complexity of Binary Search?", options: ["O(1)", "O(log n)", "O(n)", "O(n log n)"], correct: 1 },
+      { q: "Which sorting algorithm has an average time complexity of O(n log n)?", options: ["Bubble Sort", "Merge Sort", "Insertion Sort", "Selection Sort"], correct: 1 },
+      { q: "What is recursion in programming?", options: ["A function calling itself", "An infinite while loop", "Sorting an array", "Allocating memory"], correct: 0 },
+      { q: "What technique divides a problem into subproblems, solves each once, and stores answers?", options: ["Greedy", "Dynamic Programming", "Backtracking", "Brute Force"], correct: 1 }
+    ]
+  };
+
+  function selectQuizQuestions(name) {
+    const lower = (name || "").toLowerCase();
+    for (const [key, questions] of Object.entries(topicQuestionBank)) {
+      if (lower.includes(key)) {
+        return questions;
+      }
+    }
+    return topicQuestionBank["functions"];
+  }
+
+  const quizQuestions = selectQuizQuestions(topicNameDisplay);
+  let quizIndex = 0;
+  let quizSelected = null;
+  let quizAnswered = false;
+  let correctAnswersCount = 0;
+  let isSubmitting = false;
+
+  // Render initial notice area
+  const noticeArea = document.getElementById("topicNoticeArea");
+  if (targetTopicId) {
+    noticeArea.innerHTML = `
+      <div class="topic-notice-badge linked">
+        🎯 Linked to Roadmap Topic: <strong>${topicNameDisplay}</strong> (ID: ${targetTopicId})
+      </div>
+    `;
+  } else {
+    noticeArea.innerHTML = `
+      <div class="topic-notice-badge standalone">
+        💡 Standalone Practice Mode: Questions can be practiced freely. To record official progress against your roadmap curriculum, open this quiz from your <a href="roadmap.html" style="text-decoration:underline; font-weight:bold;">Roadmap</a>.
+      </div>
+    `;
+  }
+
+  // Auth Guard
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "index.html";
+      return;
+    }
+
+    let displayName = user.displayName || (user.email ? user.email.split("@")[0] : "Learner");
+    const userNameEl = document.getElementById("userName");
+    const dropdownUserNameEl = document.getElementById("dropdownUserName");
+    const dropdownUserEmailEl = document.getElementById("dropdownUserEmail");
+    if (userNameEl) userNameEl.textContent = displayName;
+    if (dropdownUserNameEl) dropdownUserNameEl.textContent = displayName;
+    if (dropdownUserEmailEl && user.email) dropdownUserEmailEl.textContent = user.email;
+
+    try {
+      authenticatedUser = await syncUserWithBackend();
+    } catch (err) {
+      console.warn("Could not sync user with backend:", err);
+    }
+  });
+
+  // Quiz UI Rendering
+  const pageHeaderTitle = document.getElementById("pageHeaderTitle");
+  const pageHeaderSubtitle = document.getElementById("pageHeaderSubtitle");
+  const quizTitle = document.getElementById("quizTitle");
+
+  if (pageHeaderTitle) pageHeaderTitle.textContent = `${topicNameDisplay} Quiz & Practice`;
+  if (pageHeaderSubtitle) pageHeaderSubtitle.textContent = `${topicNameDisplay} • SkillPath Curriculum`;
+  if (quizTitle) quizTitle.textContent = `${topicNameDisplay} Quiz`;
+
+  function renderQuiz() {
+    const item = quizQuestions[quizIndex];
+    document.getElementById('quizCounter').textContent = 'Question ' + (quizIndex + 1) + ' / ' + quizQuestions.length;
+    document.getElementById('quizProgressFill').style.width = (((quizIndex + 1) / quizQuestions.length) * 100) + '%';
+    document.getElementById('quizQuestionText').textContent = item.q;
+
+    const wrap = document.getElementById('quizOptionsWrap');
+    wrap.innerHTML = '';
+    quizSelected = null;
+    quizAnswered = false;
+    document.getElementById('quizFeedback').classList.remove('show');
+    document.getElementById('quizNextBtn').textContent = 'Check Answer';
+    document.getElementById('quizNextBtn').disabled = false;
+
+    const errorMsgEl = document.getElementById('quizErrorMsg');
+    if (errorMsgEl) errorMsgEl.style.display = 'none';
+
+    item.options.forEach(function(optionText, index) {
+      const div = document.createElement('div');
+      div.className = 'quiz-option';
+      div.textContent = optionText;
+      div.addEventListener('click', function() {
+        if (quizAnswered) return;
+        document.querySelectorAll('.quiz-option').forEach(function(o) { o.classList.remove('selected'); });
+        div.classList.add('selected');
+        quizSelected = index;
+      });
+      wrap.appendChild(div);
+    });
+  }
+
+  document.getElementById('quizNextBtn').addEventListener('click', async function() {
+    if (!quizAnswered) {
+      if (quizSelected === null) return;
+      quizAnswered = true;
+      const item = quizQuestions[quizIndex];
+      const options = document.querySelectorAll('.quiz-option');
+      options[item.correct].classList.add('correct');
+      if (quizSelected !== item.correct) {
+        options[quizSelected].classList.add('incorrect');
+      } else {
+        correctAnswersCount++;
+      }
+      const feedback = document.getElementById('quizFeedback');
+      feedback.classList.add('show');
+      if (quizSelected === item.correct) {
+        feedback.className = 'quiz-feedback show good';
+        feedback.textContent = 'Good job! That\'s correct.';
+      } else {
+        feedback.className = 'quiz-feedback show retry';
+        feedback.textContent = "Let's strengthen this topic with some additional practice.";
+      }
+      document.getElementById('quizNextBtn').textContent =
+        quizIndex === quizQuestions.length - 1 ? 'Finish Quiz' : 'Next Question';
+    } else {
+      if (quizIndex < quizQuestions.length - 1) {
+        quizIndex++;
+        renderQuiz();
+      } else {
+        await handleQuizCompletion();
+      }
+    }
+  });
+
+  async function handleQuizCompletion() {
+    if (isSubmitting) return;
+
+    const nextBtn = document.getElementById('quizNextBtn');
+    const errorMsgEl = document.getElementById('quizErrorMsg');
+
+    const totalQuestions = quizQuestions.length;
+    const score = correctAnswersCount;
+    const percentage = Math.round((score / totalQuestions) * 100);
+
+    // If standalone practice without a target topic ID:
+    if (!targetTopicId) {
+      renderCompletionCard(score, totalQuestions, percentage, null, false);
+      return;
+    }
+
+    if (!authenticatedUser || !authenticatedUser.user_id) {
+      try {
+        authenticatedUser = await syncUserWithBackend();
+      } catch (err) {
+        console.error("User sync error:", err);
+      }
+    }
+
+    if (!authenticatedUser || !authenticatedUser.user_id) {
+      if (errorMsgEl) {
+        errorMsgEl.textContent = "Authentication required. Please sign in again.";
+        errorMsgEl.style.display = "block";
+      }
+      return;
+    }
+
+    isSubmitting = true;
+    if (nextBtn) {
+      nextBtn.disabled = true;
+      nextBtn.textContent = "Saving result...";
+    }
+
+    try {
+      // 1. Submit quiz result to POST /quiz-results
+      const savedResult = await apiRequest("/quiz-results", {
+        method: "POST",
+        body: JSON.stringify({
+          user_id: authenticatedUser.user_id,
+          topic_id: targetTopicId,
+          score: score,
+          total_questions: totalQuestions
+        })
+      });
+
+      // 2. If score is >= 75%, also mark the topic completed in progress if needed
+      if (percentage >= 75) {
+        try {
+          await apiRequest(`/topics/${targetTopicId}`, {
+            method: "PATCH",
+            body: JSON.stringify({ status: "Completed" })
+          });
+
+          await apiRequest("/progress", {
+            method: "POST",
+            body: JSON.stringify({
+              user_id: authenticatedUser.user_id,
+              topic_id: targetTopicId,
+              completion_percentage: 100,
+              status: "Completed"
+            })
+          });
+        } catch (progErr) {
+          console.warn("Could not auto-advance topic progress:", progErr);
+        }
+      }
+
+      // 3. Render success completion card
+      renderCompletionCard(score, totalQuestions, percentage, savedResult, true);
+
+    } catch (err) {
+      console.error("Failed to save quiz result:", err);
+      isSubmitting = false;
+      if (nextBtn) {
+        nextBtn.disabled = false;
+        nextBtn.textContent = "Retry Saving Result";
+      }
+      if (errorMsgEl) {
+        errorMsgEl.textContent = `Error saving quiz result: ${err.message || "Please try again."}`;
+        errorMsgEl.style.display = "block";
+      }
+    }
+  }
+
+  function renderCompletionCard(score, total, percentage, resultData, isSaved) {
+    const quizWrap = document.getElementById('quiz');
+    const badgeColor = percentage >= 75 ? "#22c55e" : (percentage >= 50 ? "#3b82f6" : "#f59e0b");
+    const badgeText = percentage >= 75 ? "Excellent (Passed)" : (percentage >= 50 ? "Satisfactory" : "Needs Practice");
+
+    const savedBadge = isSaved ? `
+      <div style="background: #dcfce7; color: #166534; padding: 6px 14px; border-radius: 20px; font-size: 12px; display: inline-block; margin-top: 10px; font-weight: bold;">
+        ✓ Saved to your learning history (Attempt #${resultData ? resultData.attempt_no : 1})
+      </div>
+    ` : `
+      <div style="background: #fef3c7; color: #92400e; padding: 6px 14px; border-radius: 20px; font-size: 12px; display: inline-block; margin-top: 10px; font-weight: bold;">
+        Standalone Practice Mode (Result not linked to a specific roadmap topic)
+      </div>
+    `;
+
+    quizWrap.innerHTML = `
+      <div class="quiz-card" style="text-align: center; padding: 40px 20px;">
+        <span style="font-size: 40px;">🎉</span>
+        <h2 style="margin: 12px 0 6px;">Quiz Complete!</h2>
+        <p style="color: #666; font-size: 14px; margin-bottom: 20px;">${topicNameDisplay}</p>
+
+        <div style="font-size: 36px; font-weight: 800; color: #1a1a2e; margin-bottom: 6px;">
+          ${score} / ${total}
+        </div>
+        <div style="font-size: 14px; color: ${badgeColor}; font-weight: bold; margin-bottom: 15px;">
+          ${percentage}% • ${badgeText}
+        </div>
+
+        ${savedBadge}
+
+        <div style="display: flex; gap: 12px; justify-content: center; margin-top: 30px;">
+          <a href="roadmap.html" style="padding: 11px 20px; background: linear-gradient(to right, #7c5cff, #a78bfa); color: white; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px;">View Roadmap →</a>
+          <a href="dashboard.html" style="padding: 11px 20px; background: white; border: 1px solid #7c5cff; color: #7c5cff; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px;">Back to Dashboard</a>
+        </div>
+      </div>
+    `;
+  }
+
+  renderQuiz();
+</script>
+</body>
+</html>

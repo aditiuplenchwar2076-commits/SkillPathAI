@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillPath AI - Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+<div class="dashboard-container">
+  <aside class="sidebar">
+    <div class="logo">
+      <span class="logo-icon">🚀</span>
+      <div class="logo-text">
+        <h2>SkillPath <span class="highlight-ai">AI</span></h2>
+        <p>Learn. Practice. Get Placed.</p>
+      </div>
+    </div>
+
+    <button id="menuToggle" class="menu-toggle">☰</button>
+
+    <nav class="nav-menu">
+      <ul>
+        <li class="active"><a href="dashboard.html"><span class="nav-icon">🏠</span> Home</a></li>
+        <li><a href="roadmap.html"><span class="nav-icon">🗺️</span> Roadmap</a></li>
+        <li><a href="practice.html"><span class="nav-icon">📖</span> Learn</a></li>
+        <li><a href="practice.html"><span class="nav-icon">💻</span> Practice</a></li>
+        <li><a href="progress.html"><span class="nav-icon">📊</span> Progress</a></li>
+        <li><a href="#"><span class="nav-icon">💼</span> Projects</a></li>
+        <li><a href="interview.html"><span class="nav-icon">🎙️</span> Interview Prep</a></li>
+        <li><a href="#"><span class="nav-icon">📚</span> Resources</a></li>
+        <li><a href="#"><span class="nav-icon">👥</span> Community</a></li>
+        <li><a href="#"><span class="nav-icon">🎖️</span> Certificates</a></li>
+        <li><a href="#"><span class="nav-icon">⚙️</span> Settings</a></li>
+      </ul>
+    </nav>
+
+    <div class="premium-box">
+      <p class="premium-title">👑 Go Premium</p>
+      <p class="premium-text">Unlock all features, AI interviews & premium content.</p>
+      <button class="upgrade-btn">Upgrade Now →</button>
+    </div>
+
+    <div class="help-box">
+      <span class="help-icon">🤖</span>
+      <div class="help-text">
+        <p class="help-title">Need Help?</p>
+        <p class="help-subtitle">Chat with our AI Assistant</p>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+    <div class="topbar">
+      <div class="topbar-logo">
+        <span class="topbar-logo-icon">🚀</span>
+        <h2>SkillPath <span class="highlight-ai">AI</span></h2>
+      </div>
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Search topics, skills..." class="search-input">
+      </div>
+      <div class="notification">
+        <span class="bell-icon">🔔</span>
+      </div>
+      <div class="user-profile" id="userProfile" tabindex="0" role="button" aria-haspopup="true" aria-expanded="false">
+        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=SkillPathAI" alt="User profile picture" class="user-avatar">
+        <div class="user-info">
+          <p class="user-name" id="userName">Alex Rivera</p>
+          <p class="user-plan">Premium Plan</p>
+        </div>
+        <span class="dropdown-arrow" id="dropdownArrow">▾</span>
+        <div class="profile-dropdown-menu" style="display: none;" id="profileDropdownMenu">
+          <div class="dropdown-user-header">
+            <p class="dropdown-user-name" id="dropdownUserName">Alex Rivera</p>
+            <p class="dropdown-user-email" id="dropdownUserEmail">user@example.com</p>
+          </div>
+          <hr class="dropdown-divider">
+          <a href="#" class="dropdown-item"><span class="dropdown-icon">&#x128100;</span> Profile</a>
+          <a href="#" class="dropdown-item"><span class="dropdown-icon">&#x2699;</span> Settings</a>
+          <hr class="dropdown-divider">
+          <button type="button" class="dropdown-item logout-item" id="logoutBtn">
+            <span class="dropdown-icon">&#x128682;</span> Log Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="welcome-banner">
+      <div class="welcome-text">
+        <h1 id="welcomeHeading">Welcome back, Alex! 👋</h1>
+        <p>Let's build your future with a personalized learning roadmap.</p>
+
+        <div class="user-status">
+          <span class="status-pill">🛤️ Career Path: <strong>Web Development</strong></span>
+          <span class="status-pill">📊 Current Level: <strong>Intermediate</strong></span>
+        </div>
+      </div>
+      <div class="welcome-bot">
+        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=WelcomeBot" alt="AI assistant robot illustration">
+      </div>
+    </div>
+
+    <div class="career-stats-row">
+
+      <div class="my-career-card">
+        <span class="career-card-icon">💻</span>
+        <div class="my-career-info">
+          <div class="my-career-top">
+            <p class="my-career-label">Your Career</p>
+            <a href="asses.html" class="change-link">Change →</a>
+          </div>
+          <h3 id="myCareerTitle">Web Development</h3>
+          <p class="my-career-level" id="myCareerLevel">📶 Level: Intermediate</p>
+          <p class="my-career-desc" id="myCareerDesc">Build modern websites and web applications.</p>
+        </div>
+      </div>
+
+      <div class="mini-stat-card">
+        <span class="mini-stat-icon">✅</span>
+        <p class="mini-stat-num" id="statCompletedTopics">0</p>
+        <p class="mini-stat-label">Topics Completed</p>
+        <div class="mini-progress-bar">
+          <div class="mini-progress-fill" id="statTopicsProgressFill" style="width: 0%;"></div>
+        </div>
+        <p class="mini-stat-fraction" id="statTopicsFraction">0/0</p>
+      </div>
+
+      <div class="mini-stat-card">
+        <span class="mini-stat-icon">🔥</span>
+        <p class="mini-stat-num">4</p>
+        <p class="mini-stat-label">Days Streak</p>
+        <div class="streak-dots">
+          <span class="streak-dot filled"></span>
+          <span class="streak-dot filled"></span>
+          <span class="streak-dot filled"></span>
+          <span class="streak-dot filled"></span>
+          <span class="streak-dot"></span>
+          <span class="streak-dot"></span>
+          <span class="streak-dot"></span>
+        </div>
+      </div>
+
+      <div class="mini-stat-card">
+        <span class="mini-stat-icon">📁</span>
+        <p class="mini-stat-num">2</p>
+        <p class="mini-stat-label">Projects Completed</p>
+      </div>
+
+      <div class="mini-stat-card">
+        <span class="mini-stat-icon">🔄</span>
+        <p class="mini-stat-num" id="statOverallProgress">0%</p>
+        <p class="mini-stat-label">Overall Progress</p>
+        <div class="mini-ring"></div>
+      </div>
+
+    </div>
+
+    <div class="goals-row">
+
+      <div class="today-goal-card">
+        <h2>🎯 Today's Learning Goal</h2>
+        <div class="goal-content">
+          <div class="goal-info">
+            <h3 id="todayGoalTitle">HTML & CSS Fundamentals</h3>
+            <p class="goal-tags" id="todayGoalTags">Web Development • Beginner</p>
+            <div class="goal-sequence">
+              <span class="sequence-step active">Lesson</span>
+              <span class="sequence-arrow">→</span>
+              <span class="sequence-step">Quiz</span>
+              <span class="sequence-arrow">→</span>
+              <span class="sequence-step">Practice</span>
+            </div>
+          </div>
+          <a href="roadmap.html" class="continue-learning-btn">Continue Learning →</a>
+        </div>
+      </div>
+
+      <div class="ask-ai-card">
+        <div class="ask-ai-header">
+          <span class="ask-ai-bot-icon">🤖</span>
+          <div>
+            <h3>Ask SkillPath AI</h3>
+            <p>Get personalized help, career guidance, learning tips and more.</p>
+          </div>
+        </div>
+
+        <button type="button" class="open-chat-btn" id="openChatBtn">Open Chat →</button>
+
+        <div class="quick-questions">
+          <button type="button" class="quick-question-btn">What should I learn today?</button>
+          <button type="button" class="quick-question-btn">Explain recursion</button>
+          <button type="button" class="quick-question-btn">How to improve my DSA?</button>
+          <button type="button" class="quick-question-btn">Suggest a project idea</button>
+        </div>
+      </div>
+
+    </div>
+
+    <section class="roadmap-section">
+
+      <div class="roadmap-header">
+        <h2 id="roadmapSectionTitle">Your Personalized Roadmap</h2>
+        <a href="asses.html" class="change-path-link">🔄 Change Path</a>
+      </div>
+
+      <div class="roadmap-tabs">
+        <a href="#" class="tab active">Overview</a>
+        <a href="#" class="tab">Phase View</a>
+        <a href="#" class="tab">Skill View</a>
+
+        <div class="status-legend">
+          <span class="legend-item"><span class="dot completed"></span> Completed</span>
+          <span class="legend-item"><span class="dot in-progress"></span> In Progress</span>
+          <span class="legend-item"><span class="dot upcoming"></span> Upcoming</span>
+          <span class="legend-item">🔒 Locked</span>
+        </div>
+      </div>
+
+      <div class="roadmap-body">
+
+        <div class="phase-timeline" id="dashboardPhaseTimeline">
+          <div class="phase-item completed">
+            <span class="phase-marker">✓</span>
+            <div class="phase-label">
+              <p class="phase-name">Phase 1</p>
+              <p class="phase-duration">(2-3 Weeks)</p>
+            </div>
+          </div>
+          <div class="phase-item in-progress">
+            <span class="phase-marker">●</span>
+            <div class="phase-label">
+              <p class="phase-name">Phase 2</p>
+              <p class="phase-duration">(3-4 Weeks)</p>
+            </div>
+          </div>
+          <div class="phase-item upcoming">
+            <span class="phase-marker">●</span>
+            <div class="phase-label">
+              <p class="phase-name">Phase 3</p>
+              <p class="phase-duration">(4-5 Weeks)</p>
+            </div>
+          </div>
+          <div class="phase-item upcoming">
+            <span class="phase-marker">●</span>
+            <div class="phase-label">
+              <p class="phase-name">Phase 4</p>
+              <p class="phase-duration">(3-4 Weeks)</p>
+            </div>
+          </div>
+          <div class="phase-item upcoming">
+            <span class="phase-marker">●</span>
+            <div class="phase-label">
+              <p class="phase-name">Phase 5</p>
+              <p class="phase-duration">(2-3 Weeks)</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="roadmap-items" id="dashboardRoadmapItems">
+
+          <div class="roadmap-item">
+            <span class="item-icon icon-1">📘</span>
+            <div class="item-info">
+              <h3>Programming Fundamentals</h3>
+              <p>Learn the basics of programming, variables, loops, functions and more.</p>
+            </div>
+            <div class="item-status">
+              <span class="status-badge completed">Completed</span>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 100%;"></div>
+              </div>
+              <span class="progress-percent">100%</span>
+            </div>
+            <span class="expand-arrow">⌄</span>
+          </div>
+
+          <div class="roadmap-item">
+            <span class="item-icon icon-2">🧩</span>
+            <div class="item-info">
+              <h3>Data Structures & Basic Algorithms</h3>
+              <p>Arrays, Strings, Linked List, Stack, Queue, Sorting, Searching</p>
+            </div>
+            <div class="item-status">
+              <span class="status-badge in-progress">In Progress</span>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 65%;"></div>
+              </div>
+              <span class="progress-percent">65%</span>
+            </div>
+            <span class="expand-arrow">⌄</span>
+          </div>
+
+          <div class="roadmap-item">
+            <span class="item-icon icon-3">🌳</span>
+            <div class="item-info">
+              <h3>Advanced Data Structures</h3>
+              <p>Trees, Binary Search Trees, Heap, Hashing, Graphs</p>
+            </div>
+            <div class="item-status">
+              <span class="status-badge upcoming">Upcoming</span>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 0%;"></div>
+              </div>
+              <span class="progress-percent">0%</span>
+            </div>
+            <span class="expand-arrow">⌄</span>
+          </div>
+
+          <div class="roadmap-item">
+            <span class="item-icon icon-4">🔁</span>
+            <div class="item-info">
+              <h3>Advanced Algorithms</h3>
+              <p>Recursion, Backtracking, Greedy, Dynamic Programming</p>
+            </div>
+            <div class="item-status">
+              <span class="status-badge upcoming">Upcoming</span>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 0%;"></div>
+              </div>
+              <span class="progress-percent">0%</span>
+            </div>
+            <span class="expand-arrow">⌄</span>
+          </div>
+
+          <div class="roadmap-item">
+            <span class="item-icon icon-5">🎯</span>
+            <div class="item-info">
+              <h3>Interview Preparation</h3>
+              <p>Mock Tests, Company Questions, System Design Basics</p>
+            </div>
+            <div class="item-status">
+              <span class="status-badge locked">🔒 Locked</span>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 0%;"></div>
+              </div>
+              <span class="progress-percent">0%</span>
+            </div>
+            <span class="expand-arrow">⌄</span>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="view-roadmap-btn-wrapper">
+        <a href="roadmap.html" class="view-roadmap-btn">View Full Roadmap →</a>
+      </div>
+
+    </section>
+
+    <section class="quick-access-section">
+      <h2>Quick Access</h2>
+      <div class="quick-access-grid">
+        <div class="quick-access-card" onclick="window.location.href='roadmap.html'" style="cursor: pointer;">
+          <span class="qa-icon">📖</span>
+          <div>
+            <p class="qa-title">Continue Learning</p>
+            <p class="qa-subtitle">Next: Curriculum & Lessons</p>
+          </div>
+        </div>
+        <div class="quick-access-card" onclick="window.location.href='practice.html'" style="cursor: pointer;">
+          <span class="qa-icon">📝</span>
+          <div>
+            <p class="qa-title">Take a Quiz</p>
+            <p class="qa-subtitle">Test your knowledge</p>
+          </div>
+        </div>
+        <div class="quick-access-card" onclick="window.location.href='practice.html'" style="cursor: pointer;">
+          <span class="qa-icon">💻</span>
+          <div>
+            <p class="qa-title">Practice Coding</p>
+            <p class="qa-subtitle">Improve your skills</p>
+          </div>
+        </div>
+        <div class="quick-access-card" onclick="window.location.href='practice.html'" style="cursor: pointer;">
+          <span class="qa-icon">📁</span>
+          <div>
+            <p class="qa-title">View Projects</p>
+            <p class="qa-subtitle">Build your portfolio</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="bottom-banner">
+      <div class="banner-message">
+        <span class="banner-icon">✨</span>
+        <p>Stay consistent, and success will follow you!</p>
+      </div>
+      <div class="banner-stat">
+        <span class="stat-icon">🎯</span>
+        <div>
+          <p class="stat-label">Daily Goal</p>
+          <p class="stat-value">20 Topics</p>
+        </div>
+      </div>
+      <div class="banner-stat">
+        <span class="stat-icon">📅</span>
+        <div>
+          <p class="stat-label">This Week</p>
+          <p class="stat-value">12/20 Topics</p>
+        </div>
+      </div>
+      <a href="roadmap.html" class="continue-btn">Continue Learning →</a>
+    </div>
+
+  </main>
+
+  <div class="right-panel">
+
+    <div class="progress-card">
+      <h3>Overall Progress</h3>
+      <div class="progress-circle">
+        <span class="circle-percent" id="rightPanelPercent">0%</span>
+      </div>
+      <p class="progress-note" id="rightPanelNote">Keep going! You're making great progress.</p>
+      <div class="progress-stats">
+        <div class="stat-box">
+          <p class="stat-num" id="rightPanelTotalTopics">0</p>
+          <p class="stat-desc">Total Topics</p>
+        </div>
+        <div class="stat-box">
+          <p class="stat-num green" id="rightPanelCompletedTopics">0</p>
+          <p class="stat-desc">Completed</p>
+        </div>
+        <div class="stat-box">
+          <p class="stat-num">🔥 4 Days</p>
+          <p class="stat-desc">Current Streak</p>
+        </div>
+        <div class="stat-box">
+          <p class="stat-num" id="rightPanelQuizAttempts">0</p>
+          <p class="stat-desc">Quizzes Taken</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="ai-recommendation-card">
+      <div class="ai-rec-header">
+        <span>✨</span>
+        <h3>AI Recommendation</h3>
+      </div>
+      <div class="ai-rec-body">
+        <span class="ai-rec-icon">🤖</span>
+        <p id="dashboardAiRecommendation">Based on your learning progress, continue your roadmap with your next topic.</p>
+      </div>
+      <a href="practice.html" id="dashboardAiRecLink" class="start-learning-btn">Start Practice →</a>
+    </div>
+
+    <div class="milestones-card">
+      <h3>Upcoming Milestones</h3>
+
+      <div class="milestone-item">
+        <span class="milestone-icon">🎯</span>
+        <div class="milestone-text">
+          <p class="milestone-title">Complete Phase 2</p>
+          <p class="milestone-time">In 12 days</p>
+        </div>
+        <span class="milestone-arrow">›</span>
+      </div>
+
+      <div class="milestone-item">
+        <span class="milestone-icon">🏆</span>
+        <div class="milestone-text">
+          <p class="milestone-title">First Mock Interview</p>
+          <p class="milestone-time">In 28 days</p>
+        </div>
+        <span class="milestone-arrow">›</span>
+      </div>
+
+      <div class="milestone-item">
+        <span class="milestone-icon">📜</span>
+        <div class="milestone-text">
+          <p class="milestone-title">Earn Certificate</p>
+          <p class="milestone-time">In 65 days</p>
+        </div>
+        <span class="milestone-arrow">›</span>
+      </div>
+
+      <a href="#" class="view-all-link">View All Milestones →</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== AI CHAT MODAL ===== -->
+<div class="chat-modal-backdrop" id="aiChatModalBackdrop" style="display: none;">
+  <div class="chat-modal" role="dialog" aria-modal="true" aria-labelledby="chatModalTitle">
+    <div class="chat-modal-header">
+      <div class="chat-header-info">
+        <span class="chat-bot-avatar">🤖</span>
+        <div>
+          <h3 id="chatModalTitle">SkillPath AI Assistant</h3>
+          <p class="chat-status-text"><span class="chat-online-dot"></span> Powered by Gemini AI</p>
+        </div>
+      </div>
+      <button type="button" class="chat-close-btn" id="closeChatBtn" aria-label="Close Chat">&times;</button>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-bubble ai">
+        <p>Hello! I'm your SkillPath AI learning assistant. How can I help you with your career roadmap, topics, or code today?</p>
+      </div>
+    </div>
+
+    <div class="chat-quick-suggestions" id="chatQuickSuggestions">
+      <button type="button" class="chat-suggestion-chip">Explain recursion</button>
+      <button type="button" class="chat-suggestion-chip">What should I learn today?</button>
+      <button type="button" class="chat-suggestion-chip">How to improve my DSA?</button>
+      <button type="button" class="chat-suggestion-chip">Suggest a project idea</button>
+    </div>
+
+    <form class="chat-input-row" id="chatInputForm">
+      <input type="text" id="chatInputField" placeholder="Ask a question or topic to explain..." autocomplete="off">
+      <button type="submit" id="chatSendBtn" class="chat-send-btn">
+        <span>Send</span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<script type="module" src="dashboard.js"></script>
+</body>
+</html>

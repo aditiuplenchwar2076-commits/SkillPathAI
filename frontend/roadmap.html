@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillPath AI | Roadmap & Learning</title>
+<link rel="stylesheet" href="dashboard.css">
+<style>
+  .content-wrap { max-width: 800px; }
+  .roadmap-page-header { margin-bottom: 20px; }
+  .roadmap-page-header h1 { font-size: 22px; margin-bottom: 4px; }
+  .roadmap-page-header p { font-size: 13px; color: #888; }
+
+  .timeline-wrap { background: white; border-radius: 16px; padding: 25px; min-height: 200px; }
+  .timeline-item {
+    display: flex;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+  }
+  .timeline-item:last-child { border-bottom: none; }
+  .timeline-marker {
+    width: 30px; height: 30px; min-width: 30px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: white;
+  }
+  .timeline-item.completed .timeline-marker { background-color: #22c55e; }
+  .timeline-item.current .timeline-marker { background: linear-gradient(to right, #7c5cff, #a78bfa); }
+  .timeline-item.upcoming .timeline-marker { background-color: #ccc; }
+  .timeline-text { flex: 1; }
+  .timeline-text h3 { font-size: 15px; margin-bottom: 2px; }
+  .timeline-text p { font-size: 12px; color: #888; }
+  .timeline-status {
+    font-size: 11px;
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 20px;
+    height: fit-content;
+    white-space: nowrap;
+  }
+  .timeline-item.completed .timeline-status { background: #dcfce7; color: #22c55e; }
+  .timeline-item.current .timeline-status { background: #dbeafe; color: #3b82f6; }
+  .timeline-item.upcoming .timeline-status { background: #f1f1f1; color: #999; }
+
+  .lesson-panel {
+    display: none;
+    background: #f8f6ff;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 0 0 15px 45px;
+    font-size: 13px;
+  }
+  .lesson-panel.open { display: block; }
+  .lesson-panel h4 { font-size: 14px; margin-bottom: 8px; }
+  .lesson-panel p { color: #555; margin-bottom: 12px; line-height: 1.6; }
+  .lesson-panel code {
+    display: block;
+    background: #1a1a2e;
+    color: #a78bfa;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    margin: 10px 0;
+    white-space: pre-wrap;
+    font-family: 'Consolas', monospace;
+  }
+  .lesson-panel ul { margin: 0 0 12px 18px; color: #555; line-height: 1.8; }
+  .lesson-actions { display: flex; gap: 10px; margin-top: 15px; }
+  .lesson-actions button, .lesson-actions a {
+    flex: 1;
+    padding: 11px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    text-align: center;
+    text-decoration: none;
+  }
+  .lesson-actions .quiz-btn { background: white; border: 1px solid #7c5cff; color: #7c5cff; }
+  .lesson-actions .practice-btn { background: white; border: 1px solid #7c5cff; color: #7c5cff; }
+  .lesson-actions .complete-btn { background: linear-gradient(to right, #7c5cff, #a78bfa); color: white; }
+</style>
+</head>
+<body>
+<div class="dashboard-container">
+
+  <aside class="sidebar">
+    <div class="logo">
+      <span class="logo-icon">🚀</span>
+      <div class="logo-text">
+        <h2>SkillPath <span class="highlight-ai">AI</span></h2>
+        <p>Learn. Practice. Get Placed.</p>
+      </div>
+    </div>
+    <button id="menuToggle" class="menu-toggle">☰</button>
+    <nav class="nav-menu">
+      <ul>
+        <li><a href="dashboard.html"><span class="nav-icon">🏠</span> Home</a></li>
+        <li class="active"><a href="roadmap.html"><span class="nav-icon">🗺️</span> Roadmap</a></li>
+        <li><a href="practice.html"><span class="nav-icon">📖</span> Learn</a></li>
+        <li><a href="practice.html"><span class="nav-icon">💻</span> Practice</a></li>
+        <li><a href="progress.html"><span class="nav-icon">📊</span> Progress</a></li>
+        <li><a href="#"><span class="nav-icon">💼</span> Projects</a></li>
+        <li><a href="interview.html"><span class="nav-icon">🎙️</span> Interview Prep</a></li>
+        <li><a href="#"><span class="nav-icon">📚</span> Resources</a></li>
+        <li><a href="#"><span class="nav-icon">👥</span> Community</a></li>
+        <li><a href="#"><span class="nav-icon">🎖️</span> Certificates</a></li>
+        <li><a href="#"><span class="nav-icon">⚙️</span> Settings</a></li>
+      </ul>
+    </nav>
+    <div class="premium-box">
+      <p class="premium-title">👑 Go Premium</p>
+      <p class="premium-text">Unlock all features, AI interviews & premium content.</p>
+      <button class="upgrade-btn">Upgrade Now →</button>
+    </div>
+    <div class="help-box">
+      <span class="help-icon">🤖</span>
+      <div class="help-text">
+        <p class="help-title">Need Help?</p>
+        <p class="help-subtitle">Chat with our AI Assistant</p>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-logo">
+        <span class="topbar-logo-icon">🚀</span>
+        <h2>SkillPath <span class="highlight-ai">AI</span></h2>
+      </div>
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Search topics, skills..." class="search-input">
+      </div>
+      <div class="notification"><span class="bell-icon">🔔</span></div>
+      <div class="user-profile" id="userProfile" tabindex="0" role="button" aria-haspopup="true" aria-expanded="false">
+        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=SkillPathAI" alt="User profile picture" class="user-avatar">
+        <div class="user-info">
+          <p class="user-name" id="userName">Learner</p>
+          <p class="user-plan">Premium Plan</p>
+        </div>
+        <span class="dropdown-arrow" id="dropdownArrow">▾</span>
+        <div class="profile-dropdown-menu" style="display: none;" id="profileDropdownMenu">
+          <div class="dropdown-user-header">
+            <p class="dropdown-user-name" id="dropdownUserName">Learner</p>
+            <p class="dropdown-user-email" id="dropdownUserEmail">user@example.com</p>
+          </div>
+          <hr class="dropdown-divider">
+          <a href="#" class="dropdown-item"><span class="dropdown-icon">&#x128100;</span> Profile</a>
+          <a href="#" class="dropdown-item"><span class="dropdown-icon">&#x2699;</span> Settings</a>
+          <hr class="dropdown-divider">
+          <button type="button" class="dropdown-item logout-item" id="logoutBtn">
+            <span class="dropdown-icon">&#x128682;</span> Log Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-wrap">
+      <div class="roadmap-page-header">
+        <h1 id="roadmapPageTitle">My Personalized Roadmap</h1>
+        <p id="roadmapPageSubtitle">Loading roadmap curriculum...</p>
+      </div>
+
+      <div class="timeline-wrap" id="timelineWrap">
+        <div style="text-align: center; padding: 40px; color: #888;">
+          <p>Loading your roadmap topics...</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script type="module">
+  import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+  import { syncUserWithBackend, apiRequest } from "./api.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCQ9YRQV9edVS0D-Lb6ORl9HX6E0oL4ECQ",
+    authDomain: "skillpathai-2e1c7.firebaseapp.com",
+    projectId: "skillpathai-2e1c7",
+    storageBucket: "skillpathai-2e1c7.firebasestorage.app",
+    messagingSenderId: "41899784962",
+    appId: "1:41899784962:web:1fe188cfca7f6fa7d201b"
+  };
+
+  const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // Fallback lesson explanations by keyword
+  const defaultLessonDictionary = {
+    "html": {
+      explanation: "HTML provides the structure of a webpage, while CSS controls how it looks — colors, spacing, layout.",
+      example: "<h1>Hello World</h1>\n<p style=\"color: purple;\">Styled text</p>",
+      concepts: ["Tags & elements", "The box model", "Selectors & specificity", "Flexbox & Grid basics"]
+    },
+    "javascript": {
+      explanation: "JavaScript adds logic, interactivity, and dynamic behaviors to modern web applications.",
+      example: "let count = 0;\ncount += 1;\nconsole.log(count);",
+      concepts: ["Variables (let, const)", "Data types", "Conditionals", "Loops"]
+    },
+    "function": {
+      explanation: "A function is a reusable block of code that performs a specific task. You define it once and can call it many times.",
+      example: "function greet(name) {\n  return 'Hello, ' + name + '!';\n}\ngreet('Alex');",
+      concepts: ["Function declarations", "Parameters", "Return values", "Arrow functions"]
+    },
+    "data structure": {
+      explanation: "Data structures are specialized formats for organizing, processing, retrieving, and storing data efficiently.",
+      example: "const stack = [];\nstack.push(10);\nconst top = stack.pop();",
+      concepts: ["Arrays & Objects", "Stacks & Queues", "Linked Lists", "Time & Space Complexity"]
+    },
+    "algorithm": {
+      explanation: "Algorithms are step-by-step procedures or formulas for solving a problem or performing a computation.",
+      example: "function binarySearch(arr, target) {\n  let left = 0, right = arr.length - 1;\n  while (left <= right) {\n    let mid = Math.floor((left + right) / 2);\n    if (arr[mid] === target) return mid;\n    if (arr[mid] < target) left = mid + 1;\n    else right = mid - 1;\n  }\n  return -1;\n}",
+      concepts: ["Searching & Sorting", "Recursion", "Two Pointers", "Divide and Conquer"]
+    },
+    "react": {
+      explanation: "React is a popular JavaScript library for building user interfaces out of reusable, state-driven components.",
+      example: "function Welcome({ name }) {\n  return <h1>Hello, {name}!</h1>;\n}",
+      concepts: ["Components & Props", "State with useState", "Effects with useEffect", "JSX Syntax"]
+    }
+  };
+
+  function getLessonContent(topicName) {
+    const lower = (topicName || "").toLowerCase();
+    for (const [key, val] of Object.entries(defaultLessonDictionary)) {
+      if (lower.includes(key)) {
+        return val;
+      }
+    }
+    return {
+      explanation: `Master core concepts and practical techniques for ${topicName}. Build projects and test your skills with guided exercises.`,
+      example: `// Core practice for: ${topicName}\nconsole.log("Learning ${topicName} with SkillPath AI");`,
+      concepts: ["Core Fundamentals", "Best Practices", "Hands-on Implementation", "Real-world Use Cases"]
+    };
+  }
+
+  // Sidebar Menu Toggle
+  const menuToggle = document.getElementById("menuToggle");
+  const navMenu = document.querySelector(".nav-menu");
+  if (menuToggle && navMenu) {
+    menuToggle.addEventListener("click", () => navMenu.classList.toggle("show"));
+  }
+
+  // Profile Dropdown
+  const userProfileEl = document.getElementById("userProfile");
+  const profileDropdownMenuEl = document.getElementById("profileDropdownMenu");
+  const logoutBtnEl = document.getElementById("logoutBtn");
+
+  if (userProfileEl && profileDropdownMenuEl) {
+    function closeDropdown() {
+      profileDropdownMenuEl.classList.remove("show");
+      profileDropdownMenuEl.style.display = "none";
+      userProfileEl.classList.remove("active");
+    }
+    function openDropdown() {
+      profileDropdownMenuEl.classList.add("show");
+      profileDropdownMenuEl.style.display = "block";
+      userProfileEl.classList.add("active");
+    }
+    userProfileEl.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isOpen = profileDropdownMenuEl.style.display === "block";
+      isOpen ? closeDropdown() : openDropdown();
+    });
+    document.addEventListener("click", (e) => {
+      if (!userProfileEl.contains(e.target)) closeDropdown();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeDropdown();
+    });
+  }
+
+  if (logoutBtnEl) {
+    logoutBtnEl.addEventListener("click", async (e) => {
+      e.preventDefault();
+      try {
+        await signOut(auth);
+        window.location.href = "index.html";
+      } catch (err) {
+        console.error("Sign out error:", err);
+      }
+    });
+  }
+
+  // Auth State & Data Loading
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "index.html";
+      return;
+    }
+
+    let displayName = user.displayName;
+    if (!displayName && user.email) displayName = user.email.split("@")[0];
+    displayName = displayName || "Learner";
+
+    const userNameEl = document.getElementById("userName");
+    const dropdownUserNameEl = document.getElementById("dropdownUserName");
+    const dropdownUserEmailEl = document.getElementById("dropdownUserEmail");
+    if (userNameEl) userNameEl.textContent = displayName;
+    if (dropdownUserNameEl) dropdownUserNameEl.textContent = displayName;
+    if (dropdownUserEmailEl && user.email) dropdownUserEmailEl.textContent = user.email;
+
+    try {
+      await loadRoadmapPageData();
+    } catch (err) {
+      console.error("Error loading roadmap data:", err);
+      showRoadmapError("Failed to load your roadmap from backend. Please refresh or try again.");
+    }
+  });
+
+  async function loadRoadmapPageData() {
+    const dbUser = await syncUserWithBackend();
+    if (!dbUser || !dbUser.user_id) {
+      showRoadmapError("Unable to synchronize user profile.");
+      return;
+    }
+
+    const userId = dbUser.user_id;
+
+    // Fetch user assessments for level info
+    let userLevel = localStorage.getItem("skillLevel") || "Beginner";
+    try {
+      const assessments = await apiRequest(`/assessments/${userId}`);
+      if (assessments && assessments.length > 0) {
+        userLevel = assessments[0].skill_level || userLevel;
+      }
+    } catch (e) {
+      console.warn("Could not fetch assessments:", e);
+    }
+
+    // Fetch roadmap
+    let activeRoadmap = null;
+    try {
+      const roadmaps = await apiRequest(`/roadmaps/${userId}`);
+      if (roadmaps && roadmaps.length > 0) {
+        activeRoadmap = roadmaps[0];
+      }
+    } catch (e) {
+      console.warn("Could not fetch roadmaps:", e);
+    }
+
+    const career = (activeRoadmap && activeRoadmap.career_path) ||
+                   localStorage.getItem("careerPath") ||
+                   localStorage.getItem("skillpath_career") ||
+                   (dbUser.career_goal && dbUser.career_goal !== "Not Set" ? dbUser.career_goal : "Web Development");
+
+    // Auto-create initial roadmap if missing
+    if (!activeRoadmap && career) {
+      try {
+        const created = await apiRequest("/roadmaps", {
+          method: "POST",
+          body: JSON.stringify({
+            user_id: userId,
+            career_path: career
+          })
+        });
+
+        if (created && created.roadmap_id) {
+          activeRoadmap = {
+            roadmap_id: created.roadmap_id,
+            user_id: userId,
+            career_path: career
+          };
+
+          const defaultTopics = [
+            "Programming Fundamentals",
+            "Data Structures & Basic Algorithms",
+            "Advanced Data Structures",
+            "Advanced Algorithms",
+            "System Design & Projects"
+          ];
+
+          for (let i = 0; i < defaultTopics.length; i++) {
+            await apiRequest("/topics", {
+              method: "POST",
+              body: JSON.stringify({
+                roadmap_id: created.roadmap_id,
+                topic_name: defaultTopics[i],
+                sequence_no: i + 1,
+                status: i === 0 ? "In Progress" : "Not Started"
+              })
+            });
+          }
+        }
+      } catch (err) {
+        console.warn("Auto-create roadmap error:", err);
+      }
+    }
+
+    if (!activeRoadmap) {
+      showEmptyRoadmap();
+      return;
+    }
+
+    // Set page headings
+    const titleEl = document.getElementById("roadmapPageTitle");
+    const subEl = document.getElementById("roadmapPageSubtitle");
+    if (titleEl) titleEl.textContent = `My Personalized Roadmap (${activeRoadmap.career_path || career})`;
+    if (subEl) subEl.textContent = `${activeRoadmap.career_path || career} • ${userLevel}`;
+
+    // Fetch topics
+    let topics = [];
+    try {
+      topics = await apiRequest(`/topics/${activeRoadmap.roadmap_id}`);
+    } catch (e) {
+      console.warn("Could not fetch topics:", e);
+    }
+
+    // Fetch progress
+    let progressRecords = [];
+    try {
+      progressRecords = await apiRequest(`/progress/${userId}`);
+    } catch (e) {
+      console.warn("Could not fetch progress:", e);
+    }
+
+    renderTimeline(topics, progressRecords, activeRoadmap, userId);
+  }
+
+  function showRoadmapError(msg) {
+    const wrap = document.getElementById("timelineWrap");
+    if (wrap) {
+      wrap.innerHTML = `<div style="text-align:center; padding:30px; color:#ef4444;"><p>${msg}</p></div>`;
+    }
+  }
+
+  function showEmptyRoadmap() {
+    const wrap = document.getElementById("timelineWrap");
+    if (wrap) {
+      wrap.innerHTML = `
+        <div style="text-align:center; padding:40px 20px;">
+          <h3 style="margin-bottom:8px;">No Roadmap Generated Yet</h3>
+          <p style="color:#666; margin-bottom:20px;">Take our skill assessment to unlock your custom personalized roadmap.</p>
+          <a href="asses.html" style="padding:10px 22px; background:linear-gradient(to right, #7c5cff, #a78bfa); color:white; border-radius:8px; text-decoration:none; font-weight:bold;">Take Assessment →</a>
+        </div>
+      `;
+    }
+  }
+
+  function renderTimeline(topics, progressRecords, roadmap, userId) {
+    const wrap = document.getElementById("timelineWrap");
+    if (!wrap) return;
+
+    if (!topics || topics.length === 0) {
+      showEmptyRoadmap();
+      return;
+    }
+
+    const progressMap = {};
+    if (Array.isArray(progressRecords)) {
+      progressRecords.forEach((p) => {
+        progressMap[p.topic_id] = p;
+      });
+    }
+
+    let html = "";
+    topics.forEach((t, idx) => {
+      const p = progressMap[t.topic_id];
+      const isCompleted = (t.status && t.status.toLowerCase() === "completed") ||
+                          (p && (p.completion_percentage === 100 || p.status === "Completed"));
+      const isCurrent = !isCompleted && (idx === 0 || (t.status && t.status.toLowerCase() === "in progress"));
+
+      const itemClass = isCompleted ? "completed" : (isCurrent ? "current" : "upcoming");
+      const markerSymbol = isCompleted ? "✓" : (isCurrent ? "●" : "○");
+      const statusLabel = isCompleted ? "Completed" : (isCurrent ? "In Progress" : "Upcoming");
+
+      html += `
+        <div class="timeline-item ${itemClass}" data-topic-id="${t.topic_id}" data-seq="${idx}">
+          <span class="timeline-marker">${markerSymbol}</span>
+          <div class="timeline-text">
+            <h3>${t.sequence_no}. ${t.topic_name}</h3>
+            <p>Phase ${idx + 1} • ${roadmap.career_path || "SkillPath"}</p>
+          </div>
+          <span class="timeline-status">${statusLabel}</span>
+        </div>
+        <div class="lesson-panel" id="lesson-${t.topic_id}"></div>
+      `;
+    });
+
+    wrap.innerHTML = html;
+
+    // Attach click listeners to expand accordion
+    wrap.querySelectorAll(".timeline-item").forEach((item) => {
+      item.addEventListener("click", () => {
+        const topicId = item.getAttribute("data-topic-id");
+        const panel = document.getElementById("lesson-" + topicId);
+        const isOpen = panel.classList.contains("open");
+
+        // Close all
+        wrap.querySelectorAll(".lesson-panel").forEach((p) => p.classList.remove("open"));
+
+        if (!isOpen) {
+          const topicObj = topics.find((x) => String(x.topic_id) === String(topicId));
+          const lesson = getLessonContent(topicObj ? topicObj.topic_name : "");
+
+          const topicName = topicObj ? topicObj.topic_name : "";
+          panel.innerHTML = `
+            <h4>Lesson</h4>
+            <p>${lesson.explanation}</p>
+            <code>${lesson.example}</code>
+            <h4>Key Concepts</h4>
+            <ul>${lesson.concepts.map((c) => `<li>${c}</li>`).join("")}</ul>
+            <div class="lesson-actions">
+              <a href="practice.html?topic_id=${topicId}&topic_name=${encodeURIComponent(topicName)}" class="quiz-btn">Take Quiz</a>
+              <a href="practice.html?topic_id=${topicId}&topic_name=${encodeURIComponent(topicName)}" class="practice-btn">Practice</a>
+              <button class="complete-btn" id="btn-complete-${topicId}">Mark Complete</button>
+            </div>
+          `;
+          panel.classList.add("open");
+
+          const markBtn = panel.querySelector(`#btn-complete-${topicId}`);
+          if (markBtn) {
+            markBtn.addEventListener("click", async (e) => {
+              e.stopPropagation();
+              markBtn.disabled = true;
+              markBtn.textContent = "Updating...";
+              try {
+                // Update topic status via PATCH /topics/{topic_id}
+                await apiRequest(`/topics/${topicId}`, {
+                  method: "PATCH",
+                  body: JSON.stringify({ status: "Completed" })
+                });
+
+                // Update progress record if exists or create
+                const p = progressMap[topicId];
+                if (p && p.progress_id) {
+                  await apiRequest(`/progress/${p.progress_id}`, {
+                    method: "PATCH",
+                    body: JSON.stringify({
+                      completion_percentage: 100,
+                      status: "Completed"
+                    })
+                  });
+                } else {
+                  await apiRequest("/progress", {
+                    method: "POST",
+                    body: JSON.stringify({
+                      user_id: userId,
+                      topic_id: Number(topicId),
+                      completion_percentage: 100,
+                      status: "Completed"
+                    })
+                  });
+                }
+
+                // Refresh roadmap view
+                await loadRoadmapPageData();
+              } catch (err) {
+                console.error("Failed to mark topic complete:", err);
+                alert("Could not update topic status. Please try again.");
+                markBtn.disabled = false;
+                markBtn.textContent = "Mark Complete";
+              }
+            });
+          }
+        }
+      });
+    });
+  }
+</script>
+</body>
+</html>
