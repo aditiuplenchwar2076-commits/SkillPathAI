@@ -480,6 +480,36 @@ def create_progress(progress: ProgressCreate, token: dict = Depends(verify_token
         if current_user.user_id != progress.user_id:
             raise HTTPException(status_code=403, detail="Forbidden: Cannot record progress for another user.")
 
+        # Ensure topic exists and belongs to the authenticated user's roadmap
+        topic = db.query(Topic).filter(Topic.topic_id == progress.topic_id).first()
+        if not topic:
+            raise HTTPException(status_code=404, detail="Topic not found.")
+        roadmap = db.query(Roadmap).filter(Roadmap.roadmap_id == topic.roadmap_id).first()
+        if not roadmap or roadmap.user_id != current_user.user_id:
+            raise HTTPException(status_code=403, detail="Forbidden: Cannot record progress for a topic outside your roadmap.")
+
+        # Deterministic upsert: update existing progress record if present, preserving completion semantics
+        existing = db.query(Progress).filter(
+            Progress.user_id == progress.user_id,
+            Progress.topic_id == progress.topic_id
+        ).first()
+
+        if existing:
+            if progress.status is not None:
+                # Do not downgrade an already Completed status to an incomplete one
+                if existing.status != "Completed" or progress.status == "Completed":
+                    existing.status = progress.status
+
+            if progress.completion_percentage is not None:
+                existing.completion_percentage = max(existing.completion_percentage or 0, progress.completion_percentage)
+
+            db.commit()
+            db.refresh(existing)
+            return {
+                "message": "Progress updated successfully!",
+                "progress_id": existing.progress_id
+            }
+
         new_progress = Progress(
             user_id=progress.user_id,
             topic_id=progress.topic_id,

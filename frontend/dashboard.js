@@ -413,7 +413,7 @@ function renderDashboardRoadmap(topics, progressRecords, roadmap, level) {
         completedCount++;
       } else if (statusText.toLowerCase() === "in progress" || percent > 0) {
         statusText = "In Progress";
-        if (percent === 0) percent = 45;
+        // Use authentic progress percentage from database; do not invent arbitrary numbers
         if (!firstIncompleteTopic) firstIncompleteTopic = topic;
       } else {
         statusText = "Upcoming";
