@@ -24,11 +24,20 @@ const isLocalhost = typeof window !== "undefined" && (
   window.location.hostname === ""
 );
 
-export const API_BASE_URL = (typeof window !== "undefined" && (window.__SKILLPATH_API_BASE_URL__ || window.SKILLPATH_API_BASE_URL))
-  ? (window.__SKILLPATH_API_BASE_URL__ || window.SKILLPATH_API_BASE_URL).replace(/\/$/, "")
-  : (isLocalhost ? "http://127.0.0.1:8000" : "http://127.0.0.1:8000");
+export const API_BASE_URL =
+  typeof window !== "undefined" &&
+  (window.__SKILLPATH_API_BASE_URL__ || window.SKILLPATH_API_BASE_URL)
+    ? (
+        window.__SKILLPATH_API_BASE_URL__ ||
+        window.SKILLPATH_API_BASE_URL
+      ).replace(/\/$/, "")
+    : isLocalhost
+      ? "http://127.0.0.1:8000"
+      : "https://skillpathai-jpdw.onrender.com";
+
 
 /**
+
  * Waits for Firebase auth state to resolve and returns the current user,
  * or null if unauthenticated.
  */
