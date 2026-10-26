@@ -22,19 +22,24 @@ from auth import verify_token
 
 app = FastAPI()
 
-# Configurable CORS origins supporting production deployment while keeping localhost default
+# Configurable CORS origins supporting production deployment, Vercel deployments, and localhost
 cors_origins_env = os.getenv("CORS_ORIGINS", "")
 allowed_origins = [origin.strip() for origin in cors_origins_env.split(",") if origin.strip()]
-if not allowed_origins:
-    allowed_origins = ["http://localhost:5500", "http://127.0.0.1:5500"]
-else:
-    for default_local in ["http://localhost:5500", "http://127.0.0.1:5500"]:
-        if default_local not in allowed_origins:
-            allowed_origins.append(default_local)
+
+default_origins = [
+    "http://localhost:5500",
+    "http://127.0.0.1:5500",
+    "https://skillpathai-frontend-fmhrbvpgv.vercel.app",
+    "https://skillpathai-frontend.vercel.app"
+]
+for default_origin in default_origins:
+    if default_origin not in allowed_origins:
+        allowed_origins.append(default_origin)
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
+    allow_origin_regex=r"^https:\/\/.*\.vercel\.app$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
