@@ -55,9 +55,19 @@ def home():
 @app.get("/db-test")
 def db_test():
     db = SessionLocal()
-
     try:
-        return {"message": "FastAPI connected to MySQL!"}
+        from sqlalchemy import text
+        version = db.execute(text("SELECT VERSION()")).scalar()
+        database_name = db.execute(text("SELECT DATABASE()")).scalar()
+        tables = db.execute(text("SHOW TABLES")).scalars().all()
+        return {
+            "message": "FastAPI connected to MySQL!",
+            "database": database_name,
+            "version": version,
+            "tables": tables
+        }
+    except Exception as e:
+        return {"error": str(e), "type": type(e).__name__}
     finally:
         db.close()
 
