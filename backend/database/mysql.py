@@ -8,7 +8,7 @@ load_dotenv()
 
 raw_database_url = os.getenv("DATABASE_URL")
 
-# Resolve CA certificate path: DB_SSL_CA, backend/ca.pem, or root ca.pem
+# Resolve CA certificate path: DB_SSL_CA, backend/ca.pem, or embedded project Aiven CA
 default_ca_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "ca.pem")
 if not os.path.exists(default_ca_path):
     default_ca_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ca.pem")
@@ -16,16 +16,25 @@ if not os.path.exists(default_ca_path):
 env_ca_path = os.getenv("DB_SSL_CA")
 ssl_ca_path = env_ca_path if (env_ca_path and os.path.exists(env_ca_path)) else (default_ca_path if os.path.exists(default_ca_path) else None)
 
-# Also support embedding CA cert directly in environment variable (e.g. AIVEN_CA_CERT)
-env_ca_content = os.getenv("AIVEN_CA_CERT") or os.getenv("DB_CA_CERT")
-if not ssl_ca_path and env_ca_content and env_ca_content.strip():
-    temp_ca_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "aiven_ca_runtime.pem")
+# If ca.pem is not found on container disk (e.g. omitted by gitignore in production container),
+# automatically write the embedded Aiven project CA cert to a temporary file
+if not ssl_ca_path or not os.path.exists(ssl_ca_path):
     try:
-        with open(temp_ca_path, "w", encoding="utf-8") as f:
-            f.write(env_ca_content.strip())
-        ssl_ca_path = temp_ca_path
-    except Exception as _ca_write_err:
-        print(f"Warning: unable to write runtime CA certificate: {_ca_write_err}")
+        from aiven_ca_embedded import AIVEN_CA_PEM
+    except ImportError:
+        try:
+            from backend.aiven_ca_embedded import AIVEN_CA_PEM
+        except ImportError:
+            AIVEN_CA_PEM = None
+
+    if AIVEN_CA_PEM and AIVEN_CA_PEM.strip():
+        temp_ca_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "aiven_ca_runtime.pem")
+        try:
+            with open(temp_ca_path, "w", encoding="utf-8") as f:
+                f.write(AIVEN_CA_PEM.strip())
+            ssl_ca_path = temp_ca_path
+        except Exception as _ca_write_err:
+            print(f"Warning: unable to write runtime CA certificate: {_ca_write_err}")
 
 ssl_mode = os.getenv("DB_SSL_MODE", "").lower()
 
