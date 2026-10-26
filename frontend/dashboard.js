@@ -351,11 +351,20 @@ function renderDashboardRoadmap(topics, progressRecords, roadmap, level) {
     return;
   }
 
-  // Build progress lookup map by topic_id
+  // Build progress lookup map by topic_id (taking highest completion / completed status if multiple)
   const progressMap = {};
   if (Array.isArray(progressRecords)) {
     progressRecords.forEach((p) => {
-      progressMap[p.topic_id] = p;
+      const existing = progressMap[p.topic_id];
+      if (!existing) {
+        progressMap[p.topic_id] = p;
+      } else {
+        const isNewDone = (p.status && p.status.toLowerCase() === "completed") || p.completion_percentage >= 100;
+        const isOldDone = (existing.status && existing.status.toLowerCase() === "completed") || existing.completion_percentage >= 100;
+        if (isNewDone || (!isOldDone && (p.completion_percentage || 0) > (existing.completion_percentage || 0))) {
+          progressMap[p.topic_id] = p;
+        }
+      }
     });
   }
 
@@ -392,10 +401,13 @@ function renderDashboardRoadmap(topics, progressRecords, roadmap, level) {
 
     topics.forEach((topic, idx) => {
       const p = progressMap[topic.topic_id];
-      let percent = p ? p.completion_percentage : 0;
+      let percent = p ? (p.completion_percentage || 0) : 0;
       let statusText = topic.status || "Not Started";
+      const isTopicCompleted = (statusText.toLowerCase() === "completed") ||
+                               (percent >= 100) ||
+                               (p && p.status && p.status.toLowerCase() === "completed");
 
-      if (statusText.toLowerCase() === "completed" || percent >= 100) {
+      if (isTopicCompleted) {
         percent = 100;
         statusText = "Completed";
         completedCount++;
