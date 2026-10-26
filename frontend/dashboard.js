@@ -231,9 +231,49 @@ async function loadUserDashboardData(firebaseUser) {
     console.warn("Error fetching performance data:", err);
   }
 
+  // 6. Fetch user streak and activity analytics
+  try {
+    const streakData = await apiRequest(`/analytics/streak/${userId}`);
+    if (streakData) {
+      renderStreakAndProjectMetrics(streakData);
+    }
+  } catch (err) {
+    console.warn("Error fetching streak analytics:", err);
+    renderStreakAndProjectMetrics({ streak_days: 0, completed_projects: 0, week_completed_topics: 0 });
+  }
+
   // Calculate metrics
   renderDashboardRoadmap(topics, progressRecords, activeRoadmap, level);
   await renderQuizPerformanceMetrics(topics, quizResults, performanceData);
+}
+
+function renderStreakAndProjectMetrics(streakData) {
+  const streakDays = (streakData && typeof streakData.streak_days === "number") ? streakData.streak_days : 0;
+  const completedProjects = (streakData && typeof streakData.completed_projects === "number") ? streakData.completed_projects : 0;
+  const weekCompleted = (streakData && typeof streakData.week_completed_topics === "number") ? streakData.week_completed_topics : 0;
+
+  const statDaysEl = document.getElementById("statDaysStreak");
+  if (statDaysEl) statDaysEl.textContent = streakDays;
+
+  const rightPanelStreakEl = document.getElementById("rightPanelStreak");
+  if (rightPanelStreakEl) rightPanelStreakEl.textContent = `🔥 ${streakDays} ${streakDays === 1 ? 'Day' : 'Days'}`;
+
+  const statProjectsEl = document.getElementById("statCompletedProjects");
+  if (statProjectsEl) statProjectsEl.textContent = completedProjects;
+
+  const bottomWeekEl = document.getElementById("bottomBannerWeekTopics");
+  if (bottomWeekEl) bottomWeekEl.textContent = `${weekCompleted} Topics`;
+
+  const streakDotsContainer = document.getElementById("statStreakDots");
+  if (streakDotsContainer) {
+    // Generate 7 dots representing up to 7 consecutive days in streak
+    let dotsHtml = "";
+    for (let i = 1; i <= 7; i++) {
+      const isFilled = i <= streakDays;
+      dotsHtml += `<span class="streak-dot ${isFilled ? 'filled' : ''}"></span>`;
+    }
+    streakDotsContainer.innerHTML = dotsHtml;
+  }
 }
 
 async function renderQuizPerformanceMetrics(topics, quizResults, performanceData) {
@@ -320,6 +360,7 @@ function renderEmptyRoadmapState() {
   `;
 
   updateStatMetrics(0, 0, 0);
+  renderStreakAndProjectMetrics({ streak_days: 0, completed_projects: 0, week_completed_topics: 0 });
 }
 
 function updateStatMetrics(completed, total, overallPercent) {

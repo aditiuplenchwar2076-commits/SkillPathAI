@@ -129,13 +129,13 @@
 
       <div class="mini-stat-card">
         <span class="mini-stat-icon">🔥</span>
-        <p class="mini-stat-num">4</p>
+        <p class="mini-stat-num" id="statDaysStreak">0</p>
         <p class="mini-stat-label">Days Streak</p>
-        <div class="streak-dots">
-          <span class="streak-dot filled"></span>
-          <span class="streak-dot filled"></span>
-          <span class="streak-dot filled"></span>
-          <span class="streak-dot filled"></span>
+        <div class="streak-dots" id="statStreakDots">
+          <span class="streak-dot"></span>
+          <span class="streak-dot"></span>
+          <span class="streak-dot"></span>
+          <span class="streak-dot"></span>
           <span class="streak-dot"></span>
           <span class="streak-dot"></span>
           <span class="streak-dot"></span>
@@ -144,7 +144,7 @@
 
       <div class="mini-stat-card">
         <span class="mini-stat-icon">📁</span>
-        <p class="mini-stat-num">2</p>
+        <p class="mini-stat-num" id="statCompletedProjects">0</p>
         <p class="mini-stat-label">Projects Completed</p>
       </div>
 
@@ -400,7 +400,7 @@
         <span class="stat-icon">📅</span>
         <div>
           <p class="stat-label">This Week</p>
-          <p class="stat-value">12/20 Topics</p>
+          <p class="stat-value" id="bottomBannerWeekTopics">0 Topics</p>
         </div>
       </div>
       <a href="roadmap.html" class="continue-btn">Continue Learning →</a>
@@ -426,7 +426,7 @@
           <p class="stat-desc">Completed</p>
         </div>
         <div class="stat-box">
-          <p class="stat-num">🔥 4 Days</p>
+          <p class="stat-num" id="rightPanelStreak">🔥 0 Days</p>
           <p class="stat-desc">Current Streak</p>
         </div>
         <div class="stat-box">

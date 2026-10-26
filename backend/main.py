@@ -941,4 +941,65 @@ def get_performance(user_id: int, token: dict = Depends(verify_token)):
     finally:
 
         db.close()
+
+
+@app.get("/analytics/streak/{user_id}")
+def get_user_streak(user_id: int, token: dict = Depends(verify_token)):
+    db = SessionLocal()
+
+    try:
+        current_user = get_authenticated_user(token, db)
+        if current_user.user_id != user_id:
+            raise HTTPException(status_code=403, detail="Forbidden: Cannot view streak of another user.")
+
+        # Query genuine qualifying learning activity timestamps for this user:
+        # 1. Topic progress updates
+        # 2. Topic quiz completions
+        # 3. Assessment completions
+        progress_timestamps = db.query(Progress.last_updated).filter(Progress.user_id == user_id).all()
+        quiz_timestamps = db.query(QuizResult.completed_at).filter(QuizResult.user_id == user_id).all()
+        assessment_timestamps = db.query(Assessment.completed_at).filter(Assessment.user_id == user_id).all()
+
+        import datetime
+        active_dates = set()
+        for row in progress_timestamps + quiz_timestamps + assessment_timestamps:
+            ts = row[0]
+            if ts:
+                # Normalize timestamp to date
+                active_dates.add(ts.date())
+
+        sorted_dates = sorted(active_dates, reverse=True)
+        today = datetime.date.today()
+
+        streak = 0
+        if sorted_dates:
+            most_recent = sorted_dates[0]
+            # Streak is active if user had qualifying learning activity today or yesterday
+            if most_recent >= today - datetime.timedelta(days=1):
+                expected_date = most_recent
+                for d in sorted_dates:
+                    if d == expected_date:
+                        streak += 1
+                        expected_date = d - datetime.timedelta(days=1)
+                    else:
+                        break
+
+        # Calculate this week's topics completed count for authenticated user
+        week_start = today - datetime.timedelta(days=today.weekday()) # Monday of current week
+        week_completed_count = db.query(Progress).filter(
+            Progress.user_id == user_id,
+            Progress.status == "Completed",
+            Progress.last_updated >= week_start
+        ).count()
+
+        return {
+            "user_id": user_id,
+            "streak_days": streak,
+            "active_dates_count": len(sorted_dates),
+            "completed_projects": 0,  # Zero by default until authenticated user completes dedicated project modules
+            "week_completed_topics": week_completed_count
+        }
+
+    finally:
+        db.close()
    

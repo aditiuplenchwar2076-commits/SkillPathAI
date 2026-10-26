@@ -9,6 +9,7 @@ Tests:
 """
 
 import unittest
+import datetime
 from decimal import Decimal
 
 
@@ -187,6 +188,85 @@ class TestDatabaseUpsertAndIntegrity(unittest.TestCase):
 
         self.assertEqual(updated_status, "Completed")
         self.assertEqual(updated_pct, 100)
+
+
+def calculate_streak(active_dates, reference_date):
+    """
+    Computes consecutive active days based on authentic activity dates.
+    Streak requires activity today or yesterday relative to reference_date.
+    """
+    import datetime
+    if not active_dates:
+        return 0
+
+    sorted_dates = sorted(set(active_dates), reverse=True)
+    today = reference_date
+
+    most_recent = sorted_dates[0]
+    if most_recent < today - datetime.timedelta(days=1):
+        return 0
+
+    streak = 0
+    expected_date = most_recent
+    for d in sorted_dates:
+        if d == expected_date:
+            streak += 1
+            expected_date = d - datetime.timedelta(days=1)
+        else:
+            break
+    return streak
+
+
+class TestStreakCalculation(unittest.TestCase):
+    import datetime
+
+    def test_new_user_has_zero_streak(self):
+        today = datetime.date(2026, 10, 26)
+        streak = calculate_streak([], today)
+        self.assertEqual(streak, 0)
+
+    def test_single_activity_today_gives_one_day_streak(self):
+        import datetime
+        today = datetime.date(2026, 10, 26)
+        streak = calculate_streak([today], today)
+        self.assertEqual(streak, 1)
+
+    def test_activity_yesterday_gives_one_day_streak(self):
+        import datetime
+        today = datetime.date(2026, 10, 26)
+        yesterday = today - datetime.timedelta(days=1)
+        streak = calculate_streak([yesterday], today)
+        self.assertEqual(streak, 1)
+
+    def test_activity_two_days_ago_broken_streak(self):
+        import datetime
+        today = datetime.date(2026, 10, 26)
+        two_days_ago = today - datetime.timedelta(days=2)
+        streak = calculate_streak([two_days_ago], today)
+        self.assertEqual(streak, 0)
+
+    def test_consecutive_four_days(self):
+        import datetime
+        today = datetime.date(2026, 10, 26)
+        dates = [
+            today,
+            today - datetime.timedelta(days=1),
+            today - datetime.timedelta(days=2),
+            today - datetime.timedelta(days=3)
+        ]
+        streak = calculate_streak(dates, today)
+        self.assertEqual(streak, 4)
+
+    def test_gap_in_dates_stops_streak(self):
+        import datetime
+        today = datetime.date(2026, 10, 26)
+        dates = [
+            today,
+            today - datetime.timedelta(days=1),
+            today - datetime.timedelta(days=3) # Gap on day 2
+        ]
+        streak = calculate_streak(dates, today)
+        self.assertEqual(streak, 2)
 
 
 if __name__ == "__main__":
