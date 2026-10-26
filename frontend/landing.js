@@ -16,17 +16,28 @@ const auth = getAuth(app);
 
 // Dynamic Authentication State Handler for Topbar
 const navAuthBtn = document.getElementById("navAuthBtn");
+const navDashboardLink = document.getElementById("navDashboardLink");
 
 onAuthStateChanged(auth, (user) => {
-  if (navAuthBtn) {
-    if (user) {
-      navAuthBtn.textContent = "Dashboard";
-      navAuthBtn.href = "dashboard.html";
-      navAuthBtn.classList.remove("btn-ghost");
-      navAuthBtn.classList.add("btn-primary");
-    } else {
+  if (user) {
+    if (navDashboardLink) navDashboardLink.style.display = "inline-block";
+    if (navAuthBtn) {
+      navAuthBtn.textContent = "Log out";
+      navAuthBtn.href = "#";
+      navAuthBtn.classList.remove("btn-primary");
+      navAuthBtn.classList.add("btn-ghost");
+      navAuthBtn.onclick = async (e) => {
+        e.preventDefault();
+        await signOut(auth);
+        window.location.href = "index.html";
+      };
+    }
+  } else {
+    if (navDashboardLink) navDashboardLink.style.display = "none";
+    if (navAuthBtn) {
       navAuthBtn.textContent = "Log in";
       navAuthBtn.href = "login.html";
+      navAuthBtn.onclick = null;
       navAuthBtn.classList.remove("btn-primary");
       navAuthBtn.classList.add("btn-ghost");
     }

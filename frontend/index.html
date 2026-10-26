@@ -2,109 +2,417 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SkillPath AI | Choose your career path</title>
-  <link rel="stylesheet" href="landing.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillPath AI | Your Career Goals. Your Personalized Learning Path.</title>
+  <meta name="description" content="AI-powered personalized learning platform that maps your target career, assesses your skills, provides step-by-step curriculum roadmaps, and guides your journey.">
+  <link rel="stylesheet" href="landing-page.css">
 </head>
 <body>
 
-  <!-- TOP BAR -->
-  <header class="topbar">
-    <a class="logo" href="index.html">
-      <span class="logo-icon">🚀</span>
-      <span class="logo-text">
-        <strong>SkillPath <em>AI</em></strong>
-        <small>Learn. Practice. Get Placed.</small>
-      </span>
-    </a>
-    <nav>
-      <a href="#careers">Careers</a>
-      <a href="#how">How it works</a>
-      <a href="login.html" class="btn btn-ghost" id="navAuthBtn">Log in</a>
-    </nav>
+  <!-- Top Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="logo">
+        <span class="logo-icon">🚀</span>
+        <div class="logo-text">
+          <h1>SkillPath <span class="highlight-ai">AI</span></h1>
+          <p>Learn. Practice. Get Placed.</p>
+        </div>
+      </a>
+
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle navigation menu">☰</button>
+
+      <nav class="nav-menu" id="navMenu">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="#about" class="nav-link">About</a>
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#how" class="nav-link">How It Works</a>
+        <a href="#preview" class="nav-link">Platform</a>
+        <a href="home.html" class="nav-link">Explore Careers</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="login.html" class="btn btn-ghost" id="navAuthBtn">Log in</a>
+        <a href="login.html?signup=true" class="btn btn-primary" id="navGetStartedBtn">Get Started</a>
+      </div>
+    </div>
   </header>
 
-  <!-- HERO -->
-  <section class="hero">
-    <h1>Pick a career. We'll build the path.</h1>
-    <p>Choose the role you want, take a short skill check, and get a roadmap made for your level.</p>
-    <a href="#careers" class="btn btn-primary">Choose my career</a>
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container hero-grid">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span>✨</span> AI-Driven EdTech Platform
+        </div>
+        <h1 class="hero-title">
+          Your Career Goals. <br>
+          <span class="gradient-text">Your Personalized Learning Path.</span>
+        </h1>
+        <p class="hero-description">
+          SkillPath AI helps learners identify their target career, assess existing skills, follow custom step-by-step curriculum roadmaps, and practice with real-time AI guidance.
+        </p>
+
+        <div class="hero-actions">
+          <a href="login.html?signup=true" class="btn btn-primary btn-lg">Get Started Free →</a>
+          <a href="#features" class="btn btn-secondary btn-lg">Explore Features</a>
+        </div>
+
+        <div class="hero-features-list">
+          <span>✓ Skill Placement Checks</span>
+          <span>✓ Custom Roadmaps</span>
+          <span>✓ Interactive AI Tutoring</span>
+        </div>
+      </div>
+
+      <!-- Hero Visual Card -->
+      <div class="hero-mockup-wrap">
+        <div class="mockup-card">
+          <div class="mockup-header">
+            <span class="mockup-dot red"></span>
+            <span class="mockup-dot yellow"></span>
+            <span class="mockup-dot green"></span>
+            <span style="font-size: 0.8rem; font-weight: 600; color: #64748b; margin-left: 8px;">skillpath.ai/dashboard</span>
+          </div>
+          <div class="mockup-body">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+              <div>
+                <h4 style="font-size: 1.1rem; color: #0f172a;">Web Development Track</h4>
+                <p style="font-size: 0.82rem; color: #64748b;">Intermediate Level • Personalized</p>
+              </div>
+              <span style="background: #eef2ff; color: #4f46e5; font-size: 0.8rem; font-weight: 700; padding: 4px 10px; border-radius: 6px;">Active Roadmap</span>
+            </div>
+
+            <div class="mockup-roadmap-step">
+              <span class="mockup-step-icon">📘</span>
+              <div class="mockup-step-info">
+                <h4>1. Modern Frontend Architecture</h4>
+                <p>Component hierarchy, state flows & modular design</p>
+              </div>
+            </div>
+
+            <div class="mockup-roadmap-step active">
+              <span class="mockup-step-icon">⚡</span>
+              <div class="mockup-step-info">
+                <h4>2. Asynchronous State & APIs</h4>
+                <p>RESTful client calls, error boundaries & promises</p>
+              </div>
+            </div>
+
+            <div class="mockup-roadmap-step">
+              <span class="mockup-step-icon">🚀</span>
+              <div class="mockup-step-info">
+                <h4>3. Full-Stack Data Integration</h4>
+                <p>FastAPI connection, relational models & deployment</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mockup-floating-badge">
+          <span class="badge-icon">🎯</span>
+          <div class="badge-text">
+            <h5>AI Diagnostic Score</h5>
+            <p>Adaptive Placement Ready</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 
-  <!-- CAREER SELECTION -->
-  <section id="careers" class="section">
-    <h2>Choose your career path</h2>
-    <p class="sub">Select one. You can change it later from your dashboard.</p>
+  <!-- About Section -->
+  <section class="section section-alt" id="about">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-content">
+          <span class="section-tag">About SkillPath AI</span>
+          <h2 class="section-title">Built for Students and Ambitious Career Starters</h2>
+          <p>
+            Self-taught developers and learners frequently face tutorial burnout and scattered video playlists that don't match their current abilities.
+          </p>
+          <p>
+            SkillPath AI solves the fragmentation problem by diagnosing what you already know and constructing a structured, sequential curriculum explicitly tailored to your target industry position.
+          </p>
+          <ul class="about-points">
+            <li><span>✓</span> Diagnoses skill gaps with dynamic multiple-choice assessments.</li>
+            <li><span>✓</span> Replaces aimless browsing with step-by-step milestone progression.</li>
+            <li><span>✓</span> Explains intricate concepts on demand using conversational AI tutoring.</li>
+            <li><span>✓</span> Real-time streak tracking keeps daily study habits consistent.</li>
+          </ul>
+        </div>
 
-    <div class="career-grid" id="careerGrid">
-      <button class="career-card" data-career="Web Developer">
-        <span class="icon">🌐</span><h3>Web Developer</h3><p>HTML, CSS, JavaScript, React</p>
-      </button>
-      <button class="career-card" data-career="Data Analyst">
-        <span class="icon">📊</span><h3>Data Analyst</h3><p>Excel, SQL, Power BI</p>
-      </button>
-      <button class="career-card" data-career="Data Scientist">
-        <span class="icon">🧪</span><h3>Data Scientist</h3><p>Python, statistics, ML</p>
-      </button>
-      <button class="career-card" data-career="AI / ML Engineer">
-        <span class="icon">🤖</span><h3>AI / ML Engineer</h3><p>Deep learning, model building</p>
-      </button>
-      <button class="career-card" data-career="Cybersecurity Analyst">
-        <span class="icon">🔒</span><h3>Cybersecurity Analyst</h3><p>Networks, threats, defence</p>
-      </button>
-      <button class="career-card" data-career="UI/UX Designer">
-        <span class="icon">🎨</span><h3>UI/UX Designer</h3><p>Figma, research, prototyping</p>
-      </button>
-      <button class="career-card" data-career="Cloud Engineer">
-        <span class="icon">☁️</span><h3>Cloud Engineer</h3><p>AWS, Linux, DevOps basics</p>
-      </button>
-      <button class="career-card" data-career="Mobile App Developer">
-        <span class="icon">📱</span><h3>Mobile App Developer</h3><p>Android, Flutter, React Native</p>
-      </button>
-      <button class="career-card" data-career="Software Engineer">
-        <span class="icon">💻</span><h3>Software Engineer</h3><p>DSA, OOP, system design</p>
-      </button>
-    </div>
-
-    <div class="selection-bar" id="selectionBar">
-      <p id="selectionText">No career selected yet</p>
-      <button class="btn btn-primary" id="continueBtn" disabled>Start skill assessment</button>
+        <div class="about-card-box">
+          <h3 class="box-title">Why SkillPath AI Works</h3>
+          <div class="box-item">
+            <div class="box-item-icon">🎯</div>
+            <div>
+              <h4 style="font-size: 1rem; color: #0f172a;">Focused Direction</h4>
+              <p style="font-size: 0.85rem; color: #64748b;">No more wondering what to learn next; every day has a defined topic.</p>
+            </div>
+          </div>
+          <div class="box-item">
+            <div class="box-item-icon">🧠</div>
+            <div>
+              <h4 style="font-size: 1rem; color: #0f172a;">Gemini-Powered Clarifications</h4>
+              <p style="font-size: 0.85rem; color: #64748b;">Get concise, pedagogical explanations with live code snippets.</p>
+            </div>
+          </div>
+          <div class="box-item">
+            <div class="box-item-icon">📊</div>
+            <div>
+              <h4 style="font-size: 1rem; color: #0f172a;">Verifiable Milestones</h4>
+              <p style="font-size: 0.85rem; color: #64748b;">Topic quizzes confirm mastery before unlocking advanced curriculum.</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
-  <!-- HOW IT WORKS -->
-  <section id="how" class="section alt">
-    <h2>How it works</h2>
-    <ol class="steps">
-      <li><h3>Take the assessment</h3><p>A short quiz shows where you stand today.</p></li>
-      <li><h3>See your level</h3><p>You're placed at Beginner, Intermediate or Advanced.</p></li>
-      <li><h3>Follow your roadmap</h3><p>Learn, practise and build projects in order.</p></li>
-      <li><h3>Get job-ready</h3><p>Practise interviews and track your readiness.</p></li>
-    </ol>
+  <!-- Features Section -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Platform Features</span>
+        <h2 class="section-title">Everything You Need to Master Your Tech Career</h2>
+        <p class="section-subtitle">Real capabilities designed to guide you from foundational knowledge to professional fluency.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon-wrap">🌐</div>
+          <h3>Career Exploration</h3>
+          <p>Explore in-demand roles including Web Developer, Data Analyst, Cloud Engineer, Cybersecurity, and AI/ML Engineer with role-specific skill targets.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-wrap">📝</div>
+          <h3>Diagnostic Skill Assessment</h3>
+          <p>Take an initial multi-topic assessment to determine whether your baseline is Beginner, Intermediate, or Advanced.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-wrap">🗺️</div>
+          <h3>Personalized Curriculum Roadmaps</h3>
+          <p>Follow a sequenced timeline of topics broken down into digestible phases, ensuring prerequisites are mastered first.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-wrap">🤖</div>
+          <h3>AI Tutoring & Chat Assistant</h3>
+          <p>Stuck on an algorithm or concept? The integrated Gemini assistant breaks down complex code directly in your dashboard.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-wrap">✅</div>
+          <h3>Topic Quizzes & Knowledge Checks</h3>
+          <p>Validate your understanding after completing modules with authentic quiz evaluations that record your progress.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-wrap">🔥</div>
+          <h3>Streak Tracking & Progress Analytics</h3>
+          <p>Measure weekly learning consistency, consecutive active day streaks, and overall roadmap completion percentages.</p>
+        </div>
+      </div>
+    </div>
   </section>
 
-  <footer>© 2026 SkillPath AI</footer>
+  <!-- How It Works Section -->
+  <section class="section section-alt" id="how">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Visual Flow</span>
+        <h2 class="section-title">How SkillPath AI Works</h2>
+        <p class="section-subtitle">A proven 6-step journey from onboarding to career confidence.</p>
+      </div>
 
-  <!-- CHATBOT (this page only) -->
-  <button class="chat-toggle" id="chatToggle" aria-label="Open chat">💬</button>
+      <div class="steps-container">
+        <div class="step-card">
+          <span class="step-number">1</span>
+          <h3>Create an Account</h3>
+          <p>Sign up securely with email or Google to initialize your personal learning database profile.</p>
+        </div>
 
-  <div class="chat-window" id="chatWindow" hidden>
-    <div class="chat-head">
-      <strong>SkillPath Assistant</strong>
-      <button id="chatClose" aria-label="Close chat">✕</button>
-    </div>
-    <div class="chat-body" id="chatBody"></div>
-    <div class="chat-quick" id="chatQuick">
-      <button>Which career should I pick?</button>
-      <button>How does the assessment work?</button>
-      <button>Is SkillPath free?</button>
-    </div>
-    <div class="chat-input">
-      <input type="text" id="chatInput" placeholder="Ask about careers..." autocomplete="off">
-      <button id="chatSend">Send</button>
-    </div>
-  </div>
+        <div class="step-card">
+          <span class="step-number">2</span>
+          <h3>Choose Target Career</h3>
+          <p>Select your goal from Web Development, Data Science, AI/ML, Cloud, Security, or Software Engineering.</p>
+        </div>
 
-  <script type="module" src="landing.js"></script>
+        <div class="step-card">
+          <span class="step-number">3</span>
+          <h3>Skill Assessment</h3>
+          <p>Complete a tailored diagnostic check to pinpoint your existing strengths and knowledge level.</p>
+        </div>
+
+        <div class="step-card">
+          <span class="step-number">4</span>
+          <h3>Generate Roadmap</h3>
+          <p>Receive an authentic, phased roadmap customized specifically to fill your detected skill gaps.</p>
+        </div>
+
+        <div class="step-card">
+          <span class="step-number">5</span>
+          <h3>Learn & Practice</h3>
+          <p>Study structured lessons, ask the AI assistant for guidance, and complete knowledge quizzes.</p>
+        </div>
+
+        <div class="step-card">
+          <span class="step-number">6</span>
+          <h3>Track & Excel</h3>
+          <p>Watch your progress metrics rise, sustain daily streaks, and prepare for placement.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Product Preview Section -->
+  <section class="section" id="preview">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Inside the Platform</span>
+        <h2 class="section-title">Designed for Everyday Productivity</h2>
+        <p class="section-subtitle">A cohesive interface providing full visibility into your learning momentum.</p>
+      </div>
+
+      <div class="preview-card">
+        <div class="preview-nav">
+          <button class="preview-tab active">Overview Dashboard</button>
+          <button class="preview-tab" onclick="window.location.href='home.html'">Explore Career Catalog →</button>
+        </div>
+        <div class="preview-content">
+          <div class="preview-details">
+            <h3>Unified Student Dashboard</h3>
+            <p>
+              Your personal hub consolidates active roadmap phases, today's focus goals, diagnostic recommendations, and verifiable completion rates calculated from your quiz submissions.
+            </p>
+            <div class="preview-stats-row">
+              <div class="preview-stat-box">
+                <div class="stat-val">100%</div>
+                <div class="stat-label">Authentic Metrics</div>
+              </div>
+              <div class="preview-stat-box">
+                <div class="stat-val">Live</div>
+                <div class="stat-label">FastAPI Engine</div>
+              </div>
+              <div class="preview-stat-box">
+                <div class="stat-val">24/7</div>
+                <div class="stat-label">AI Tutor</div>
+              </div>
+            </div>
+          </div>
+          <div class="preview-visual-box">
+            <div class="vis-icon">📊</div>
+            <h4 style="color: #0f172a; margin-bottom: 6px;">Connected Experience</h4>
+            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 16px;">Seamless transition between roadmaps, interactive practice sessions, and interview preparation.</p>
+            <a href="login.html" class="btn btn-secondary">Preview In Action →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Benefits Section -->
+  <section class="section section-alt" id="benefits">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Tangible Advantages</span>
+        <h2 class="section-title">Why Learners Choose SkillPath AI</h2>
+        <p class="section-subtitle">Real structure leads to real placement outcomes.</p>
+      </div>
+
+      <div class="benefits-grid">
+        <div class="benefit-card">
+          <h4>🎯 No Resource Overload</h4>
+          <p>Curated learning sequences replace fragmented YouTube searches and conflicting tutorials.</p>
+        </div>
+
+        <div class="benefit-card">
+          <h4>⏱️ Fast-Tracked Progression</h4>
+          <p>Diagnostic testing allows intermediate students to bypass basics and start right at their growth edge.</p>
+        </div>
+
+        <div class="benefit-card">
+          <h4>🤖 Instant Clarifications</h4>
+          <p>Interactive AI explanations mean you never spend hours blocked on a single tricky syntax or design pattern.</p>
+        </div>
+
+        <div class="benefit-card">
+          <h4>📈 Proof of Consistency</h4>
+          <p>Activity streaks and completed topic analytics provide verifiable records of continuous learning.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final Call to Action -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-box">
+        <h2>Ready to Build Your Career Path?</h2>
+        <p>Join SkillPath AI today. Choose your target role, take your quick skill assessment, and unlock your personal learning roadmap.</p>
+        <div class="cta-actions">
+          <a href="login.html?signup=true" class="btn btn-primary btn-lg">Get Started Free →</a>
+          <a href="home.html" class="btn btn-secondary btn-lg">Browse In-App Careers</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="logo">
+            <span class="logo-icon">🚀</span>
+            <div class="logo-text">
+              <h2>SkillPath <span class="highlight-ai" style="color:#06b6d4;">AI</span></h2>
+            </div>
+          </div>
+          <p>Personalized learning roadmaps, adaptive skill assessments, and AI guidance to help learners fast-track their tech careers.</p>
+        </div>
+
+        <div class="footer-column">
+          <h4>Platform</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#how">How It Works</a></li>
+            <li><a href="home.html">Career Catalog</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-column">
+          <h4>Application</h4>
+          <ul>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="login.html?signup=true">Sign Up</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="roadmap.html">Roadmap</a></li>
+            <li><a href="practice.html">Practice & Learn</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-column">
+          <h4>Technology</h4>
+          <ul>
+            <li><a href="#">FastAPI Backend</a></li>
+            <li><a href="#">Aiven Cloud MySQL</a></li>
+            <li><a href="#">Firebase Authentication</a></li>
+            <li><a href="#">Google Gemini AI</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>© 2026 SkillPath AI. All rights reserved. Empowering learners worldwide.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="landing-page.js"></script>
 </body>
 </html>

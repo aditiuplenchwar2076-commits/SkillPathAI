@@ -29,31 +29,53 @@ const signupLink = document.getElementById("signupLink");
 const welcomeHeading = document.querySelector(".welcome-heading");
 const welcomeSubtext = document.querySelector(".welcome-subtext");
 const loginButton = document.querySelector(".login-btn");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
 
-signupLink.addEventListener("click", (event) => {
-  event.preventDefault();
-  isSignupMode = !isSignupMode;
+function setSignupMode(signup) {
+  isSignupMode = signup;
+  if (welcomeHeading) {
+    welcomeHeading.textContent = isSignupMode
+      ? "Create Account ✨"
+      : "Welcome Back 👋";
+  }
+  if (welcomeSubtext) {
+    welcomeSubtext.textContent = isSignupMode
+      ? "Create your SkillPath AI account"
+      : "Login to continue your learning journey";
+  }
+  if (loginButton) {
+    loginButton.textContent = isSignupMode ? "Sign Up" : "Login";
+  }
+  if (signupLink) {
+    signupLink.textContent = isSignupMode ? "Login" : "Sign up";
+  }
 
-  welcomeHeading.textContent = isSignupMode
-    ? "Create Account ✨"
-    : "Welcome Back 👋";
-
-  welcomeSubtext.textContent = isSignupMode
-    ? "Create your SkillPath AI account"
-    : "Login to continue your learning journey";
-
-  loginButton.textContent = isSignupMode ? "Sign Up" : "Login";
-  signupLink.textContent = isSignupMode ? "Login" : "Sign up";
-
-  document.querySelector(".signup-text").firstChild.textContent =
-    isSignupMode
+  const signupTextContainer = document.querySelector(".signup-text");
+  if (signupTextContainer && signupTextContainer.firstChild) {
+    signupTextContainer.firstChild.textContent = isSignupMode
       ? "Already have an account? "
       : "Don't have an account? ";
+  }
 
-  passwordInput.autocomplete = isSignupMode
-    ? "new-password"
-    : "current-password";
-});
+  if (passwordInput) {
+    passwordInput.autocomplete = isSignupMode
+      ? "new-password"
+      : "current-password";
+  }
+}
+
+// Auto-switch to signup if URL contains ?signup=true
+if (typeof window !== "undefined" && window.location.search.includes("signup=true")) {
+  setSignupMode(true);
+}
+
+if (signupLink) {
+  signupLink.addEventListener("click", (event) => {
+    event.preventDefault();
+    setSignupMode(!isSignupMode);
+  });
+}
 
 const loginForm = document.querySelector(".login-form");
 const emailInput = document.getElementById("email");
@@ -118,7 +140,7 @@ loginForm.addEventListener("submit", async (event) => {
       localStorage.removeItem("skillpath_level");
       localStorage.removeItem("skillpath_route");
       localStorage.removeItem("skillpath_score");
-      window.location.href = "landing.html";
+      window.location.href = "home.html";
     } else {
       // Temporary fallback check for existing users:
       // Limitation: Until backend profile checking is integrated, an existing user logging in
@@ -128,7 +150,7 @@ loginForm.addEventListener("submit", async (event) => {
       if (hasOnboarding) {
         window.location.href = "dashboard.html";
       } else {
-        window.location.href = "landing.html";
+        window.location.href = "home.html";
       }
     }
 
