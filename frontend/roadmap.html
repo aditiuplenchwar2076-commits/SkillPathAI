@@ -323,26 +323,20 @@
 
     const userId = dbUser.user_id;
 
-    // Fetch user assessments for level info
+    // Fetch assessments and roadmaps in parallel
     let userLevel = localStorage.getItem("skillLevel") || "Beginner";
-    try {
-      const assessments = await apiRequest(`/assessments/${userId}`);
-      if (assessments && assessments.length > 0) {
-        userLevel = assessments[0].skill_level || userLevel;
-      }
-    } catch (e) {
-      console.warn("Could not fetch assessments:", e);
-    }
-
-    // Fetch roadmap
     let activeRoadmap = null;
-    try {
-      const roadmaps = await apiRequest(`/roadmaps/${userId}`);
-      if (roadmaps && roadmaps.length > 0) {
-        activeRoadmap = roadmaps[0];
-      }
-    } catch (e) {
-      console.warn("Could not fetch roadmaps:", e);
+
+    const [assessmentsRes, roadmapsRes] = await Promise.allSettled([
+      apiRequest(`/assessments/${userId}`),
+      apiRequest(`/roadmaps/${userId}`)
+    ]);
+
+    if (assessmentsRes.status === "fulfilled" && assessmentsRes.value && assessmentsRes.value.length > 0) {
+      userLevel = assessmentsRes.value[0].skill_level || userLevel;
+    }
+    if (roadmapsRes.status === "fulfilled" && roadmapsRes.value && roadmapsRes.value.length > 0) {
+      activeRoadmap = roadmapsRes.value[0];
     }
 
     const career = (activeRoadmap && activeRoadmap.career_path) ||
@@ -404,21 +398,14 @@
     if (titleEl) titleEl.textContent = `My Personalized Roadmap (${activeRoadmap.career_path || career})`;
     if (subEl) subEl.textContent = `${activeRoadmap.career_path || career} • ${userLevel}`;
 
-    // Fetch topics
-    let topics = [];
-    try {
-      topics = await apiRequest(`/topics/${activeRoadmap.roadmap_id}`);
-    } catch (e) {
-      console.warn("Could not fetch topics:", e);
-    }
+    // Fetch topics and progress in parallel
+    const [topicsRes, progressRes] = await Promise.allSettled([
+      apiRequest(`/topics/${activeRoadmap.roadmap_id}`),
+      apiRequest(`/progress/${userId}`)
+    ]);
 
-    // Fetch progress
-    let progressRecords = [];
-    try {
-      progressRecords = await apiRequest(`/progress/${userId}`);
-    } catch (e) {
-      console.warn("Could not fetch progress:", e);
-    }
+    const topics = topicsRes.status === "fulfilled" ? (topicsRes.value || []) : [];
+    const progressRecords = progressRes.status === "fulfilled" ? (progressRes.value || []) : [];
 
     renderTimeline(topics, progressRecords, activeRoadmap, userId);
   }

@@ -1002,4 +1002,175 @@ def get_user_streak(user_id: int, token: dict = Depends(verify_token)):
 
     finally:
         db.close()
+
+
+@app.get("/dashboard/overview")
+def get_dashboard_overview(token: dict = Depends(verify_token)):
+    """
+    Consolidated single-roundtrip endpoint for the dashboard.
+    Returns user info, latest assessment, active roadmap with topics,
+    progress records, streak analytics, and performance in one fast query.
+    Reduces 8 separate HTTP roundtrips down to 1.
+    """
+    import datetime
+    db = SessionLocal()
+    try:
+        user = get_authenticated_user(token, db)
+        user_id = user.user_id
+
+        # 1. Latest assessment
+        latest_assessment = (
+            db.query(Assessment)
+            .filter(Assessment.user_id == user_id)
+            .order_by(Assessment.assessment_id.desc())
+            .first()
+        )
+
+        # 2. Roadmaps
+        roadmaps = (
+            db.query(Roadmap)
+            .filter(Roadmap.user_id == user_id)
+            .order_by(Roadmap.roadmap_id.desc())
+            .all()
+        )
+        active_roadmap = roadmaps[0] if roadmaps else None
+
+        # 3. Topics for active roadmap
+        topics = []
+        if active_roadmap:
+            topics = (
+                db.query(Topic)
+                .filter(Topic.roadmap_id == active_roadmap.roadmap_id)
+                .order_by(Topic.sequence_no.asc())
+                .all()
+            )
+
+        # 4. Progress records
+        progress_records = (
+            db.query(Progress)
+            .filter(Progress.user_id == user_id)
+            .all()
+        )
+
+        # 5. Quiz results
+        quiz_results = (
+            db.query(QuizResult)
+            .filter(QuizResult.user_id == user_id)
+            .order_by(QuizResult.completed_at.desc())
+            .all()
+        )
+
+        # 6. Streak analytics
+        progress_timestamps = [p.last_updated for p in progress_records if p.last_updated]
+        quiz_timestamps = [q.completed_at for q in quiz_results if q.completed_at]
+        assessment_timestamps = [a.completed_at for a in [latest_assessment] if a and a.completed_at]
+
+        active_dates = set()
+        for ts in progress_timestamps + quiz_timestamps + assessment_timestamps:
+            if ts:
+                active_dates.add(ts.date())
+
+        sorted_dates = sorted(active_dates, reverse=True)
+        today = datetime.date.today()
+        streak = 0
+        if sorted_dates:
+            most_recent = sorted_dates[0]
+            if most_recent >= today - datetime.timedelta(days=1):
+                expected_date = most_recent
+                for d in sorted_dates:
+                    if d == expected_date:
+                        streak += 1
+                        expected_date = d - datetime.timedelta(days=1)
+                    else:
+                        break
+
+        week_start = today - datetime.timedelta(days=today.weekday())
+        week_completed_count = sum(
+            1 for p in progress_records
+            if p.status == "Completed" and p.last_updated and p.last_updated.date() >= week_start
+        )
+
+        # 7. Performance breakdown
+        topic_data = {}
+        for r in quiz_results:
+            if r.topic_id not in topic_data:
+                topic_data[r.topic_id] = {"total_percentage": 0, "attempts": 0}
+            pct = (float(r.score) / r.total_questions) * 100 if r.total_questions > 0 else 0
+            topic_data[r.topic_id]["total_percentage"] += pct
+            topic_data[r.topic_id]["attempts"] += 1
+
+        performance = []
+        for topic_id, data in topic_data.items():
+            avg = data["total_percentage"] / data["attempts"]
+            performance.append({
+                "topic_id": topic_id,
+                "average_percentage": round(avg, 2),
+                "attempts": data["attempts"],
+                "performance_level": "Good" if avg >= 75 else ("Needs Improvement" if avg >= 50 else "Weak"),
+                "needs_practice": avg < 75
+            })
+
+        return {
+            "user": {
+                "user_id": user.user_id,
+                "name": user.name,
+                "email": user.email,
+                "firebase_uid": user.firebase_uid,
+                "career_goal": user.career_goal
+            },
+            "latest_assessment": {
+                "assessment_id": latest_assessment.assessment_id,
+                "skill_level": latest_assessment.skill_level,
+                "score": latest_assessment.score,
+                "completed_at": latest_assessment.completed_at.isoformat() if latest_assessment.completed_at else None
+            } if latest_assessment else None,
+            "active_roadmap": {
+                "roadmap_id": active_roadmap.roadmap_id,
+                "user_id": active_roadmap.user_id,
+                "career_path": active_roadmap.career_path
+            } if active_roadmap else None,
+            "topics": [
+                {
+                    "topic_id": t.topic_id,
+                    "roadmap_id": t.roadmap_id,
+                    "topic_name": t.topic_name,
+                    "sequence_no": t.sequence_no,
+                    "status": t.status
+                }
+                for t in topics
+            ],
+            "progress": [
+                {
+                    "progress_id": p.progress_id,
+                    "user_id": p.user_id,
+                    "topic_id": p.topic_id,
+                    "completion_percentage": p.completion_percentage,
+                    "status": p.status,
+                    "last_updated": p.last_updated.isoformat() if p.last_updated else None
+                }
+                for p in progress_records
+            ],
+            "streak": {
+                "user_id": user_id,
+                "streak_days": streak,
+                "active_dates_count": len(sorted_dates),
+                "completed_projects": 0,
+                "week_completed_topics": week_completed_count
+            },
+            "quiz_results": [
+                {
+                    "result_id": q.result_id,
+                    "user_id": q.user_id,
+                    "topic_id": q.topic_id,
+                    "score": q.score,
+                    "total_questions": q.total_questions,
+                    "attempt_no": q.attempt_no,
+                    "completed_at": q.completed_at.isoformat() if q.completed_at else None
+                }
+                for q in quiz_results
+            ],
+            "performance": performance
+        }
+    finally:
+        db.close()
    

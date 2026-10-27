@@ -95,6 +95,70 @@ function applyCareerAndLevel(career, level) {
  * 4. Fetches topics & progress if roadmap exists, or creates default/AI roadmap if needed
  */
 async function loadUserDashboardData(firebaseUser) {
+  // Attempt to fetch everything in a single, high-performance aggregate request
+  try {
+    const overview = await apiRequest("/dashboard/overview");
+    if (overview && overview.user) {
+      const dbUser = overview.user;
+      const userId = dbUser.user_id;
+
+      const latestAssessment = overview.latest_assessment;
+      if (latestAssessment && latestAssessment.skill_level) {
+        localStorage.setItem("skillLevel", latestAssessment.skill_level);
+        localStorage.setItem("skillpath_level", latestAssessment.skill_level);
+      }
+
+      let activeRoadmap = overview.active_roadmap;
+      const career = (activeRoadmap && activeRoadmap.career_path) ||
+                     localStorage.getItem("careerPath") ||
+                     localStorage.getItem("skillpath_career") ||
+                     (dbUser.career_goal && dbUser.career_goal !== "Not Set" ? dbUser.career_goal : null);
+
+      const level = (latestAssessment && latestAssessment.skill_level) ||
+                    localStorage.getItem("skillLevel") ||
+                    localStorage.getItem("skillpath_level") ||
+                    "Beginner";
+
+      if (career) {
+        applyCareerAndLevel(career, level);
+      }
+
+      let topics = overview.topics || [];
+      const progressRecords = overview.progress || [];
+      const quizResults = overview.quiz_results || [];
+      const performanceData = overview.performance || [];
+      const streakData = overview.streak || { streak_days: 0, completed_projects: 0, week_completed_topics: 0 };
+
+      renderStreakAndProjectMetrics(streakData);
+
+      if (!activeRoadmap && career && career !== "Not Set") {
+        try {
+          const created = await apiRequest("/roadmaps", {
+            method: "POST",
+            body: JSON.stringify({ user_id: userId, career_path: career })
+          });
+          if (created && created.roadmap_id) {
+            activeRoadmap = { roadmap_id: created.roadmap_id, user_id: userId, career_path: career };
+          }
+        } catch (e) {
+          console.warn("Could not create roadmap:", e);
+        }
+      }
+
+      if (!activeRoadmap) {
+        renderEmptyRoadmapState();
+        return;
+      }
+
+      renderDashboardRoadmap(topics, progressRecords, activeRoadmap, level);
+      await renderQuizPerformanceMetrics(topics, quizResults, performanceData);
+      return;
+    }
+  } catch (overviewErr) {
+    console.warn("Single-trip overview endpoint unavailable or falling back:", overviewErr);
+  }
+
+  // Graceful fallback with parallel fetching
   const dbUser = await syncUserWithBackend();
   if (!dbUser || !dbUser.user_id) {
     console.warn("Could not sync user with backend.");
@@ -103,33 +167,23 @@ async function loadUserDashboardData(firebaseUser) {
 
   const userId = dbUser.user_id;
 
-  // 1. Fetch assessments
-  let latestAssessment = null;
-  try {
-    const assessments = await apiRequest(`/assessments/${userId}`);
-    if (assessments && assessments.length > 0) {
-      latestAssessment = assessments[0]; // descending order
-      if (latestAssessment.skill_level) {
-        localStorage.setItem("skillLevel", latestAssessment.skill_level);
-        localStorage.setItem("skillpath_level", latestAssessment.skill_level);
-      }
-    }
-  } catch (err) {
-    console.warn("Error fetching assessments:", err);
+  // Execute roadmap and assessment queries in parallel
+  const [assessmentRes, roadmapRes] = await Promise.allSettled([
+    apiRequest(`/assessments/${userId}`),
+    apiRequest(`/roadmaps/${userId}`)
+  ]);
+
+  const latestAssessment = (assessmentRes.status === "fulfilled" && assessmentRes.value && assessmentRes.value.length > 0)
+    ? assessmentRes.value[0] : null;
+
+  if (latestAssessment && latestAssessment.skill_level) {
+    localStorage.setItem("skillLevel", latestAssessment.skill_level);
+    localStorage.setItem("skillpath_level", latestAssessment.skill_level);
   }
 
-  // 2. Fetch roadmaps
-  let activeRoadmap = null;
-  try {
-    const roadmaps = await apiRequest(`/roadmaps/${userId}`);
-    if (roadmaps && roadmaps.length > 0) {
-      activeRoadmap = roadmaps[0];
-    }
-  } catch (err) {
-    console.warn("Error fetching roadmaps:", err);
-  }
+  let activeRoadmap = (roadmapRes.status === "fulfilled" && roadmapRes.value && roadmapRes.value.length > 0)
+    ? roadmapRes.value[0] : null;
 
-  // Determine current career and level
   const career = (activeRoadmap && activeRoadmap.career_path) ||
                  localStorage.getItem("careerPath") ||
                  localStorage.getItem("skillpath_career") ||
@@ -144,105 +198,28 @@ async function loadUserDashboardData(firebaseUser) {
     applyCareerAndLevel(career, level);
   }
 
-  // If no roadmap exists yet:
-  if (!activeRoadmap) {
-    if (career && career !== "Not Set") {
-      try {
-        // Automatically create initial roadmap for user's chosen career
-        const created = await apiRequest("/roadmaps", {
-          method: "POST",
-          body: JSON.stringify({
-            user_id: userId,
-            career_path: career
-          })
-        });
-
-        if (created && created.roadmap_id) {
-          activeRoadmap = {
-            roadmap_id: created.roadmap_id,
-            user_id: userId,
-            career_path: career
-          };
-
-          // Seed default core topics for this roadmap
-          const defaultTopics = [
-            "Programming Fundamentals",
-            "Data Structures & Basic Algorithms",
-            "Advanced Data Structures",
-            "Advanced Algorithms",
-            "System Design & Projects"
-          ];
-
-          for (let i = 0; i < defaultTopics.length; i++) {
-            await apiRequest("/topics", {
-              method: "POST",
-              body: JSON.stringify({
-                roadmap_id: created.roadmap_id,
-                topic_name: defaultTopics[i],
-                sequence_no: i + 1,
-                status: i === 0 ? "In Progress" : "Not Started"
-              })
-            });
-          }
-        }
-      } catch (e) {
-        console.warn("Could not auto-generate initial roadmap:", e);
-      }
-    }
-  }
-
-  // If still no roadmap, show assessment prompt empty state
   if (!activeRoadmap) {
     renderEmptyRoadmapState();
     return;
   }
 
-  // 3. Fetch topics for active roadmap
-  let topics = [];
-  try {
-    topics = await apiRequest(`/topics/${activeRoadmap.roadmap_id}`);
-  } catch (err) {
-    console.warn("Error fetching topics:", err);
-  }
+  // Parallel fetch remaining dependencies
+  const [topicsRes, progressRes, quizRes, perfRes, streakRes] = await Promise.allSettled([
+    apiRequest(`/topics/${activeRoadmap.roadmap_id}`),
+    apiRequest(`/progress/${userId}`),
+    apiRequest(`/quiz-results/${userId}`),
+    apiRequest(`/performance/${userId}`),
+    apiRequest(`/analytics/streak/${userId}`)
+  ]);
 
-  // 4. Fetch progress for user
-  let progressRecords = [];
-  try {
-    progressRecords = await apiRequest(`/progress/${userId}`);
-  } catch (err) {
-    console.warn("Error fetching progress records:", err);
-  }
+  const topics = topicsRes.status === "fulfilled" ? (topicsRes.value || []) : [];
+  const progressRecords = progressRes.status === "fulfilled" ? (progressRes.value || []) : [];
+  const quizResults = quizRes.status === "fulfilled" ? (quizRes.value || []) : [];
+  const performanceData = (perfRes.status === "fulfilled" && perfRes.value && Array.isArray(perfRes.value.performance))
+    ? perfRes.value.performance : [];
+  const streakData = streakRes.status === "fulfilled" ? streakRes.value : { streak_days: 0, completed_projects: 0, week_completed_topics: 0 };
 
-  // 5. Fetch quiz results and performance for user
-  let quizResults = [];
-  let performanceData = [];
-  try {
-    quizResults = await apiRequest(`/quiz-results/${userId}`);
-  } catch (err) {
-    console.warn("Error fetching quiz results:", err);
-  }
-
-  try {
-    const perfResponse = await apiRequest(`/performance/${userId}`);
-    if (perfResponse && Array.isArray(perfResponse.performance)) {
-      performanceData = perfResponse.performance;
-    }
-  } catch (err) {
-    console.warn("Error fetching performance data:", err);
-  }
-
-  // 6. Fetch user streak and activity analytics
-  try {
-    const streakData = await apiRequest(`/analytics/streak/${userId}`);
-    if (streakData) {
-      renderStreakAndProjectMetrics(streakData);
-    }
-  } catch (err) {
-    console.warn("Error fetching streak analytics:", err);
-    renderStreakAndProjectMetrics({ streak_days: 0, completed_projects: 0, week_completed_topics: 0 });
-  }
-
-  // Calculate metrics
+  renderStreakAndProjectMetrics(streakData);
   renderDashboardRoadmap(topics, progressRecords, activeRoadmap, level);
   await renderQuizPerformanceMetrics(topics, quizResults, performanceData);
 }
