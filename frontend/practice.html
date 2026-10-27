@@ -119,21 +119,21 @@
       <ul>
         <li><a href="dashboard.html"><span class="nav-icon">🏠</span> Home</a></li>
         <li><a href="roadmap.html"><span class="nav-icon">🗺️</span> Roadmap</a></li>
-        <li><a href="practice.html"><span class="nav-icon">📖</span> Learn</a></li>
-        <li class="active"><a href="practice.html"><span class="nav-icon">💻</span> Practice</a></li>
+        <li><a href="practice.html?tab=quiz"><span class="nav-icon">📖</span> Learn</a></li>
+        <li class="active"><a href="practice.html?tab=practice"><span class="nav-icon">💻</span> Practice</a></li>
         <li><a href="progress.html"><span class="nav-icon">📊</span> Progress</a></li>
-        <li><a href="#"><span class="nav-icon">💼</span> Projects</a></li>
+        <li><a href="practice.html?tab=projects"><span class="nav-icon">💼</span> Projects</a></li>
         <li><a href="interview.html"><span class="nav-icon">🎙️</span> Interview Prep</a></li>
-        <li><a href="#"><span class="nav-icon">📚</span> Resources</a></li>
-        <li><a href="#"><span class="nav-icon">👥</span> Community</a></li>
-        <li><a href="#"><span class="nav-icon">🎖️</span> Certificates</a></li>
-        <li><a href="#"><span class="nav-icon">⚙️</span> Settings</a></li>
+        <li><a href="resources.html"><span class="nav-icon">📚</span> Resources</a></li>
+        <li><a href="community.html"><span class="nav-icon">👥</span> Community</a></li>
+        <li><a href="certificates.html"><span class="nav-icon">🎖️</span> Certificates</a></li>
+        <li><a href="settings.html"><span class="nav-icon">⚙️</span> Settings</a></li>
       </ul>
     </nav>
     <div class="premium-box">
       <p class="premium-title">👑 Go Premium</p>
       <p class="premium-text">Unlock all features, AI interviews & premium content.</p>
-      <button class="upgrade-btn">Upgrade Now →</button>
+      <button type="button" class="upgrade-btn" onclick="window.location.href='pricing.html'">Upgrade Now →</button>
     </div>
     <div class="help-box">
       <span class="help-icon">🤖</span>
@@ -215,8 +215,11 @@
           <div class="practice-task" id="practiceTaskDesc">
             Build a responsive navigation bar using HTML, CSS and JavaScript. It should collapse into a hamburger menu on smaller screens.
           </div>
-          <textarea placeholder="Write or paste your code here..."></textarea>
-          <button class="practice-submit-btn">Submit Practice</button>
+          <textarea id="practiceCodeInput" placeholder="Write or paste your code here..."></textarea>
+          <div style="display: flex; gap: 12px; align-items: center; margin-top: 10px;">
+            <button type="button" id="submitPracticeBtn" class="practice-submit-btn">Submit Practice</button>
+            <span id="practiceSaveStatus" style="display: none; font-size: 13px; font-weight: bold; color: #166534;">✓ Solution submitted & saved!</span>
+          </div>
         </div>
       </div>
 
@@ -229,7 +232,7 @@
             <h3>Personal Portfolio</h3>
             <p class="skills-line">HTML | CSS</p>
             <p>Build a simple personal portfolio site to showcase your projects and skills.</p>
-            <button class="project-start-btn">Start Project</button>
+            <button type="button" class="project-start-btn" onclick="window.location.href='project-detail.html?id=portfolio'">Start Project</button>
           </div>
 
           <div class="project-card">
@@ -237,7 +240,7 @@
             <h3>Weather Application</h3>
             <p class="skills-line">JavaScript | API</p>
             <p>Build an app that fetches and displays live weather data for any city.</p>
-            <button class="project-start-btn">Start Project</button>
+            <button type="button" class="project-start-btn" onclick="window.location.href='project-detail.html?id=weather'">Start Project</button>
           </div>
 
           <div class="project-card">
@@ -245,7 +248,7 @@
             <h3>Full Stack Application</h3>
             <p class="skills-line">React | Node | Database | API</p>
             <p>Build a complete full-stack app with a database, authentication and a REST API.</p>
-            <button class="project-start-btn">Start Project</button>
+            <button type="button" class="project-start-btn" onclick="window.location.href='project-detail.html?id=fullstack'">Start Project</button>
           </div>
 
         </div>
@@ -272,19 +275,52 @@
   const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
-  // Tab switching
+  // Tab switching & URL query activation
   const tabButtons = document.querySelectorAll('.tab-switcher-btn');
   const tabPanels = document.querySelectorAll('.tab-panel');
 
+  function activateTab(tabId) {
+    const targetBtn = document.querySelector(`.tab-switcher-btn[data-tab="${tabId}"]`);
+    const targetPanel = document.getElementById(tabId);
+    if (targetBtn && targetPanel) {
+      tabButtons.forEach(b => b.classList.remove('active'));
+      tabPanels.forEach(p => p.classList.remove('active'));
+      targetBtn.classList.add('active');
+      targetPanel.classList.add('active');
+    }
+  }
+
   tabButtons.forEach(function(btn) {
     btn.addEventListener('click', function() {
-      tabButtons.forEach(function(b) { b.classList.remove('active'); });
-      tabPanels.forEach(function(p) { p.classList.remove('active'); });
-
-      btn.classList.add('active');
-      document.getElementById(btn.getAttribute('data-tab')).classList.add('active');
+      const tabId = btn.getAttribute('data-tab');
+      activateTab(tabId);
     });
   });
+
+  const queryTab = new URLSearchParams(window.location.search).get('tab');
+  if (queryTab && ['quiz', 'practice', 'projects'].includes(queryTab)) {
+    activateTab(queryTab);
+  }
+
+  // Practice submit button listener
+  const submitPracticeBtn = document.getElementById('submitPracticeBtn');
+  if (submitPracticeBtn) {
+    submitPracticeBtn.addEventListener('click', () => {
+      const code = document.getElementById('practiceCodeInput').value.trim();
+      if (!code) {
+        alert('Please write or paste your solution code before submitting.');
+        return;
+      }
+      submitPracticeBtn.disabled = true;
+      submitPracticeBtn.textContent = 'Submitting...';
+      setTimeout(() => {
+        submitPracticeBtn.disabled = false;
+        submitPracticeBtn.textContent = 'Resubmit Practice';
+        const status = document.getElementById('practiceSaveStatus');
+        if (status) status.style.display = 'inline';
+      }, 500);
+    });
+  }
 
   // Sidebar toggle
   const menuToggle = document.getElementById("menuToggle");
@@ -630,5 +666,6 @@
 
   renderQuiz();
 </script>
+<script src="search-handler.js"></script>
 </body>
 </html>

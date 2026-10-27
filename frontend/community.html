@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillPath AI | Community Hub</title>
+<link rel="stylesheet" href="dashboard.css">
+<style>
+  .content-wrap { max-width: 900px; }
+  .community-hero {
+    background: linear-gradient(135deg, #4f46e5, #7c5cff);
+    color: white;
+    padding: 30px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+  }
+  .community-stats {
+    display: flex;
+    gap: 30px;
+    margin-top: 18px;
+  }
+  .community-stat p { font-size: 24px; font-weight: 800; }
+  .community-stat span { font-size: 12px; opacity: 0.85; }
+
+  .post-card {
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+    border: 1px solid #eee;
+  }
+  .post-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .post-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+  }
+  .post-author { font-size: 14px; font-weight: bold; }
+  .post-time { font-size: 11px; color: #9ca3af; }
+  .post-title { font-size: 16px; font-weight: bold; margin-bottom: 6px; }
+  .post-body { font-size: 14px; color: #4b5563; line-height: 1.6; margin-bottom: 14px; }
+  .post-tags { display: flex; gap: 8px; }
+  .post-tag {
+    font-size: 11px;
+    background: #f3f4f6;
+    color: #4b5563;
+    padding: 3px 10px;
+    border-radius: 12px;
+  }
+</style>
+</head>
+<body>
+<div class="dashboard-container">
+  <aside class="sidebar">
+    <div class="logo">
+      <span class="logo-icon">🚀</span>
+      <div class="logo-text">
+        <h2>SkillPath <span class="highlight-ai">AI</span></h2>
+        <p>Learn. Practice. Get Placed.</p>
+      </div>
+    </div>
+    <button id="menuToggle" class="menu-toggle">☰</button>
+    <nav class="nav-menu">
+      <ul>
+        <li><a href="dashboard.html"><span class="nav-icon">🏠</span> Home</a></li>
+        <li><a href="roadmap.html"><span class="nav-icon">🗺️</span> Roadmap</a></li>
+        <li><a href="practice.html"><span class="nav-icon">📖</span> Learn</a></li>
+        <li><a href="practice.html"><span class="nav-icon">💻</span> Practice</a></li>
+        <li><a href="progress.html"><span class="nav-icon">📊</span> Progress</a></li>
+        <li><a href="practice.html?tab=projects"><span class="nav-icon">💼</span> Projects</a></li>
+        <li><a href="interview.html"><span class="nav-icon">🎙️</span> Interview Prep</a></li>
+        <li><a href="resources.html"><span class="nav-icon">📚</span> Resources</a></li>
+        <li class="active"><a href="community.html"><span class="nav-icon">👥</span> Community</a></li>
+        <li><a href="certificates.html"><span class="nav-icon">🎖️</span> Certificates</a></li>
+        <li><a href="settings.html"><span class="nav-icon">⚙️</span> Settings</a></li>
+      </ul>
+    </nav>
+    <div class="premium-box">
+      <p class="premium-title">👑 Go Premium</p>
+      <p class="premium-text">Unlock all features, AI interviews & premium content.</p>
+      <button class="upgrade-btn">Upgrade Now →</button>
+    </div>
+    <div class="help-box">
+      <span class="help-icon">🤖</span>
+      <div class="help-text">
+        <p class="help-title">Need Help?</p>
+        <p class="help-subtitle">Chat with our AI Assistant</p>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-logo">
+        <span class="topbar-logo-icon">🚀</span>
+        <h2>SkillPath <span class="highlight-ai">AI</span></h2>
+      </div>
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Search discussions, topics..." class="search-input">
+      </div>
+      <div class="notification"><span class="bell-icon">🔔</span></div>
+      <div class="user-profile" id="userProfile">
+        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=SkillPathAI" alt="Avatar" class="user-avatar">
+        <div class="user-info">
+          <p class="user-name" id="userName">Learner</p>
+          <p class="user-plan">Premium Plan</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-wrap">
+      <div class="community-hero">
+        <h1 style="font-size: 24px; margin-bottom: 6px;">SkillPath Learner Community</h1>
+        <p style="font-size: 14px; opacity: 0.9;">Collaborate, share solutions, and get peer feedback across all career tracks.</p>
+        <div class="community-stats">
+          <div class="community-stat"><p>1,240+</p><span>Active Learners</span></div>
+          <div class="community-stat"><p>3,800+</p><span>Topics Solved</span></div>
+          <div class="community-stat"><p>98%</p><span>Questions Answered</span></div>
+        </div>
+      </div>
+
+      <div class="post-card">
+        <div class="post-header">
+          <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Aditi" class="post-avatar" alt="Avatar">
+          <div>
+            <p class="post-author">Aditi U.</p>
+            <p class="post-time">2 hours ago • Web Development Track</p>
+          </div>
+        </div>
+        <h3 class="post-title">Key takeaways from finishing the DSA & Algorithms Roadmap Milestone</h3>
+        <p class="post-body">Practicing two-pointer techniques on arrays helped significantly when solving palindrome and two-sum style questions. Don't skip tracing loops by hand!</p>
+        <div class="post-tags">
+          <span class="post-tag">#algorithms</span>
+          <span class="post-tag">#study-tips</span>
+        </div>
+      </div>
+
+      <div class="post-card">
+        <div class="post-header">
+          <img src="https://api.dicebear.com/7.x/bottts/svg?seed=DevLearner" class="post-avatar" alt="Avatar">
+          <div>
+            <p class="post-author">Carlos M.</p>
+            <p class="post-time">5 hours ago • Full Stack AI Track</p>
+          </div>
+        </div>
+        <h3 class="post-title">How to best structure a full-stack REST API with FastAPI & MySQL</h3>
+        <p class="post-body">Separating schemas (Pydantic models) from database ORM models made unit tests and validation much cleaner. Highly recommend using dependency injection for database sessions.</p>
+        <div class="post-tags">
+          <span class="post-tag">#fastapi</span>
+          <span class="post-tag">#architecture</span>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script type="module">
+  import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCQ9YRQV9edVS0D-Lb6ORl9HX6E0oL4ECQ",
+    authDomain: "skillpathai-2e1c7.firebaseapp.com",
+    projectId: "skillpathai-2e1c7",
+    storageBucket: "skillpathai-2e1c7.firebasestorage.app",
+    messagingSenderId: "41899784962",
+    appId: "1:41899784962:web:1fe188cfca7f6fa7d201b"
+  };
+
+  const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  onAuthStateChanged(auth, (user) => {
+    if (!user) { window.location.href = "index.html"; return; }
+    const displayName = user.displayName || (user.email ? user.email.split("@")[0] : "Learner");
+    const el = document.getElementById("userName");
+    if (el) el.textContent = displayName;
+  });
+
+  const menuToggle = document.getElementById("menuToggle");
+  const navMenu = document.querySelector(".nav-menu");
+  if (menuToggle && navMenu) {
+    menuToggle.addEventListener("click", () => navMenu.classList.toggle("show"));
+  }
+</script>
+<script src="search-handler.js"></script>
+</body>
+</html>

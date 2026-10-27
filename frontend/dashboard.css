@@ -119,27 +119,16 @@ a {
 
 
 .menu-toggle {
-
   background: none;
-
   border: none;
-
   font-size: 22px;
-
   cursor: pointer;
-
   margin-bottom: 15px;
-
-  display: block;
-
+  display: none;
 }
 
-
-
 .nav-menu {
-
-  display: none;
-
+  display: block;
 }
 
 
@@ -2135,33 +2124,29 @@ a {
 
 
 @media (max-width: 768px) {
-
   .dashboard-container {
-
     flex-direction: column;
-
   }
-
-
 
   .sidebar {
-
     width: 100%;
-
     flex-direction: row;
-
     flex-wrap: wrap;
-
     align-items: center;
-
+    justify-content: space-between;
   }
 
-
+  .menu-toggle {
+    display: block;
+  }
 
   .nav-menu {
-
     display: none;
+    width: 100%;
+  }
 
+  .nav-menu.show {
+    display: block;
   }
 
 

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillPath AI | Upgrade to Premium</title>
+<link rel="stylesheet" href="dashboard.css">
+<style>
+  .content-wrap { max-width: 900px; }
+  .pricing-hero {
+    text-align: center;
+    padding: 30px 20px;
+    margin-bottom: 24px;
+  }
+  .pricing-hero h1 { font-size: 28px; margin-bottom: 8px; }
+  .pricing-hero p { font-size: 15px; color: #6b7280; }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 30px;
+  }
+  .pricing-card {
+    background: white;
+    border-radius: 18px;
+    padding: 32px 24px;
+    border: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+  }
+  .pricing-card.featured {
+    border: 2px solid #7c5cff;
+    box-shadow: 0 10px 25px -5px rgba(124, 92, 255, 0.2);
+  }
+  .featured-tag {
+    position: absolute;
+    top: -12px;
+    right: 24px;
+    background: linear-gradient(to right, #7c5cff, #a78bfa);
+    color: white;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 4px 14px;
+    border-radius: 20px;
+    text-transform: uppercase;
+  }
+  .price { font-size: 36px; font-weight: 800; color: #111827; margin: 16px 0 8px; }
+  .price span { font-size: 14px; font-weight: normal; color: #6b7280; }
+  .feature-list {
+    list-style: none;
+    margin: 20px 0;
+    font-size: 14px;
+    color: #4b5563;
+    line-height: 2;
+  }
+  .feature-list li::before {
+    content: "✓ ";
+    color: #10b981;
+    font-weight: bold;
+    margin-right: 6px;
+  }
+  .plan-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    text-align: center;
+  }
+  .plan-btn.primary {
+    background: linear-gradient(to right, #7c5cff, #a78bfa);
+    color: white;
+  }
+  .plan-btn.outline {
+    background: white;
+    border: 1px solid #d1d5db;
+    color: #374151;
+  }
+</style>
+</head>
+<body>
+<div class="dashboard-container">
+  <aside class="sidebar">
+    <div class="logo">
+      <span class="logo-icon">🚀</span>
+      <div class="logo-text">
+        <h2>SkillPath <span class="highlight-ai">AI</span></h2>
+        <p>Learn. Practice. Get Placed.</p>
+      </div>
+    </div>
+    <button id="menuToggle" class="menu-toggle">☰</button>
+    <nav class="nav-menu">
+      <ul>
+        <li><a href="dashboard.html"><span class="nav-icon">🏠</span> Home</a></li>
+        <li><a href="roadmap.html"><span class="nav-icon">🗺️</span> Roadmap</a></li>
+        <li><a href="practice.html"><span class="nav-icon">📖</span> Learn</a></li>
+        <li><a href="practice.html"><span class="nav-icon">💻</span> Practice</a></li>
+        <li><a href="progress.html"><span class="nav-icon">📊</span> Progress</a></li>
+        <li><a href="practice.html?tab=projects"><span class="nav-icon">💼</span> Projects</a></li>
+        <li><a href="interview.html"><span class="nav-icon">🎙️</span> Interview Prep</a></li>
+        <li><a href="resources.html"><span class="nav-icon">📚</span> Resources</a></li>
+        <li><a href="community.html"><span class="nav-icon">👥</span> Community</a></li>
+        <li><a href="certificates.html"><span class="nav-icon">🎖️</span> Certificates</a></li>
+        <li><a href="settings.html"><span class="nav-icon">⚙️</span> Settings</a></li>
+      </ul>
+    </nav>
+    <div class="help-box">
+      <span class="help-icon">🤖</span>
+      <div class="help-text">
+        <p class="help-title">Need Help?</p>
+        <p class="help-subtitle">Chat with our AI Assistant</p>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-logo">
+        <span class="topbar-logo-icon">🚀</span>
+        <h2>SkillPath <span class="highlight-ai">AI</span></h2>
+      </div>
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Search..." class="search-input">
+      </div>
+      <div class="notification"><span class="bell-icon">🔔</span></div>
+      <div class="user-profile" id="userProfile">
+        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=SkillPathAI" alt="Avatar" class="user-avatar">
+        <div class="user-info">
+          <p class="user-name" id="userName">Learner</p>
+          <p class="user-plan">Free Plan</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-wrap">
+      <div class="pricing-hero">
+        <h1>Unlock Your Full Engineering Potential</h1>
+        <p>Choose the plan that suits your timeline and interview goals.</p>
+      </div>
+
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div>
+            <h3>Free Plan</h3>
+            <p style="color:#6b7280; font-size:13px;">Core learning roadmap & practice</p>
+            <div class="price">$0 <span>/ forever</span></div>
+            <ul class="feature-list">
+              <li>Custom Roadmap generation</li>
+              <li>Basic quizzes & topic flashcards</li>
+              <li>Community discussions</li>
+              <li>Standard progress tracking</li>
+            </ul>
+          </div>
+          <button class="plan-btn outline" onclick="window.location.href='dashboard.html'">Current Plan</button>
+        </div>
+
+        <div class="pricing-card featured">
+          <div class="featured-tag">Most Popular</div>
+          <div>
+            <h3>SkillPath Pro</h3>
+            <p style="color:#6b7280; font-size:13px;">Everything you need to get placed</p>
+            <div class="price">$19 <span>/ month</span></div>
+            <ul class="feature-list">
+              <li>Unlimited AI mock interviews & voice analysis</li>
+              <li>AI-powered code evaluations on practice exercises</li>
+              <li>Verified Certificates of Completion</li>
+              <li>Full Portfolio project reviews</li>
+              <li>Priority placement partner referrals</li>
+            </ul>
+          </div>
+          <button class="plan-btn primary" onclick="alert('Thank you for your interest! The payment gateway will launch in the next release.');">Upgrade to Pro</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script type="module">
+  import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCQ9YRQV9edVS0D-Lb6ORl9HX6E0oL4ECQ",
+    authDomain: "skillpathai-2e1c7.firebaseapp.com",
+    projectId: "skillpathai-2e1c7",
+    storageBucket: "skillpathai-2e1c7.firebasestorage.app",
+    messagingSenderId: "41899784962",
+    appId: "1:41899784962:web:1fe188cfca7f6fa7d201b"
+  };
+
+  const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  onAuthStateChanged(auth, (user) => {
+    if (!user) { window.location.href = "index.html"; return; }
+    const displayName = user.displayName || (user.email ? user.email.split("@")[0] : "Learner");
+    const el = document.getElementById("userName");
+    if (el) el.textContent = displayName;
+  });
+
+  const menuToggle = document.getElementById("menuToggle");
+  const navMenu = document.querySelector(".nav-menu");
+  if (menuToggle && navMenu) {
+    menuToggle.addEventListener("click", () => navMenu.classList.toggle("show"));
+  }
+</script>
+<script src="search-handler.js"></script>
+</body>
+</html>

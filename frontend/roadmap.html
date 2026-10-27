@@ -100,21 +100,21 @@
       <ul>
         <li><a href="dashboard.html"><span class="nav-icon">🏠</span> Home</a></li>
         <li class="active"><a href="roadmap.html"><span class="nav-icon">🗺️</span> Roadmap</a></li>
-        <li><a href="practice.html"><span class="nav-icon">📖</span> Learn</a></li>
-        <li><a href="practice.html"><span class="nav-icon">💻</span> Practice</a></li>
+        <li><a href="practice.html?tab=quiz"><span class="nav-icon">📖</span> Learn</a></li>
+        <li><a href="practice.html?tab=practice"><span class="nav-icon">💻</span> Practice</a></li>
         <li><a href="progress.html"><span class="nav-icon">📊</span> Progress</a></li>
-        <li><a href="#"><span class="nav-icon">💼</span> Projects</a></li>
+        <li><a href="practice.html?tab=projects"><span class="nav-icon">💼</span> Projects</a></li>
         <li><a href="interview.html"><span class="nav-icon">🎙️</span> Interview Prep</a></li>
-        <li><a href="#"><span class="nav-icon">📚</span> Resources</a></li>
-        <li><a href="#"><span class="nav-icon">👥</span> Community</a></li>
-        <li><a href="#"><span class="nav-icon">🎖️</span> Certificates</a></li>
-        <li><a href="#"><span class="nav-icon">⚙️</span> Settings</a></li>
+        <li><a href="resources.html"><span class="nav-icon">📚</span> Resources</a></li>
+        <li><a href="community.html"><span class="nav-icon">👥</span> Community</a></li>
+        <li><a href="certificates.html"><span class="nav-icon">🎖️</span> Certificates</a></li>
+        <li><a href="settings.html"><span class="nav-icon">⚙️</span> Settings</a></li>
       </ul>
     </nav>
     <div class="premium-box">
       <p class="premium-title">👑 Go Premium</p>
       <p class="premium-text">Unlock all features, AI interviews & premium content.</p>
-      <button class="upgrade-btn">Upgrade Now →</button>
+      <button type="button" class="upgrade-btn" onclick="window.location.href='pricing.html'">Upgrade Now →</button>
     </div>
     <div class="help-box">
       <span class="help-icon">🤖</span>
@@ -573,5 +573,6 @@
     });
   }
 </script>
+<script src="search-handler.js"></script>
 </body>
 </html>

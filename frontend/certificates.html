@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillPath AI | Certificates & Credentials</title>
+<link rel="stylesheet" href="dashboard.css">
+<style>
+  .content-wrap { max-width: 900px; }
+  .cert-card {
+    background: white;
+    border-radius: 16px;
+    padding: 28px;
+    border: 1px solid #eee;
+    margin-bottom: 24px;
+    display: flex;
+    gap: 24px;
+    align-items: center;
+  }
+  @media (max-width: 768px) {
+    .cert-card { flex-direction: column; text-align: center; }
+  }
+  .cert-icon {
+    font-size: 54px;
+    background: #fdf2f8;
+    width: 100px;
+    height: 100px;
+    min-width: 100px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed #f472b6;
+  }
+  .cert-info h3 { font-size: 18px; margin-bottom: 6px; }
+  .cert-info p { font-size: 14px; color: #4b5563; line-height: 1.6; margin-bottom: 12px; }
+  .cert-status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+  .cert-status-badge.locked { background: #f3f4f6; color: #6b7280; }
+  .cert-status-badge.unlocked { background: #dcfce7; color: #166534; }
+  .cert-action-btn {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 10px 20px;
+    background: linear-gradient(to right, #7c5cff, #a78bfa);
+    color: white;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 13px;
+    text-decoration: none;
+  }
+</style>
+</head>
+<body>
+<div class="dashboard-container">
+  <aside class="sidebar">
+    <div class="logo">
+      <span class="logo-icon">🚀</span>
+      <div class="logo-text">
+        <h2>SkillPath <span class="highlight-ai">AI</span></h2>
+        <p>Learn. Practice. Get Placed.</p>
+      </div>
+    </div>
+    <button id="menuToggle" class="menu-toggle">☰</button>
+    <nav class="nav-menu">
+      <ul>
+        <li><a href="dashboard.html"><span class="nav-icon">🏠</span> Home</a></li>
+        <li><a href="roadmap.html"><span class="nav-icon">🗺️</span> Roadmap</a></li>
+        <li><a href="practice.html"><span class="nav-icon">📖</span> Learn</a></li>
+        <li><a href="practice.html"><span class="nav-icon">💻</span> Practice</a></li>
+        <li><a href="progress.html"><span class="nav-icon">📊</span> Progress</a></li>
+        <li><a href="practice.html?tab=projects"><span class="nav-icon">💼</span> Projects</a></li>
+        <li><a href="interview.html"><span class="nav-icon">🎙️</span> Interview Prep</a></li>
+        <li><a href="resources.html"><span class="nav-icon">📚</span> Resources</a></li>
+        <li><a href="community.html"><span class="nav-icon">👥</span> Community</a></li>
+        <li class="active"><a href="certificates.html"><span class="nav-icon">🎖️</span> Certificates</a></li>
+        <li><a href="settings.html"><span class="nav-icon">⚙️</span> Settings</a></li>
+      </ul>
+    </nav>
+    <div class="premium-box">
+      <p class="premium-title">👑 Go Premium</p>
+      <p class="premium-text">Unlock all features, AI interviews & premium content.</p>
+      <button class="upgrade-btn">Upgrade Now →</button>
+    </div>
+    <div class="help-box">
+      <span class="help-icon">🤖</span>
+      <div class="help-text">
+        <p class="help-title">Need Help?</p>
+        <p class="help-subtitle">Chat with our AI Assistant</p>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-logo">
+        <span class="topbar-logo-icon">🚀</span>
+        <h2>SkillPath <span class="highlight-ai">AI</span></h2>
+      </div>
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Search certificates..." class="search-input">
+      </div>
+      <div class="notification"><span class="bell-icon">🔔</span></div>
+      <div class="user-profile" id="userProfile">
+        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=SkillPathAI" alt="Avatar" class="user-avatar">
+        <div class="user-info">
+          <p class="user-name" id="userName">Learner</p>
+          <p class="user-plan">Premium Plan</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-wrap">
+      <div class="page-header" style="margin-bottom: 24px;">
+        <h1 style="font-size: 22px; margin-bottom: 6px;">Certificates of Completion</h1>
+        <p style="font-size: 14px; color: #6b7280;">Earn industry-aligned credentials by mastering your personalized career curriculum.</p>
+      </div>
+
+      <div class="cert-card">
+        <div class="cert-icon">🏆</div>
+        <div class="cert-info">
+          <span class="cert-status-badge locked">In Progress (60% Needed)</span>
+          <h3 style="margin-top: 10px;">Foundational Software Engineering Track</h3>
+          <p>Awarded upon completing 100% of core curriculum topics, quizzes with score &ge; 75%, and project submission.</p>
+          <a href="roadmap.html" class="cert-action-btn">View Unfinished Milestones →</a>
+        </div>
+      </div>
+
+      <div class="cert-card">
+        <div class="cert-icon">🎖️</div>
+        <div class="cert-info">
+          <span class="cert-status-badge locked">Locked</span>
+          <h3 style="margin-top: 10px;">AI Mock Interview & Placement Readiness</h3>
+          <p>Awarded upon scoring &ge; 4.0 in AI technical mock interviews, problem solving rounds, and aptitude readiness.</p>
+          <a href="interview.html" class="cert-action-btn">Launch Mock Interview →</a>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script type="module">
+  import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCQ9YRQV9edVS0D-Lb6ORl9HX6E0oL4ECQ",
+    authDomain: "skillpathai-2e1c7.firebaseapp.com",
+    projectId: "skillpathai-2e1c7",
+    storageBucket: "skillpathai-2e1c7.firebasestorage.app",
+    messagingSenderId: "41899784962",
+    appId: "1:41899784962:web:1fe188cfca7f6fa7d201b"
+  };
+
+  const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  onAuthStateChanged(auth, (user) => {
+    if (!user) { window.location.href = "index.html"; return; }
+    const displayName = user.displayName || (user.email ? user.email.split("@")[0] : "Learner");
+    const el = document.getElementById("userName");
+    if (el) el.textContent = displayName;
+  });
+
+  const menuToggle = document.getElementById("menuToggle");
+  const navMenu = document.querySelector(".nav-menu");
+  if (menuToggle && navMenu) {
+    menuToggle.addEventListener("click", () => navMenu.classList.toggle("show"));
+  }
+</script>
+<script src="search-handler.js"></script>
+</body>
+</html>
