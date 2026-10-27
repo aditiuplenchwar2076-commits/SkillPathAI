@@ -349,15 +349,20 @@ async function renderQuizPerformanceMetrics(topics, quizResults, performanceData
 
 function renderEmptyRoadmapState() {
   const container = document.getElementById("dashboardRoadmapItems");
-  if (!container) return;
+  const todayGoalTitle = document.getElementById("todayGoalTitle");
+  if (todayGoalTitle) {
+    todayGoalTitle.textContent = "Start by Choosing a Career Path";
+  }
 
-  container.innerHTML = `
-    <div style="padding: 30px; text-align: center; background: #fff; border-radius: 12px; border: 1px dashed #d1d5db;">
-      <h3 style="margin-bottom: 8px; color: #1e1b4b;">No Learning Roadmap Found</h3>
-      <p style="color: #6b7280; margin-bottom: 20px; font-size: 14px;">Take our quick assessment to personalize your career roadmap and curriculum.</p>
-      <a href="asses.html" class="btn-primary" style="display: inline-block; padding: 10px 22px; background: linear-gradient(to right, #4F63D2, #7c93f5); color: white; border-radius: 8px; font-weight: bold; text-decoration: none;">Take Skill Assessment →</a>
-    </div>
-  `;
+  if (container) {
+    container.innerHTML = `
+      <div style="padding: 30px; text-align: center; background: #fff; border-radius: 12px; border: 1px dashed #d1d5db;">
+        <h3 style="margin-bottom: 8px; color: #1e1b4b;">No Learning Roadmap Found</h3>
+        <p style="color: #6b7280; margin-bottom: 20px; font-size: 14px;">Take our quick assessment to personalize your career roadmap and curriculum.</p>
+        <a href="asses.html" class="btn-primary" style="display: inline-block; padding: 10px 22px; background: linear-gradient(to right, #4F63D2, #7c93f5); color: white; border-radius: 8px; font-weight: bold; text-decoration: none;">Take Skill Assessment →</a>
+      </div>
+    `;
+  }
 
   updateStatMetrics(0, 0, 0);
   renderStreakAndProjectMetrics({ streak_days: 0, completed_projects: 0, week_completed_topics: 0 });
@@ -489,10 +494,12 @@ function renderDashboardRoadmap(topics, progressRecords, roadmap, level) {
     container.innerHTML = html;
 
     // Update today's learning goal with the current active topic
-    if (firstIncompleteTopic) {
-      const todayGoalTitle = document.getElementById("todayGoalTitle");
-      if (todayGoalTitle) {
+    const todayGoalTitle = document.getElementById("todayGoalTitle");
+    if (todayGoalTitle) {
+      if (firstIncompleteTopic) {
         todayGoalTitle.textContent = firstIncompleteTopic.topic_name;
+      } else if (topics.length > 0) {
+        todayGoalTitle.textContent = "Roadmap Completed! 🎉";
       }
     }
   }

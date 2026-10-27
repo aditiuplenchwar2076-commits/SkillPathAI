@@ -9,6 +9,7 @@ import {
   signOut,
   getAdditionalUserInfo
 } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+import { syncUserWithBackend, apiRequest } from "./api.js";
 
 // SkillPathAI Firebase project configuration
 const firebaseConfig = {
@@ -94,35 +95,47 @@ if (signupLink) {
 }
 
 /**
- * Routes user according to their onboarding status.
+ * Synchronizes user with backend and routes according to user profile & onboarding status.
  * Checks for returnUrl query parameter first.
  */
-function handleAuthSuccess(userCredential, isCreated) {
-  const additionalInfo = getAdditionalUserInfo(userCredential);
-  const isNewUser = isCreated || (additionalInfo ? additionalInfo.isNewUser : false);
+async function handleAuthSuccess(userCredential, isCreated) {
+  clearErrors();
 
   const urlParams = new URLSearchParams(window.location.search);
   const returnUrl = urlParams.get("returnUrl");
 
-  if (isNewUser) {
-    // Clear prior cached data for fresh account setup
-    localStorage.removeItem("careerPath");
-    localStorage.removeItem("skillLevel");
-    localStorage.removeItem("skillpath_career");
-    localStorage.removeItem("skillpath_level");
-    localStorage.removeItem("skillpath_route");
-    localStorage.removeItem("skillpath_score");
-    window.location.href = "home.html";
-  } else {
-    // Returning user
-    const hasOnboarding = localStorage.getItem("careerPath") || localStorage.getItem("skillLevel");
-    if (returnUrl && !returnUrl.includes("login.html") && !returnUrl.includes("index.html")) {
-      window.location.href = returnUrl;
-    } else if (hasOnboarding) {
-      window.location.href = "dashboard.html";
-    } else {
-      window.location.href = "home.html";
+  if (returnUrl && !returnUrl.includes("login.html") && !returnUrl.includes("index.html")) {
+    window.location.replace(returnUrl);
+    return;
+  }
+
+  let dbUser = null;
+  try {
+    dbUser = await syncUserWithBackend();
+  } catch (syncErr) {
+    console.warn("Backend user sync during auth:", syncErr);
+  }
+
+  // Check if user has an existing roadmap or onboarding in database or localStorage
+  let hasRoadmap = false;
+  if (dbUser && dbUser.user_id) {
+    try {
+      const roadmaps = await apiRequest(`/roadmaps/${dbUser.user_id}`);
+      if (Array.isArray(roadmaps) && roadmaps.length > 0) {
+        hasRoadmap = true;
+      }
+    } catch (e) {
+      console.warn("Could not check roadmaps during auth routing:", e);
     }
+  }
+
+  const hasLocalCareer = localStorage.getItem("careerPath") || localStorage.getItem("skillpath_career");
+
+  if (hasRoadmap || hasLocalCareer) {
+    window.location.replace("dashboard.html");
+  } else {
+    // Fresh user without a selected career path or roadmap
+    window.location.replace("home.html");
   }
 }
 
@@ -198,7 +211,7 @@ if (loginForm) {
         userCredential = await signInWithEmailAndPassword(auth, email, password);
       }
 
-      handleAuthSuccess(userCredential, isSignupMode);
+      await handleAuthSuccess(userCredential, isSignupMode);
     } catch (error) {
       if (loginButton) {
         loginButton.disabled = false;
@@ -223,11 +236,18 @@ if (googleButton) {
     const originalBtnContent = googleButton.innerHTML;
     googleButton.disabled = true;
     googleButton.style.opacity = "0.7";
+    googleButton.innerHTML = "<span>Signing in with Google...</span>";
 
     try {
       const userCredential = await signInWithPopup(auth, googleProvider);
-      handleAuthSuccess(userCredential, false);
+      // Popup succeeded: user is authenticated with Firebase
+      await handleAuthSuccess(userCredential, false);
     } catch (error) {
+      // If user is already authenticated (e.g. redirect in flight or secondary error), do not show error
+      if (auth.currentUser) {
+        return;
+      }
+
       googleButton.disabled = false;
       googleButton.style.opacity = "1";
       googleButton.innerHTML = originalBtnContent;
