@@ -1,7 +1,10 @@
 import os
+import logging
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, HTTPException, Depends
 from database.mysql import SessionLocal
+
+logger = logging.getLogger("skillpathai.backend")
 from models.user import User
 from schemas.user import UserCreate, UserResponse
 from models.profile import Profile
@@ -54,20 +57,24 @@ def home():
 
 @app.get("/db-test")
 def db_test():
+    """
+    Minimal database connectivity health check.
+    Does not expose sensitive metadata (database name, version, table list).
+    """
     db = SessionLocal()
     try:
         from sqlalchemy import text
-        version = db.execute(text("SELECT VERSION()")).scalar()
-        database_name = db.execute(text("SELECT DATABASE()")).scalar()
-        tables = db.execute(text("SHOW TABLES")).scalars().all()
+        db.execute(text("SELECT 1")).scalar()
         return {
-            "message": "FastAPI connected to MySQL!",
-            "database": database_name,
-            "version": version,
-            "tables": tables
+            "status": "ok",
+            "database": "connected"
         }
     except Exception as e:
-        return {"error": str(e), "type": type(e).__name__}
+        logger.error("Database health check error: %s", type(e).__name__)
+        raise HTTPException(
+            status_code=503,
+            detail="Database service temporarily unavailable."
+        )
     finally:
         db.close()
 
@@ -129,13 +136,26 @@ def sync_user(token: dict = Depends(verify_token)):
         db.close()
 
 @app.post("/users")
-def create_user(user: UserCreate):
+def create_user(user: UserCreate, token: dict = Depends(verify_token)):
     db = SessionLocal()
 
     try:
+        firebase_uid = token.get("uid")
+        if not firebase_uid:
+            raise HTTPException(status_code=401, detail="Invalid token: missing UID")
+
+        # Check if user with this firebase_uid already exists
+        existing_user = db.query(User).filter(User.firebase_uid == firebase_uid).first()
+        if existing_user:
+            return {
+                "message": "User already exists!",
+                "user_id": existing_user.user_id
+            }
+
         new_user = User(
             name=user.name,
             email=user.email,
+            firebase_uid=firebase_uid,
             career_goal=user.career_goal
         )
 
@@ -152,12 +172,36 @@ def create_user(user: UserCreate):
         db.close()
 
 @app.post("/profiles")
-def create_profile(profile: ProfileCreate):
+def create_profile(profile: ProfileCreate, token: dict = Depends(verify_token)):
     db = SessionLocal()
 
     try:
+        current_user = get_authenticated_user(token, db)
+        if current_user.user_id != profile.user_id:
+            raise HTTPException(
+                status_code=403,
+                detail="Forbidden: Cannot create profile for another user."
+            )
+
+        existing_profile = db.query(Profile).filter(Profile.user_id == current_user.user_id).first()
+        if existing_profile:
+            if profile.education is not None:
+                existing_profile.education = profile.education
+            if profile.interests is not None:
+                existing_profile.interests = profile.interests
+            if profile.current_skills is not None:
+                existing_profile.current_skills = profile.current_skills
+            if profile.skill_level is not None:
+                existing_profile.skill_level = profile.skill_level
+            db.commit()
+            db.refresh(existing_profile)
+            return {
+                "message": "Profile updated successfully!",
+                "profile_id": existing_profile.profile_id
+            }
+
         new_profile = Profile(
-            user_id=profile.user_id,
+            user_id=current_user.user_id,
             education=profile.education,
             interests=profile.interests,
             current_skills=profile.current_skills,
@@ -181,10 +225,20 @@ def get_profile(user_id: int, token: dict = Depends(verify_token)):
     db = SessionLocal()
 
     try:
+        current_user = get_authenticated_user(token, db)
+        if current_user.user_id != user_id:
+            raise HTTPException(
+                status_code=403,
+                detail="Forbidden: Cannot view profile of another user."
+            )
+
         profile = db.query(Profile).filter(Profile.user_id == user_id).first()
 
         if not profile:
-            return {"message": "Profile not found"}
+            raise HTTPException(
+                status_code=404,
+                detail="Profile not found."
+            )
 
         return {
             "profile_id": profile.profile_id,
@@ -198,16 +252,36 @@ def get_profile(user_id: int, token: dict = Depends(verify_token)):
     finally:
         db.close()    
 @app.patch("/profiles/{user_id}")
-def update_profile(user_id: int, profile: ProfileUpdate):
+def update_profile(user_id: int, profile: ProfileUpdate, token: dict = Depends(verify_token)):
     db = SessionLocal()
 
     try:
+        current_user = get_authenticated_user(token, db)
+        if current_user.user_id != user_id:
+            raise HTTPException(
+                status_code=403,
+                detail="Forbidden: Cannot modify profile of another user."
+            )
+
         existing_profile = db.query(Profile).filter(
             Profile.user_id == user_id
         ).first()
 
         if not existing_profile:
-            return {"message": "Profile not found"}
+            existing_profile = Profile(
+                user_id=user_id,
+                education=profile.education or "",
+                interests=profile.interests or "",
+                current_skills=profile.current_skills or "",
+                skill_level=profile.skill_level or "Beginner"
+            )
+            db.add(existing_profile)
+            db.commit()
+            db.refresh(existing_profile)
+            return {
+                "message": "Profile created successfully!",
+                "profile_id": existing_profile.profile_id
+            }
 
         if profile.education is not None:
             existing_profile.education = profile.education
@@ -681,27 +755,90 @@ def get_quiz_results(user_id: int, token: dict = Depends(verify_token)):
         db.close()
 
 @app.get("/ai-test")
-def ai_test():
-    response = test_gemini()
+def ai_test(token: dict = Depends(verify_token)):
+    try:
+        response = test_gemini()
+        return {
+            "message": "Gemini is working!",
+            "response": response
+        }
+    except Exception as e:
+        err_msg = str(e)
+        logger.error("AI test error: %s", err_msg)
+        if "not configured" in err_msg.lower():
+            raise HTTPException(
+                status_code=503,
+                detail="AI service is not configured on the server."
+            )
+        if "timed out" in err_msg.lower() or "timeout" in err_msg.lower():
+            raise HTTPException(
+                status_code=504,
+                detail="AI request timed out."
+            )
+        if "quota" in err_msg.lower() or "429" in err_msg or "resource_exhausted" in err_msg.lower():
+            raise HTTPException(
+                status_code=429,
+                detail="AI quota or rate limit exceeded. Please try again shortly."
+            )
+        raise HTTPException(
+            status_code=500,
+            detail="AI service is currently unavailable."
+        )
 
-    return {
-        "message": "Gemini is working!",
-        "response": response
-    }
+
 @app.post("/generate-roadmap")
-def generate_ai_roadmap(data: AIRoadmapRequest):
-
+def generate_ai_roadmap(data: AIRoadmapRequest, token: dict = Depends(verify_token)):
     db = SessionLocal()
 
     try:
+        current_user = get_authenticated_user(token, db)
+        if current_user.user_id != data.user_id:
+            raise HTTPException(
+                status_code=403,
+                detail="Forbidden: Cannot generate roadmap for another user."
+            )
+
         # Generate roadmap using Gemini
-        roadmap = generate_roadmap(
-            career_goal=data.career_goal,
-            current_skills=data.current_skills,
-            interests=data.interests,
-            skill_level=data.skill_level,
-            assessment_score=data.assessment_score
-        )
+        try:
+            roadmap = generate_roadmap(
+                career_goal=data.career_goal,
+                current_skills=data.current_skills,
+                interests=data.interests,
+                skill_level=data.skill_level,
+                assessment_score=data.assessment_score
+            )
+        except Exception as e:
+            err_msg = str(e)
+            logger.error("Gemini roadmap generation error: %s", err_msg)
+            if "not configured" in err_msg.lower():
+                raise HTTPException(
+                    status_code=503,
+                    detail="AI service is not configured on the server."
+                )
+            if "timed out" in err_msg.lower() or "timeout" in err_msg.lower():
+                raise HTTPException(
+                    status_code=504,
+                    detail="AI request timed out. The upstream model took too long to respond. Please try again."
+                )
+            if "quota" in err_msg.lower() or "429" in err_msg or "resource_exhausted" in err_msg.lower():
+                raise HTTPException(
+                    status_code=429,
+                    detail="AI quota or rate limit exceeded. Please wait a moment and try again."
+                )
+            if "503" in err_msg or "service_unavailable" in err_msg or "high demand" in err_msg:
+                raise HTTPException(
+                    status_code=503,
+                    detail="The AI assistant is temporarily experiencing high demand. Please try again in a few moments."
+                )
+            if "validation error" in err_msg.lower() or "empty" in err_msg.lower() or "malformed" in err_msg.lower():
+                raise HTTPException(
+                    status_code=502,
+                    detail="AI returned an invalid or malformed roadmap response. Please try again."
+                )
+            raise HTTPException(
+                status_code=500,
+                detail="Unable to generate AI roadmap. Please try again later."
+            )
 
         # Save roadmap
         new_roadmap = Roadmap(
@@ -732,21 +869,33 @@ def generate_ai_roadmap(data: AIRoadmapRequest):
             "topics": roadmap.topics
         }
 
+    except HTTPException:
+        db.rollback()
+        raise
+
     except Exception as e:
         db.rollback()
-        return {
-            "error": str(e)
-        }
+        logger.error("Unexpected error saving roadmap: %s", e)
+        raise HTTPException(
+            status_code=500,
+            detail="An unexpected error occurred while saving the roadmap."
+        )
 
     finally:
         db.close()
 
 @app.post("/generate-roadmap/{user_id}")
-def generate_roadmap_for_user(user_id: int):
-
+def generate_roadmap_for_user(user_id: int, token: dict = Depends(verify_token)):
     db = SessionLocal()
 
     try:
+        current_user = get_authenticated_user(token, db)
+        if current_user.user_id != user_id:
+            raise HTTPException(
+                status_code=403,
+                detail="Forbidden: Cannot generate roadmap for another user."
+            )
+
         # Get user
         user = db.query(User).filter(User.user_id == user_id).first()
 
@@ -782,13 +931,46 @@ def generate_roadmap_for_user(user_id: int):
             )
 
         # Generate roadmap using user's database data
-        roadmap = generate_roadmap(
-            career_goal=user.career_goal,
-            current_skills=profile.current_skills,
-            interests=profile.interests,
-            skill_level=profile.skill_level,
-            assessment_score=float(assessment.score)
-        )
+        try:
+            roadmap = generate_roadmap(
+                career_goal=user.career_goal or "Software Engineering",
+                current_skills=profile.current_skills or "",
+                interests=profile.interests or "",
+                skill_level=profile.skill_level or "Beginner",
+                assessment_score=float(assessment.score) if assessment.score is not None else 0.0
+            )
+        except Exception as e:
+            err_msg = str(e)
+            logger.error("Gemini roadmap generation for user error: %s", err_msg)
+            if "not configured" in err_msg.lower():
+                raise HTTPException(
+                    status_code=503,
+                    detail="AI service is not configured on the server."
+                )
+            if "timed out" in err_msg.lower() or "timeout" in err_msg.lower():
+                raise HTTPException(
+                    status_code=504,
+                    detail="AI request timed out. The upstream model took too long to respond. Please try again."
+                )
+            if "quota" in err_msg.lower() or "429" in err_msg or "resource_exhausted" in err_msg.lower():
+                raise HTTPException(
+                    status_code=429,
+                    detail="AI quota or rate limit exceeded. Please wait a moment and try again."
+                )
+            if "503" in err_msg or "service_unavailable" in err_msg or "high demand" in err_msg:
+                raise HTTPException(
+                    status_code=503,
+                    detail="The AI assistant is temporarily experiencing high demand. Please try again in a few moments."
+                )
+            if "validation error" in err_msg.lower() or "empty" in err_msg.lower() or "malformed" in err_msg.lower():
+                raise HTTPException(
+                    status_code=502,
+                    detail="AI returned an invalid or malformed roadmap response. Please try again."
+                )
+            raise HTTPException(
+                status_code=500,
+                detail="Unable to generate AI roadmap. Please try again later."
+            )
 
         # Save roadmap
         new_roadmap = Roadmap(
@@ -821,13 +1003,15 @@ def generate_roadmap_for_user(user_id: int):
         }
 
     except HTTPException:
+        db.rollback()
         raise
 
     except Exception as e:
         db.rollback()
+        logger.error("Unexpected error in generate_roadmap_for_user: %s", e)
         raise HTTPException(
             status_code=500,
-            detail=str(e)
+            detail="An unexpected error occurred while generating the roadmap."
         )
 
     finally:
@@ -841,10 +1025,21 @@ def explain_topic_api(data: TopicExplanationRequest, token: dict = Depends(verif
         )
     except Exception as e:
         err_msg = str(e)
+        logger.error("Gemini explain topic error: %s", err_msg)
+        if "not configured" in err_msg.lower():
+            raise HTTPException(
+                status_code=503,
+                detail="AI service is not configured on the server."
+            )
         if "timed out" in err_msg.lower() or "timeout" in err_msg.lower():
             raise HTTPException(
                 status_code=504,
                 detail="AI request timed out. The upstream model took too long to respond. Please try again."
+            )
+        if "quota" in err_msg.lower() or "429" in err_msg or "resource_exhausted" in err_msg.lower():
+            raise HTTPException(
+                status_code=429,
+                detail="AI quota or rate limit exceeded. Please wait a moment and try again."
             )
         if "503" in err_msg or "service_unavailable" in err_msg or "high demand" in err_msg:
             raise HTTPException(
@@ -853,7 +1048,7 @@ def explain_topic_api(data: TopicExplanationRequest, token: dict = Depends(verif
             )
         raise HTTPException(
             status_code=500,
-            detail=f"Unable to generate explanation: {err_msg}"
+            detail="Unable to generate explanation. Please try again later."
         )
 
     return {
@@ -1090,7 +1285,50 @@ def get_dashboard_overview(token: dict = Depends(verify_token)):
             if p.status == "Completed" and p.last_updated and p.last_updated.date() >= week_start
         )
 
-        # 7. Performance breakdown
+        # 7. Progress summary (single deterministic source of truth)
+        progress_map = {}
+        for p in progress_records:
+            t_id = p.topic_id
+            existing = progress_map.get(t_id)
+            if not existing:
+                progress_map[t_id] = p
+            else:
+                is_new_done = (p.status and p.status.lower() == "completed") or (p.completion_percentage and p.completion_percentage >= 100)
+                is_old_done = (existing.status and existing.status.lower() == "completed") or (existing.completion_percentage and existing.completion_percentage >= 100)
+                if is_new_done or (not is_old_done and (p.completion_percentage or 0) > (existing.completion_percentage or 0)):
+                    progress_map[t_id] = p
+
+        completed_count = 0
+        current_topic = None
+        for t in topics:
+            p = progress_map.get(t.topic_id)
+            pct = p.completion_percentage if (p and p.completion_percentage is not None) else 0
+            status_text = t.status or "Not Started"
+            is_done = (status_text.lower() == "completed") or (pct >= 100) or (p and p.status and p.status.lower() == "completed")
+
+            if is_done:
+                completed_count += 1
+            elif not current_topic:
+                current_topic = {
+                    "topic_id": t.topic_id,
+                    "topic_name": t.topic_name,
+                    "sequence_no": t.sequence_no,
+                    "status": "In Progress" if (status_text.lower() == "in progress" or pct > 0) else "Not Started",
+                    "completion_percentage": pct
+                }
+
+        total_topics = len(topics)
+        overall_percentage = round((completed_count / total_topics) * 100) if total_topics > 0 else 0
+
+        progress_summary = {
+            "completed_topics": completed_count,
+            "total_topics": total_topics,
+            "overall_percentage": overall_percentage,
+            "fraction": f"{completed_count}/{total_topics}",
+            "current_topic": current_topic
+        }
+
+        # 8. Performance breakdown
         topic_data = {}
         for r in quiz_results:
             if r.topic_id not in topic_data:
@@ -1121,7 +1359,7 @@ def get_dashboard_overview(token: dict = Depends(verify_token)):
             "latest_assessment": {
                 "assessment_id": latest_assessment.assessment_id,
                 "skill_level": latest_assessment.skill_level,
-                "score": latest_assessment.score,
+                "score": float(latest_assessment.score) if latest_assessment.score is not None else None,
                 "completed_at": latest_assessment.completed_at.isoformat() if latest_assessment.completed_at else None
             } if latest_assessment else None,
             "active_roadmap": {
@@ -1150,10 +1388,12 @@ def get_dashboard_overview(token: dict = Depends(verify_token)):
                 }
                 for p in progress_records
             ],
+            "progress_summary": progress_summary,
             "streak": {
                 "user_id": user_id,
                 "streak_days": streak,
                 "active_dates_count": len(sorted_dates),
+                "active_dates": [d.isoformat() for d in sorted_dates],
                 "completed_projects": 0,
                 "week_completed_topics": week_completed_count
             },
@@ -1162,7 +1402,7 @@ def get_dashboard_overview(token: dict = Depends(verify_token)):
                     "result_id": q.result_id,
                     "user_id": q.user_id,
                     "topic_id": q.topic_id,
-                    "score": q.score,
+                    "score": float(q.score) if q.score is not None else 0.0,
                     "total_questions": q.total_questions,
                     "attempt_no": q.attempt_no,
                     "completed_at": q.completed_at.isoformat() if q.completed_at else None

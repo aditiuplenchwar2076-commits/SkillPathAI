@@ -94,9 +94,13 @@ if (signupLink) {
   });
 }
 
+let isAuthSubmitting = false;
+let isGoogleSubmitting = false;
+
 /**
  * Synchronizes user with backend and routes according to user profile & onboarding status.
  * Checks for returnUrl query parameter first.
+ * Provides informative status updates if backend cold start takes longer than 3.5 seconds.
  */
 async function handleAuthSuccess(userCredential, isCreated) {
   clearErrors();
@@ -109,11 +113,23 @@ async function handleAuthSuccess(userCredential, isCreated) {
     return;
   }
 
+  // Display informative status if Render cold-start takes longer than 3.5s
+  const coldStartTimer = setTimeout(() => {
+    if (loginButton && loginButton.disabled) {
+      loginButton.textContent = "Server is waking up, please hold on...";
+    }
+    if (googleButton && googleButton.disabled) {
+      googleButton.innerHTML = "<span>Server is waking up, please hold on...</span>";
+    }
+  }, 3500);
+
   let dbUser = null;
   try {
     dbUser = await syncUserWithBackend();
   } catch (syncErr) {
     console.warn("Backend user sync during auth:", syncErr);
+  } finally {
+    clearTimeout(coldStartTimer);
   }
 
   // Check if user has an existing roadmap or onboarding in database or localStorage
@@ -173,6 +189,8 @@ function mapAuthError(error) {
 if (loginForm) {
   loginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
+    if (isAuthSubmitting) return; // Prevent double submission
+
     clearErrors();
 
     const email = emailInput ? emailInput.value.trim() : "";
@@ -197,31 +215,58 @@ if (loginForm) {
     }
 
     // Disable button & show loading state
-    const originalBtnText = loginButton ? loginButton.textContent : "Submit";
+    isAuthSubmitting = true;
+    const defaultBtnText = isSignupMode ? "Sign Up" : "Login";
+    const originalBtnText = (loginButton && loginButton.textContent) ? loginButton.textContent : defaultBtnText;
     if (loginButton) {
       loginButton.disabled = true;
       loginButton.textContent = isSignupMode ? "Creating account..." : "Logging in...";
     }
 
+    let redirecting = false;
+
     try {
       let userCredential;
       if (isSignupMode) {
-        userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        // Protect against duplicate user creation:
+        // If current session already authenticated the user with this email (e.g. previous attempt timed out during sync)
+        if (auth.currentUser && auth.currentUser.email && auth.currentUser.email.toLowerCase() === email.toLowerCase()) {
+          userCredential = { user: auth.currentUser };
+        } else {
+          try {
+            userCredential = await createUserWithEmailAndPassword(auth, email, password);
+          } catch (createErr) {
+            // If already registered, attempt login with the provided credentials
+            if (createErr.code === "auth/email-already-in-use") {
+              try {
+                userCredential = await signInWithEmailAndPassword(auth, email, password);
+              } catch (signInErr) {
+                throw createErr;
+              }
+            } else {
+              throw createErr;
+            }
+          }
+        }
       } else {
         userCredential = await signInWithEmailAndPassword(auth, email, password);
       }
 
+      redirecting = true;
       await handleAuthSuccess(userCredential, isSignupMode);
     } catch (error) {
-      if (loginButton) {
-        loginButton.disabled = false;
-        loginButton.textContent = originalBtnText;
-      }
+      redirecting = false;
       const errInfo = mapAuthError(error);
       if (errInfo.field === "email" && emailError) {
         emailError.textContent = errInfo.msg;
       } else if (passwordError) {
         passwordError.textContent = errInfo.msg;
+      }
+    } finally {
+      isAuthSubmitting = false;
+      if (!redirecting && loginButton) {
+        loginButton.disabled = false;
+        loginButton.textContent = isSignupMode ? "Sign Up" : "Login";
       }
     }
   });
@@ -231,30 +276,41 @@ if (loginForm) {
 if (googleButton) {
   googleButton.addEventListener("click", async (event) => {
     event.preventDefault();
+    if (isGoogleSubmitting) return;
+
     clearErrors();
 
     const originalBtnContent = googleButton.innerHTML;
+    isGoogleSubmitting = true;
     googleButton.disabled = true;
     googleButton.style.opacity = "0.7";
     googleButton.innerHTML = "<span>Signing in with Google...</span>";
 
+    let redirecting = false;
+
     try {
       const userCredential = await signInWithPopup(auth, googleProvider);
-      // Popup succeeded: user is authenticated with Firebase
+      redirecting = true;
       await handleAuthSuccess(userCredential, false);
     } catch (error) {
+      redirecting = false;
       // If user is already authenticated (e.g. redirect in flight or secondary error), do not show error
       if (auth.currentUser) {
+        redirecting = true;
+        await handleAuthSuccess({ user: auth.currentUser }, false);
         return;
       }
-
-      googleButton.disabled = false;
-      googleButton.style.opacity = "1";
-      googleButton.innerHTML = originalBtnContent;
 
       const errInfo = mapAuthError(error);
       if (passwordError) {
         passwordError.textContent = errInfo.msg;
+      }
+    } finally {
+      isGoogleSubmitting = false;
+      if (!redirecting && googleButton) {
+        googleButton.disabled = false;
+        googleButton.style.opacity = "1";
+        googleButton.innerHTML = originalBtnContent;
       }
     }
   });

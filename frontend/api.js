@@ -58,6 +58,7 @@ export function getCurrentUser() {
  * Sends an authenticated HTTP request to the FastAPI backend.
  * Obtains a fresh Firebase ID token directly via user.getIdToken().
  * Never stores or reads tokens from localStorage.
+ * Includes configurable AbortController timeout support (default 25s).
  */
 export async function apiRequest(endpoint, options = {}) {
   const user = await getCurrentUser();
@@ -76,10 +77,50 @@ export async function apiRequest(endpoint, options = {}) {
     ...(options.headers || {})
   };
 
-  const response = await fetch(url, {
-    ...options,
-    headers
-  });
+  // Configure AbortController timeout (default 25s, or custom timeout in options)
+  const controller = new AbortController();
+  const timeoutMs = typeof options.timeout === "number" ? options.timeout : 25000;
+  let didTimeout = false;
+  let timerId = null;
+
+  if (timeoutMs > 0) {
+    timerId = setTimeout(() => {
+      didTimeout = true;
+      controller.abort();
+    }, timeoutMs);
+  }
+
+  // Link any external AbortSignal if caller provided one
+  if (options.signal) {
+    if (options.signal.aborted) {
+      controller.abort();
+    } else {
+      options.signal.addEventListener("abort", () => controller.abort());
+    }
+  }
+
+  const { timeout: _unusedTimeout, signal: _unusedSignal, ...fetchOptions } = options;
+
+  let response;
+  try {
+    response = await fetch(url, {
+      ...fetchOptions,
+      headers,
+      signal: controller.signal
+    });
+  } catch (fetchErr) {
+    if (didTimeout || (fetchErr && fetchErr.name === "AbortError" && didTimeout)) {
+      const timeoutErr = new Error("Request timed out while waiting for server response. The server may be waking up, please try again.");
+      timeoutErr.name = "TimeoutError";
+      timeoutErr.status = 504;
+      throw timeoutErr;
+    }
+    throw fetchErr;
+  } finally {
+    if (timerId) {
+      clearTimeout(timerId);
+    }
+  }
 
   if (!response.ok) {
     let errorDetail = "API request failed with status " + response.status;
@@ -102,9 +143,12 @@ export async function apiRequest(endpoint, options = {}) {
 /**
  * Synchronizes the authenticated Firebase identity with the MySQL backend.
  * Calls POST /users/sync and returns the internal user record (user_id, email, etc).
+ * Sets a 35s timeout to accommodate backend cold starts gracefully.
  */
-export async function syncUserWithBackend() {
+export async function syncUserWithBackend(options = {}) {
   return await apiRequest("/users/sync", {
-    method: "POST"
+    method: "POST",
+    timeout: 35000,
+    ...options
   });
 }
