@@ -2019,9 +2019,39 @@ a {
 
   gap: 12px;
 
-  padding: 10px 0;
+  padding: 10px 8px;
 
   border-bottom: 1px solid #f0f0f0;
+
+  text-decoration: none;
+
+  color: inherit;
+
+  cursor: pointer;
+
+  border-radius: 8px;
+
+  transition: background-color 0.15s ease, color 0.15s ease;
+
+}
+
+.milestone-item:hover {
+
+  background-color: #f8f9ff;
+
+}
+
+.milestone-item:hover .milestone-title {
+
+  color: #7c5cff;
+
+}
+
+.milestone-item:hover .milestone-arrow {
+
+  color: #7c5cff;
+
+  transform: translateX(3px);
 
 }
 
@@ -2040,6 +2070,8 @@ a {
   font-size: 13px;
 
   font-weight: bold;
+
+  transition: color 0.15s ease;
 
 }
 
@@ -2063,6 +2095,8 @@ a {
 
   font-size: 18px;
 
+  transition: transform 0.15s ease, color 0.15s ease;
+
 }
 
 
@@ -2080,6 +2114,18 @@ a {
   font-weight: bold;
 
   margin-top: 15px;
+
+  text-decoration: none;
+
+  transition: opacity 0.15s ease;
+
+}
+
+.view-all-link:hover {
+
+  text-decoration: underline;
+
+  opacity: 0.9;
 
 }
 

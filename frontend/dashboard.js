@@ -99,7 +99,7 @@ export function updateDashboardGreeting(firebaseUser, dbUser, activityState) {
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     // If no user is signed in, redirect to login page
-    window.location.href = "index.html";
+    window.location.href = "login.html";
     return;
   }
 
@@ -758,12 +758,35 @@ if (userProfileEl && profileDropdownMenuEl) {
   }
 
   userProfileEl.addEventListener("click", function(event) {
+    // If click originated inside the dropdown menu, let the inner item handle it
+    if (profileDropdownMenuEl.contains(event.target)) {
+      return;
+    }
     event.stopPropagation();
     const isOpen = profileDropdownMenuEl.style.display === "block" || profileDropdownMenuEl.classList.contains("show");
     if (isOpen) {
       closeDropdown();
     } else {
       openDropdown();
+    }
+  });
+
+  // Prevent clicks inside the dropdown menu from closing it prematurely
+  profileDropdownMenuEl.addEventListener("click", function(event) {
+    event.stopPropagation();
+  });
+
+  // Keyboard accessibility for userProfile button (Enter / Space)
+  userProfileEl.addEventListener("keydown", function(event) {
+    if (event.key === "Enter" || event.key === " ") {
+      if (event.target !== userProfileEl) return;
+      event.preventDefault();
+      const isOpen = profileDropdownMenuEl.style.display === "block" || profileDropdownMenuEl.classList.contains("show");
+      if (isOpen) {
+        closeDropdown();
+      } else {
+        openDropdown();
+      }
     }
   });
 
@@ -779,6 +802,7 @@ if (userProfileEl && profileDropdownMenuEl) {
   document.addEventListener("keydown", function(event) {
     if (event.key === "Escape") {
       closeDropdown();
+      userProfileEl.focus();
     }
   });
 }
@@ -787,12 +811,21 @@ if (logoutBtnEl) {
   logoutBtnEl.addEventListener("click", async function(event) {
     event.preventDefault();
     event.stopPropagation();
+    const currentUid = auth.currentUser ? auth.currentUser.uid : null;
     try {
       await signOut(auth);
-      window.location.href = "index.html";
+      if (currentUid) {
+        sessionStorage.removeItem(`skillpath_first_login_${currentUid}`);
+      }
+      Object.keys(sessionStorage).forEach((key) => {
+        if (key.startsWith("skillpath_first_login_")) {
+          sessionStorage.removeItem(key);
+        }
+      });
+      window.location.href = "login.html";
     } catch (error) {
       console.error("Error signing out:", error);
-      alert("Failed to log out. Please try again.");
+      alert("Failed to log out. Please check your network connection and try again.");
     }
   });
 }
