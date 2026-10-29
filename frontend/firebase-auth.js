@@ -105,6 +105,44 @@ let isGoogleSubmitting = false;
 async function handleAuthSuccess(userCredential, isCreated) {
   clearErrors();
 
+  // Authoritative first-time registration detection using Firebase isNewUser
+  let isNewUser = false;
+  try {
+    const additionalInfo = getAdditionalUserInfo(userCredential);
+    if (additionalInfo && typeof additionalInfo.isNewUser === "boolean") {
+      isNewUser = additionalInfo.isNewUser;
+    } else {
+      isNewUser = Boolean(isCreated);
+    }
+  } catch (infoErr) {
+    isNewUser = Boolean(isCreated);
+  }
+
+  const authUser = userCredential ? userCredential.user : null;
+  const uid = authUser ? authUser.uid : null;
+
+  if (uid) {
+    if (isNewUser) {
+      // Persist the first-login flag before redirecting after registration
+      try {
+        localStorage.setItem(`skillpath_first_login_${uid}`, "true");
+        sessionStorage.setItem(`skillpath_first_login_${uid}`, "true");
+        localStorage.removeItem(`skillpath_is_returning_${uid}`);
+      } catch (e) {
+        console.warn("Could not save first-login state:", e);
+      }
+    } else {
+      // Existing returning account signing in
+      try {
+        localStorage.setItem(`skillpath_is_returning_${uid}`, "true");
+        localStorage.removeItem(`skillpath_first_login_${uid}`);
+        sessionStorage.removeItem(`skillpath_first_login_${uid}`);
+      } catch (e) {
+        console.warn("Could not save returning-login state:", e);
+      }
+    }
+  }
+
   const urlParams = new URLSearchParams(window.location.search);
   const returnUrl = urlParams.get("returnUrl");
 

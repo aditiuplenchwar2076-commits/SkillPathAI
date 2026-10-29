@@ -16,6 +16,85 @@ const firebaseConfig = {
 const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
+// Display name resolver with graceful fallbacks
+export function getResolvedDisplayName(firebaseUser, dbUser) {
+  if (firebaseUser && typeof firebaseUser.displayName === "string" && firebaseUser.displayName.trim()) {
+    return firebaseUser.displayName.trim();
+  }
+  if (dbUser && typeof dbUser.name === "string" && dbUser.name.trim() && dbUser.name.trim().toLowerCase() !== "user") {
+    return dbUser.name.trim();
+  }
+  if (firebaseUser && typeof firebaseUser.email === "string" && firebaseUser.email.includes("@")) {
+    const prefix = firebaseUser.email.split("@")[0].trim();
+    if (prefix) return prefix;
+  }
+  return "Learner";
+}
+
+// Authoritative first-time user check based on registration transaction flag
+export function isAuthoritativeFirstTimeUser(user) {
+  if (!user || !user.uid) return false;
+  const uid = user.uid;
+
+  const sessionFlag = sessionStorage.getItem(`skillpath_first_login_${uid}`);
+  const localFlag = localStorage.getItem(`skillpath_first_login_${uid}`);
+  if (sessionFlag === "true" || localFlag === "true") {
+    return true;
+  }
+
+  // If returning flag is explicitly set or missing, do NOT treat missing localStorage as proof of a new user
+  return false;
+}
+
+// Consumes the first-time flag only after the dashboard greeting has been displayed
+export function consumeFirstTimeUserFlag(uid) {
+  if (!uid) return;
+  try {
+    localStorage.removeItem(`skillpath_first_login_${uid}`);
+    sessionStorage.removeItem(`skillpath_first_login_${uid}`);
+    localStorage.setItem(`skillpath_is_returning_${uid}`, "true");
+  } catch (e) {
+    console.warn("Could not consume first-time user flag:", e);
+  }
+}
+
+// Dashboard greeting manager ensuring all 3 cases and neutral fallback
+export function updateDashboardGreeting(firebaseUser, dbUser, activityState) {
+  const welcomeHeadingEl = document.getElementById("welcomeHeading");
+  if (!welcomeHeadingEl) return;
+
+  const displayName = getResolvedDisplayName(firebaseUser, dbUser);
+
+  // Update navbar/profile display names
+  const userNameEl = document.getElementById("userName");
+  const dropdownUserNameEl = document.getElementById("dropdownUserName");
+  if (userNameEl) userNameEl.textContent = displayName;
+  if (dropdownUserNameEl) dropdownUserNameEl.textContent = displayName;
+
+  // Case 1: First-time user on their first login
+  if (activityState && activityState.isFirstTime) {
+    welcomeHeadingEl.textContent = `Welcome to SkillPathAI, ${displayName}! 👋`;
+    consumeFirstTimeUserFlag(firebaseUser?.uid);
+    return;
+  }
+
+  // Requirement 4: Do not infer zero activity from failed, timed-out, or incomplete backend requests!
+  // Keep the neutral "Welcome back, [Name]! 👋" greeting until valid data is available.
+  if (!activityState || !activityState.hasValidData) {
+    welcomeHeadingEl.textContent = `Welcome back, ${displayName}! 👋`;
+    return;
+  }
+
+  // Case 3: Returning user who has completed activities
+  if (activityState.hasCompletedActivities) {
+    welcomeHeadingEl.textContent = `Welcome back, ${displayName}! You're making progress—keep it up! 🚀`;
+    return;
+  }
+
+  // Case 2: Returning user with an incomplete roadmap (0 completed activities)
+  welcomeHeadingEl.textContent = `Welcome back, ${displayName}! Ready to continue learning?`;
+}
+
 // Auth guard & dynamic user profile population
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -24,12 +103,8 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  // Display user name if available; otherwise display the email portion before the @ symbol
-  let displayName = user.displayName;
-  if (!displayName && user.email) {
-    displayName = user.email.split("@")[0];
-  }
-  displayName = displayName || "Learner";
+  const isFirstTime = isAuthoritativeFirstTimeUser(user);
+  const displayName = getResolvedDisplayName(user, null);
 
   const userNameEl = document.getElementById("userName");
   const welcomeHeadingEl = document.getElementById("welcomeHeading");
@@ -38,7 +113,14 @@ onAuthStateChanged(auth, async (user) => {
     userNameEl.textContent = displayName;
   }
   if (welcomeHeadingEl) {
-    welcomeHeadingEl.textContent = "Welcome back, " + displayName + "! 👋";
+    if (isFirstTime) {
+      // Preliminary first-time greeting while dashboard data loads;
+      // flag is consumed in updateDashboardGreeting after dashboard greeting is rendered.
+      welcomeHeadingEl.textContent = `Welcome to SkillPathAI, ${displayName}! 👋`;
+    } else {
+      // Safe initial neutral greeting while backend data loads
+      welcomeHeadingEl.textContent = `Welcome back, ${displayName}! 👋`;
+    }
   }
 
   // Update dropdown user info
@@ -59,7 +141,7 @@ onAuthStateChanged(auth, async (user) => {
 
   // Load real data from MySQL backend via syncUserWithBackend and apiRequest
   try {
-    await loadUserDashboardData(user);
+    await loadUserDashboardData(user, isFirstTime);
   } catch (err) {
     console.error("Failed to load dashboard data from backend:", err);
   }
@@ -94,7 +176,7 @@ function applyCareerAndLevel(career, level) {
  * 3. Fetches roadmaps (GET /roadmaps/{user_id})
  * 4. Fetches topics & progress if roadmap exists, or creates default/AI roadmap if needed
  */
-async function loadUserDashboardData(firebaseUser) {
+async function loadUserDashboardData(firebaseUser, isFirstTime = false) {
   // Attempt to fetch everything in a single, high-performance aggregate request
   try {
     const overview = await apiRequest("/dashboard/overview");
@@ -130,6 +212,45 @@ async function loadUserDashboardData(firebaseUser) {
       const streakData = overview.streak || { streak_days: 0, completed_projects: 0, week_completed_topics: 0 };
 
       renderStreakAndProjectMetrics(streakData);
+
+      // Evaluate authentic user activity for dashboard greeting with strict field validation
+      if (!isFirstTime) {
+        const hasValidSummary = overview.progress_summary &&
+          typeof overview.progress_summary === "object" &&
+          typeof overview.progress_summary.completed_topics === "number" &&
+          !isNaN(overview.progress_summary.completed_topics);
+        const hasValidProgressList = Array.isArray(overview.progress);
+        const hasValidQuizList = Array.isArray(overview.quiz_results);
+
+        const hasValidActivityData = (hasValidSummary || hasValidProgressList) && hasValidQuizList;
+
+        if (hasValidActivityData) {
+          const completedTopics = hasValidSummary
+            ? overview.progress_summary.completed_topics
+            : overview.progress.filter(p => (p.status && p.status.toLowerCase() === "completed") || (p.completion_percentage && p.completion_percentage >= 100)).length;
+          const completedQuizzes = overview.quiz_results.length;
+          const hasDone = (completedTopics > 0) || (completedQuizzes > 0);
+
+          updateDashboardGreeting(firebaseUser, dbUser, {
+            isFirstTime: false,
+            hasValidData: true,
+            hasCompletedActivities: hasDone
+          });
+        } else {
+          // If required activity data is missing or malformed, retain neutral greeting
+          updateDashboardGreeting(firebaseUser, dbUser, {
+            isFirstTime: false,
+            hasValidData: false,
+            hasCompletedActivities: false
+          });
+        }
+      } else {
+        updateDashboardGreeting(firebaseUser, dbUser, {
+          isFirstTime: true,
+          hasValidData: true,
+          hasCompletedActivities: false
+        });
+      }
 
       if ((!activeRoadmap || topics.length === 0) && career && career !== "Not Set") {
         if (latestAssessment) {
@@ -235,6 +356,46 @@ async function loadUserDashboardData(firebaseUser) {
   const streakData = streakRes.status === "fulfilled" ? streakRes.value : { streak_days: 0, completed_projects: 0, week_completed_topics: 0 };
 
   renderStreakAndProjectMetrics(streakData);
+
+  // Evaluate authentic user activity for dashboard greeting in fallback mode
+  const topicsOk = topicsRes.status === "fulfilled" && Array.isArray(topicsRes.value);
+  const progressOk = progressRes.status === "fulfilled" && Array.isArray(progressRes.value);
+  const quizOk = quizRes.status === "fulfilled" && Array.isArray(quizRes.value);
+
+  if (!isFirstTime) {
+    if (topicsOk && progressOk && quizOk) {
+      const progressRecordsList = progressRes.value;
+      const topicsList = topicsRes.value;
+      const quizResultsList = quizRes.value;
+
+      const completedTopics = progressRecordsList.filter(p =>
+        (p.status && p.status.toLowerCase() === "completed") || (p.completion_percentage && p.completion_percentage >= 100)
+      ).length;
+      const completedTopicsInList = topicsList.filter(t => t.status && t.status.toLowerCase() === "completed").length;
+      const completedQuizzes = quizResultsList.length;
+
+      const hasDone = completedTopics > 0 || completedTopicsInList > 0 || completedQuizzes > 0;
+
+      updateDashboardGreeting(firebaseUser, dbUser, {
+        isFirstTime: false,
+        hasValidData: true,
+        hasCompletedActivities: hasDone
+      });
+    } else {
+      // Incomplete or failed requests: keep neutral greeting, do not infer zero activity
+      updateDashboardGreeting(firebaseUser, dbUser, {
+        isFirstTime: false,
+        hasValidData: false,
+        hasCompletedActivities: false
+      });
+    }
+  } else {
+    updateDashboardGreeting(firebaseUser, dbUser, {
+      isFirstTime: true,
+      hasValidData: true,
+      hasCompletedActivities: false
+    });
+  }
 
   if (!topics || topics.length === 0) {
     renderEmptyRoadmapState();
