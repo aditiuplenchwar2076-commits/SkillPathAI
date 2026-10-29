@@ -372,58 +372,49 @@
         <p class="section-subtitle">Select a target role to launch your adaptive skill diagnostic and generate a personalized curriculum roadmap.</p>
       </div>
 
-      <!-- View Switcher -->
-      <div class="careers-view-toggle-wrap">
-        <div class="careers-view-toggle" role="tablist" aria-label="Career Selection Layout">
-          <button type="button" class="careers-view-btn active" id="btnCubeView" role="tab" aria-selected="true" aria-controls="cubeContainer">
-            <span>🎲</span> 3D Cube View
-          </button>
-          <button type="button" class="careers-view-btn" id="btnArcView" role="tab" aria-selected="false" aria-controls="arcContainer">
-            <span>🌙</span> Semicircular Arc View
-          </button>
-        </div>
-      </div>
-
-      <!-- Career Hub Grid: Interactive Selector (Left) + Details Panel (Right) -->
+      <!-- Career Hub Grid: Interactive 3D Dice (Left) + Details Panel (Right) -->
       <div class="career-hub-grid">
-        <!-- Left: 3D Cube or Semicircular Arc Selector -->
+        <!-- Left: Interactive 3D Career Dice Column -->
         <div class="career-selector-column">
-          <!-- 3D Cube View (Requirement 8) -->
-          <div class="cube-view-container" id="cubeContainer" role="region" aria-label="3D Career Cube">
-            <div class="cube-viewport" id="cubeViewport" title="Drag to rotate the career cube">
-              <div class="cube-3d" id="cube3D">
-                <!-- Front Face with 3x3 Tiles -->
-                <div class="cube-face cube-face-front" id="cubeFrontTiles">
-                  <!-- Populated dynamically by landing-page.js with 9 careers -->
+          <div class="cube-view-container" id="cubeContainer" role="region" aria-label="3D Career Dice">
+            <!-- 3D Dice Stage with Perspective -->
+            <div class="cube-stage">
+              <div class="cube-viewport" id="cubeViewport" tabindex="0" role="application" aria-label="Interactive 3D Career Dice. Use arrow keys or drag to rotate. Press Enter or Space to roll." title="Drag with mouse or swipe touch to rotate the career dice">
+                <div class="cube-3d" id="cube3D">
+                  <!-- 6 Distinct Physical Faces (One Career Per Face) -->
+                  <div class="cube-face cube-face-front" id="cubeFaceFront" data-face="front" role="button" tabindex="0" aria-label="Web Developer (Front Face)"></div>
+                  <div class="cube-face cube-face-right" id="cubeFaceRight" data-face="right" role="button" tabindex="0" aria-label="Data Analyst (Right Face)"></div>
+                  <div class="cube-face cube-face-back" id="cubeFaceBack" data-face="back" role="button" tabindex="0" aria-label="Cloud Engineer (Back Face)"></div>
+                  <div class="cube-face cube-face-left" id="cubeFaceLeft" data-face="left" role="button" tabindex="0" aria-label="AI / ML Engineer (Left Face)"></div>
+                  <div class="cube-face cube-face-top" id="cubeFaceTop" data-face="top" role="button" tabindex="0" aria-label="Cybersecurity Analyst (Top Face)"></div>
+                  <div class="cube-face cube-face-bottom" id="cubeFaceBottom" data-face="bottom" role="button" tabindex="0" aria-label="Software Engineer (Bottom Face)"></div>
                 </div>
-                <!-- Right Face -->
-                <div class="cube-face cube-face-right" aria-hidden="true"></div>
-                <!-- Left Face -->
-                <div class="cube-face cube-face-left" aria-hidden="true"></div>
-                <!-- Top Face -->
-                <div class="cube-face cube-face-top" aria-hidden="true"></div>
-                <!-- Bottom Face -->
-                <div class="cube-face cube-face-bottom" aria-hidden="true"></div>
-                <!-- Back Face -->
-                <div class="cube-face cube-face-back" aria-hidden="true"></div>
+              </div>
+              <!-- Realistic Ground Shadow Disk -->
+              <div class="cube-shadow" aria-hidden="true"></div>
+            </div>
+
+            <!-- Cube Rotation & Roll Controls -->
+            <div class="cube-controls" aria-label="Dice Rotation Controls">
+              <button type="button" class="cube-btn" id="btnRotateLeft" title="Rotate Left (⟲)">⟲ Left</button>
+              <button type="button" class="cube-btn" id="btnRotateUp" title="Tilt Up (⬆)">⬆ Up</button>
+              <button type="button" class="cube-btn cube-btn-roll" id="btnRollDice" title="Roll Random Career (🎲)">🎲 Roll Dice</button>
+              <button type="button" class="cube-btn" id="btnRotateDown" title="Tilt Down (⬇)">⬇ Down</button>
+              <button type="button" class="cube-btn" id="btnRotateRight" title="Rotate Right (⟳)">Right ⟳</button>
+              <button type="button" class="cube-btn cube-btn-reset" id="btnResetCube" title="Reset View (⌖)">⌖ Reset</button>
+            </div>
+            <p class="cube-hint">💡 Drag or swipe to rotate • Snaps to face • Click any face or chip to select</p>
+
+            <!-- Secondary Career Selection Tray: All 9 Career Tracks -->
+            <div class="all-careers-tray" id="allCareersTray" aria-label="Explore All 9 Specializations">
+              <div class="all-careers-tray-header">
+                <span class="all-careers-tray-title">Explore All 9 Specializations</span>
+                <span class="all-careers-tray-badge">6 on Dice • 3 Additional Tracks</span>
+              </div>
+              <div class="all-careers-chips" id="allCareersChips">
+                <!-- Populated dynamically by landing-page.js with all 9 career chips -->
               </div>
             </div>
-
-            <!-- Cube Rotation Controls -->
-            <div class="cube-controls" aria-label="Cube Rotation Controls">
-              <button type="button" class="cube-btn" id="btnRotateLeft" title="Rotate Left (⟲)">⟲ Rotate Left</button>
-              <button type="button" class="cube-btn" id="btnResetCube" title="Reset View (⌖)">⌖ Reset</button>
-              <button type="button" class="cube-btn" id="btnRotateRight" title="Rotate Right (⟳)">Rotate Right ⟳</button>
-            </div>
-            <p class="cube-hint">💡 Drag with mouse or swipe touch to rotate. Click any tile to select.</p>
-          </div>
-
-          <!-- Semicircular Arc View (Requirement 7) -->
-          <div class="arc-view-container" id="arcContainer" role="region" aria-label="Semicircular Career Arc">
-            <div class="arc-cards-row" id="arcCardsRow">
-              <!-- Populated dynamically by landing-page.js in a half-circle arrangement -->
-            </div>
-            <p class="cube-hint" style="text-align: center;">Click any career card along the arc to select.</p>
           </div>
         </div>
 

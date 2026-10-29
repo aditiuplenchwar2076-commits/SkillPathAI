@@ -1105,81 +1105,67 @@ body {
 }
 
 /* =========================================================
-   Requirements 7 & 8 - Career Selection (3D Cube & Arc View)
+   Career Selection - Interactive 3D Career Dice & Tracks
    ========================================================= */
-.careers-view-toggle-wrap {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 28px;
-}
-
-.careers-view-toggle {
-  display: inline-flex;
-  background: #f1f5f9;
-  padding: 4px;
-  border-radius: 30px;
-  border: 1px solid var(--border-color);
-}
-
-.careers-view-btn {
-  border: none;
-  background: transparent;
-  padding: 8px 18px;
-  border-radius: 24px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.careers-view-btn.active {
-  background: #ffffff;
-  color: var(--color-primary);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
 .career-hub-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 36px;
-  align-items: center;
+  align-items: flex-start;
 }
 
-/* 3D Cube Viewport */
+.career-selector-column {
+  display: flex;
+  flex-direction: column;
+}
+
 .cube-view-container {
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;
 }
 
-.cube-view-container.hidden {
-  display: none;
+.cube-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 
+/* 3D Dice Viewport & Lighting */
 .cube-viewport {
-  width: 320px;
-  height: 320px;
-  perspective: 1100px;
+  width: 290px;
+  height: 290px;
+  perspective: 1050px;
   cursor: grab;
   user-select: none;
   touch-action: none;
-  margin: 10px auto 16px;
+  margin: 8px auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
 }
 
 .cube-viewport:active {
   cursor: grabbing;
 }
 
+.cube-viewport:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 4px;
+  border-radius: 24px;
+}
+
 .cube-3d {
-  width: 100%;
-  height: 100%;
+  width: 200px;
+  height: 200px;
   position: relative;
   transform-style: preserve-3d;
-  transform: rotateX(-12deg) rotateY(-18deg);
+  transform: rotateX(0deg) rotateY(0deg);
   transition: transform 0.1s ease-out;
   will-change: transform;
 }
@@ -1188,236 +1174,319 @@ body {
   transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
+.cube-3d.rolling {
+  transition: transform 0.85s cubic-bezier(0.12, 0.9, 0.22, 1);
+}
+
+/* Ground shadow underneath the dice */
+.cube-shadow {
+  width: 180px;
+  height: 22px;
+  background: radial-gradient(ellipse at center, rgba(30, 27, 75, 0.22) 0%, rgba(30, 27, 75, 0) 70%);
+  border-radius: 50%;
+  filter: blur(4px);
+  margin-top: -6px;
+  margin-bottom: 12px;
+  pointer-events: none;
+}
+
+/* 6 Physical Cube Faces (One Career Per Face) */
 .cube-face {
   position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 20px;
+  width: 200px;
+  height: 200px;
+  border-radius: 22px;
   box-sizing: border-box;
-}
-
-.cube-face-front {
-  transform: translateZ(160px);
-  background: #18153b;
-  border: 3px solid rgba(91, 92, 226, 0.5);
-  box-shadow: 0 20px 45px rgba(91, 92, 226, 0.25), inset 0 0 15px rgba(91, 92, 226, 0.15);
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  gap: 8px;
-  padding: 10px;
-}
-
-.cube-face-right {
-  transform: rotateY(90deg) translateZ(160px);
-  background: #12102e;
-  border: 3px solid rgba(91, 92, 226, 0.35);
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  gap: 8px;
-  padding: 10px;
-  opacity: 0.85;
-}
-
-.cube-face-left {
-  transform: rotateY(-90deg) translateZ(160px);
-  background: #12102e;
-  border: 3px solid rgba(91, 92, 226, 0.35);
-  opacity: 0.85;
-}
-
-.cube-face-top {
-  transform: rotateX(90deg) translateZ(160px);
-  background: #25215c;
-  border: 3px solid rgba(91, 92, 226, 0.4);
-}
-
-.cube-face-bottom {
-  transform: rotateX(-90deg) translateZ(160px);
-  background: #0d0c22;
-  border: 3px solid rgba(91, 92, 226, 0.3);
-}
-
-.cube-face-back {
-  transform: rotateY(180deg) translateZ(160px);
-  background: #141233;
-  border: 3px solid rgba(91, 92, 226, 0.3);
-}
-
-.cube-tile {
-  background: #ffffff;
-  border-radius: 10px;
+  background: linear-gradient(145deg, #ffffff 0%, #f8faff 55%, #eef2ff 100%);
+  border: 2px solid rgba(91, 92, 226, 0.3);
+  box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.9), inset 0 -3px 8px rgba(91, 92, 226, 0.1), 0 10px 24px rgba(15, 23, 42, 0.08);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 6px 2px;
+  justify-content: space-between;
+  padding: 14px 12px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  border: 1.5px solid #e2e8f0;
+  backface-visibility: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
   outline: none;
+  user-select: none;
 }
 
-.cube-tile:hover {
-  transform: scale(1.04);
+.cube-face:hover {
   border-color: var(--color-primary);
-  box-shadow: 0 4px 12px rgba(91, 92, 226, 0.25);
+  box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.9), 0 0 16px rgba(91, 92, 226, 0.25);
 }
 
-.cube-tile.selected {
-  background: var(--color-primary-light);
+.cube-face:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.cube-face.selected {
   border-color: var(--color-primary);
-  border-width: 2px;
-  box-shadow: 0 0 0 2px rgba(91, 92, 226, 0.3), 0 4px 12px rgba(91, 92, 226, 0.25);
+  border-width: 2.5px;
+  background: linear-gradient(145deg, #ffffff 0%, #f0f0ff 50%, #e0e2fe 100%);
+  box-shadow: inset 0 0 14px rgba(91, 92, 226, 0.2), 0 0 0 3px rgba(91, 92, 226, 0.35), 0 12px 30px rgba(91, 92, 226, 0.32);
 }
 
-.cube-tile-icon {
-  width: 24px;
-  height: 24px;
+/* Face inner elements */
+.dice-face-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dice-face-pip {
+  background: #e2e8f0;
+  color: #334155;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.68rem;
+  letter-spacing: 0.3px;
+  transition: all 0.2s;
+}
+
+.cube-face.selected .dice-face-pip {
+  background: var(--color-primary);
+  color: #ffffff;
+}
+
+.dice-face-badge {
+  color: var(--color-primary);
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dice-face-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: #eef2ff;
   color: var(--color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 3px;
+  margin: 4px auto;
+  box-shadow: 0 4px 10px rgba(91, 92, 226, 0.15);
+  transition: all 0.25s ease;
 }
 
-.cube-tile-icon svg {
-  width: 20px;
-  height: 20px;
-  stroke: var(--color-primary);
+.cube-face.selected .dice-face-icon-wrap {
+  background: var(--color-primary);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(91, 92, 226, 0.35);
+}
+
+.dice-face-icon-wrap svg {
+  width: 26px;
+  height: 26px;
+  stroke: currentColor;
   stroke-width: 2;
   fill: none;
 }
 
-.cube-tile-name {
-  font-size: 0.68rem;
-  font-weight: 700;
+.dice-face-title {
+  font-size: 0.98rem;
+  font-weight: 800;
   color: var(--dark);
-  line-height: 1.15;
   text-align: center;
-  padding: 0 2px;
+  line-height: 1.2;
+  margin-top: 2px;
 }
 
-.cube-tile.selected .cube-tile-name {
+.cube-face.selected .dice-face-title {
   color: var(--color-primary);
 }
 
+.dice-face-preview {
+  font-size: 0.72rem;
+  color: #64748b;
+  text-align: center;
+  line-height: 1.25;
+}
+
+.dice-face-action {
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  opacity: 0.85;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+/* 3D Geometry Transforms (200px cube -> translateZ = 100px) */
+.cube-face-front  { transform: rotateY(0deg) translateZ(100px); }
+.cube-face-right  { transform: rotateY(90deg) translateZ(100px); }
+.cube-face-back   { transform: rotateY(180deg) translateZ(100px); }
+.cube-face-left   { transform: rotateY(-90deg) translateZ(100px); }
+.cube-face-top    { transform: rotateX(90deg) translateZ(100px); }
+.cube-face-bottom { transform: rotateX(-90deg) translateZ(100px); }
+
+/* Rotation & Roll Controls */
 .cube-controls {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-top: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+  width: 100%;
 }
 
 .cube-btn {
   background: #ffffff;
-  border: 1px solid var(--border-color);
+  border: 1.5px solid var(--border-color);
   border-radius: 20px;
-  padding: 6px 14px;
+  padding: 6px 13px;
   font-size: 0.78rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-main);
   cursor: pointer;
   transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .cube-btn:hover {
   background: var(--color-primary-light);
   border-color: var(--color-primary);
   color: var(--color-primary);
+  transform: translateY(-1px);
+}
+
+.cube-btn-roll {
+  background: linear-gradient(135deg, #5B5CE2 0%, #4F46E5 100%);
+  color: #ffffff;
+  border-color: #4F46E5;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+}
+
+.cube-btn-roll:hover {
+  background: linear-gradient(135deg, #4F46E5 0%, #4338CA 100%);
+  color: #ffffff;
+  border-color: #4338CA;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
+}
+
+.cube-btn-reset {
+  color: var(--text-muted);
 }
 
 .cube-hint {
   font-size: 0.75rem;
   color: var(--text-muted);
   margin-top: 8px;
-}
-
-/* Semicircular Arc View (Requirement 7) */
-.arc-view-container {
-  display: none;
-  width: 100%;
-}
-
-.arc-view-container.active {
-  display: block;
-}
-
-.arc-cards-row {
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  gap: 8px;
-  min-height: 240px;
-  padding: 20px 0;
-}
-
-.arc-card {
-  flex: 0 0 110px;
-  background: #ffffff;
-  border: 1.5px solid var(--border-color);
-  border-radius: 12px;
-  padding: 14px 8px;
   text-align: center;
+}
+
+/* Secondary Career Selection Tray (All 9 Specializations) */
+.all-careers-tray {
+  margin-top: 20px;
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 16px 18px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+}
+
+.all-careers-tray-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.all-careers-tray-title {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--dark);
+  letter-spacing: -0.2px;
+}
+
+.all-careers-tray-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.all-careers-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.career-chip {
+  border: 1.5px solid #e2e8f0;
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 6px 11px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #334155;
   cursor: pointer;
-  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s, border-color 0.25s;
-  box-shadow: var(--card-shadow);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
   outline: none;
 }
 
-.arc-card:hover {
+.career-chip:hover {
   border-color: var(--color-primary);
-  box-shadow: 0 10px 20px rgba(91, 92, 226, 0.2);
-  transform: translateY(-8px) scale(1.05) !important;
+  background: #ffffff;
+  color: var(--color-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(91, 92, 226, 0.15);
 }
 
-.arc-card.selected {
-  background: var(--color-primary-light);
+.career-chip.selected {
   border-color: var(--color-primary);
-  border-width: 2px;
-  box-shadow: 0 0 0 3px rgba(91, 92, 226, 0.25), 0 10px 20px rgba(91, 92, 226, 0.2);
-  transform: translateY(-6px) scale(1.06) !important;
+  background: var(--color-primary);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(91, 92, 226, 0.3);
 }
 
-/* Semicircular Arc offsets: Card 4 at apex, 0 and 8 lowest */
-.arc-card[data-index="0"] { transform: translateY(32px); }
-.arc-card[data-index="1"] { transform: translateY(20px); }
-.arc-card[data-index="2"] { transform: translateY(10px); }
-.arc-card[data-index="3"] { transform: translateY(4px); }
-.arc-card[data-index="4"] { transform: translateY(0px); }
-.arc-card[data-index="5"] { transform: translateY(4px); }
-.arc-card[data-index="6"] { transform: translateY(10px); }
-.arc-card[data-index="7"] { transform: translateY(20px); }
-.arc-card[data-index="8"] { transform: translateY(32px); }
+.career-chip.selected .career-chip-badge-mini {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
 
-.arc-card-icon {
-  width: 32px;
-  height: 32px;
-  margin: 0 auto 8px;
-  display: flex;
+.career-chip-icon {
+  width: 15px;
+  height: 15px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-primary);
 }
 
-.arc-card-icon svg {
-  width: 22px;
-  height: 22px;
-  stroke: var(--color-primary);
+.career-chip-icon svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
   stroke-width: 2;
   fill: none;
 }
 
-.arc-card-title {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--dark);
-  line-height: 1.2;
-}
-
-.arc-card.selected .arc-card-title {
-  color: var(--color-primary);
+.career-chip-badge-mini {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: #e2e8f0;
+  color: #475569;
+  margin-left: 2px;
 }
 
 /* Career Details Panel (Requirement 8.3) */
@@ -1571,44 +1640,28 @@ body {
     grid-template-columns: 1fr;
     gap: 28px;
   }
-  .arc-cards-row {
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
-  }
-  .arc-card[data-index] {
-    transform: none !important;
-    flex: 1 1 calc(33.33% - 10px);
-    max-width: 150px;
-  }
 }
 
 @media (max-width: 600px) {
   .cube-viewport {
-    width: 280px;
-    height: 280px;
+    width: 260px;
+    height: 260px;
   }
-  .cube-face-front {
-    transform: translateZ(140px);
+  .cube-3d {
+    width: 180px;
+    height: 180px;
   }
-  .cube-face-right {
-    transform: rotateY(90deg) translateZ(140px);
+  .cube-face {
+    width: 180px;
+    height: 180px;
+    padding: 12px 10px;
   }
-  .cube-face-left {
-    transform: rotateY(-90deg) translateZ(140px);
-  }
-  .cube-face-top {
-    transform: rotateX(90deg) translateZ(140px);
-  }
-  .cube-face-bottom {
-    transform: rotateX(-90deg) translateZ(140px);
-  }
-  .cube-face-back {
-    transform: rotateY(180deg) translateZ(140px);
-  }
-  .arc-card[data-index] {
-    flex: 1 1 calc(50% - 10px);
-  }
+  .cube-face-front  { transform: rotateY(0deg) translateZ(90px); }
+  .cube-face-right  { transform: rotateY(90deg) translateZ(90px); }
+  .cube-face-back   { transform: rotateY(180deg) translateZ(90px); }
+  .cube-face-left   { transform: rotateY(-90deg) translateZ(90px); }
+  .cube-face-top    { transform: rotateX(90deg) translateZ(90px); }
+  .cube-face-bottom { transform: rotateX(-90deg) translateZ(90px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1655,26 +1708,56 @@ body {
     width: 100%;
   }
   .cube-viewport {
-    width: 260px;
-    height: 260px;
+    width: 220px;
+    height: 220px;
   }
-  .cube-face-front {
-    transform: translateZ(130px);
+  .cube-3d {
+    width: 160px;
+    height: 160px;
   }
-  .cube-face-right {
-    transform: rotateY(90deg) translateZ(130px);
+  .cube-face {
+    width: 160px;
+    height: 160px;
+    padding: 10px 8px;
+    border-radius: 18px;
   }
-  .cube-face-left {
-    transform: rotateY(-90deg) translateZ(130px);
+  .dice-face-icon-wrap {
+    width: 40px;
+    height: 40px;
   }
-  .cube-face-top {
-    transform: rotateX(90deg) translateZ(130px);
+  .dice-face-icon-wrap svg {
+    width: 20px;
+    height: 20px;
   }
-  .cube-face-bottom {
-    transform: rotateX(-90deg) translateZ(130px);
+  .dice-face-title {
+    font-size: 0.84rem;
   }
-  .cube-face-back {
-    transform: rotateY(180deg) translateZ(130px);
+  .dice-face-preview {
+    display: none;
+  }
+  .cube-face-front  { transform: rotateY(0deg) translateZ(80px); }
+  .cube-face-right  { transform: rotateY(90deg) translateZ(80px); }
+  .cube-face-back   { transform: rotateY(180deg) translateZ(80px); }
+  .cube-face-left   { transform: rotateY(-90deg) translateZ(80px); }
+  .cube-face-top    { transform: rotateX(90deg) translateZ(80px); }
+  .cube-face-bottom { transform: rotateX(-90deg) translateZ(80px); }
+  .cube-shadow {
+    width: 150px;
+    height: 18px;
+  }
+  .cube-controls {
+    gap: 6px;
+  }
+  .cube-btn {
+    padding: 5px 10px;
+    font-size: 0.74rem;
+  }
+  .all-careers-tray {
+    padding: 14px 12px;
+  }
+  .career-chip {
+    padding: 5px 9px;
+    font-size: 0.72rem;
   }
   .career-details-panel {
     padding: 20px 16px;
