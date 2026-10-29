@@ -527,7 +527,19 @@ function renderEmptyRoadmapState() {
   renderStreakAndProjectMetrics({ streak_days: 0, completed_projects: 0, week_completed_topics: 0 });
 }
 
-function updateStatMetrics(completed, total, overallPercent) {
+export function formatProgressConicGradient(percent) {
+  let p = typeof percent === "number" && !isNaN(percent) ? percent : Number(percent);
+  if (isNaN(p) || p <= 0) {
+    p = 0;
+  } else if (p >= 100) {
+    p = 100;
+  } else {
+    p = Math.round(p);
+  }
+  return `conic-gradient(#7c5cff 0% ${p}%, #eee ${p}% 100%)`;
+}
+
+export function updateStatMetrics(completed, total, overallPercent) {
   const statCompleted = document.getElementById("statCompletedTopics");
   const statFraction = document.getElementById("statTopicsFraction");
   const statFill = document.getElementById("statTopicsProgressFill");
@@ -537,14 +549,45 @@ function updateStatMetrics(completed, total, overallPercent) {
   const rightPanelTotal = document.getElementById("rightPanelTotalTopics");
   const rightPanelCompleted = document.getElementById("rightPanelCompletedTopics");
 
-  if (statCompleted) statCompleted.textContent = completed;
-  if (statFraction) statFraction.textContent = `${completed}/${total}`;
-  if (statFill) statFill.style.width = `${total > 0 ? Math.round((completed / total) * 100) : 0}%`;
-  if (statOverall) statOverall.textContent = `${overallPercent}%`;
+  // Validate and sanitize numeric counts safely
+  const safeCompleted = typeof completed === "number" && !isNaN(completed) && completed > 0 ? Math.floor(completed) : 0;
+  const safeTotal = typeof total === "number" && !isNaN(total) && total > 0 ? Math.floor(total) : 0;
 
-  if (rightPanelPercent) rightPanelPercent.textContent = `${overallPercent}%`;
-  if (rightPanelTotal) rightPanelTotal.textContent = total;
-  if (rightPanelCompleted) rightPanelCompleted.textContent = completed;
+  // Compute safe normalized percentage (0% to 100%)
+  let safePercent = 0;
+  if (typeof overallPercent === "number" && !isNaN(overallPercent)) {
+    safePercent = Math.min(100, Math.max(0, Math.round(overallPercent)));
+  } else if (safeTotal > 0) {
+    safePercent = Math.min(100, Math.max(0, Math.round((safeCompleted / safeTotal) * 100)));
+  }
+
+  // Format the conic-gradient style so the visual purple arc strictly matches safePercent:
+  // 0% -> completely grey ring
+  // 25% -> 25% purple arc
+  // 50% -> half-purple ring
+  // 100% -> fully purple ring
+  const gradientStyle = formatProgressConicGradient(safePercent);
+
+  // Update Overall Progress circular indicator in right panel
+  const progressCircle = document.getElementById("overallProgressCircle") || document.querySelector(".progress-circle");
+  if (progressCircle) {
+    progressCircle.style.background = gradientStyle;
+  }
+
+  // Update mini stat ring in mini-stat card
+  const miniRing = document.getElementById("statMiniRing") || document.querySelector(".mini-ring");
+  if (miniRing) {
+    miniRing.style.background = gradientStyle;
+  }
+
+  if (statCompleted) statCompleted.textContent = safeCompleted;
+  if (statFraction) statFraction.textContent = `${safeCompleted}/${safeTotal}`;
+  if (statFill) statFill.style.width = `${safePercent}%`;
+  if (statOverall) statOverall.textContent = `${safePercent}%`;
+
+  if (rightPanelPercent) rightPanelPercent.textContent = `${safePercent}%`;
+  if (rightPanelTotal) rightPanelTotal.textContent = safeTotal;
+  if (rightPanelCompleted) rightPanelCompleted.textContent = safeCompleted;
 }
 
 function renderDashboardRoadmap(topics, progressRecords, roadmap, level) {

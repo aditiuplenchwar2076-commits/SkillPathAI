@@ -809,7 +809,7 @@ a {
 
   border-radius: 50%;
 
-  background: conic-gradient(#7c5cff 0% 78%, #eee 78% 100%);
+  background: conic-gradient(#7c5cff 0% 0%, #eee 0% 100%);
 
   position: absolute;
 
@@ -1823,7 +1823,7 @@ a {
 
   border-radius: 50%;
 
-  background: conic-gradient(#7c5cff 0% 42%, #eee 42% 100%);
+  background: conic-gradient(#7c5cff 0% 0%, #eee 0% 100%);
 
   display: flex;
 
