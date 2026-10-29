@@ -47,6 +47,19 @@
     background: #dcfce7;
     color: #166534;
   }
+  .error-alert {
+    display: none;
+    margin-top: 14px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    background: #fee2e2;
+    color: #991b1b;
+  }
+  .btn-save:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
 </style>
 </head>
 <body>
@@ -156,6 +169,7 @@
 
         <button type="button" id="saveSettingsBtn" class="btn-save">Save Preferences</button>
         <div id="saveSuccessAlert" class="save-alert">✓ Preferences saved successfully!</div>
+        <div id="saveErrorAlert" class="error-alert"></div>
       </div>
     </div>
   </main>
@@ -163,7 +177,8 @@
 
 <script type="module">
   import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+  import { getAuth, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+  import { syncUserWithBackend, apiRequest } from "./api.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyCQ9YRQV9edVS0D-Lb6ORl9HX6E0oL4ECQ",
@@ -177,9 +192,21 @@
   const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
-  onAuthStateChanged(auth, (user) => {
+  let currentDbUser = null;
+
+  onAuthStateChanged(auth, async (user) => {
     if (!user) { window.location.href = "login.html"; return; }
-    const displayName = user.displayName || (user.email ? user.email.split("@")[0] : "Learner");
+
+    try {
+      currentDbUser = await syncUserWithBackend();
+    } catch (e) {
+      console.warn("Could not sync user with backend on settings load:", e);
+    }
+
+    const displayName = (currentDbUser && currentDbUser.name && currentDbUser.name.trim().toLowerCase() !== "user")
+      ? currentDbUser.name.trim()
+      : (user.displayName || (user.email ? user.email.split("@")[0] : "Learner"));
+
     const el = document.getElementById("userName");
     if (el) el.textContent = displayName;
 
@@ -189,23 +216,113 @@
     const nameInput = document.getElementById("settingDisplayName");
     if (nameInput) nameInput.value = displayName;
 
-    const savedCareer = localStorage.getItem("careerPath") || localStorage.getItem("skillpath_career");
+    const savedCareer = (currentDbUser && currentDbUser.career_goal && currentDbUser.career_goal !== "Not Set" ? currentDbUser.career_goal : null) ||
+                        localStorage.getItem("careerPath") ||
+                        localStorage.getItem("skillpath_career");
     const savedLevel = localStorage.getItem("skillLevel") || localStorage.getItem("skillpath_level");
     if (savedCareer) document.getElementById("settingCareer").value = savedCareer;
     if (savedLevel) document.getElementById("settingLevel").value = savedLevel;
   });
 
-  document.getElementById("saveSettingsBtn").addEventListener("click", () => {
+  const saveBtn = document.getElementById("saveSettingsBtn");
+  const successAlert = document.getElementById("saveSuccessAlert");
+  const errorAlert = document.getElementById("saveErrorAlert");
+  const nameInput = document.getElementById("settingDisplayName");
+
+  function hideAlerts() {
+    if (successAlert) successAlert.style.display = "none";
+    if (errorAlert) errorAlert.style.display = "none";
+  }
+
+  function showError(msg) {
+    hideAlerts();
+    if (errorAlert) {
+      errorAlert.textContent = msg;
+      errorAlert.style.display = "block";
+    }
+  }
+
+  function showSuccess(msg) {
+    hideAlerts();
+    if (successAlert) {
+      successAlert.textContent = msg || "✓ Preferences saved successfully!";
+      successAlert.style.display = "block";
+      setTimeout(() => { if (successAlert) successAlert.style.display = "none"; }, 3500);
+    }
+  }
+
+  saveBtn.addEventListener("click", async () => {
+    hideAlerts();
+
+    const rawName = nameInput ? nameInput.value : "";
+    const trimmedName = rawName.trim();
+
+    if (!trimmedName) {
+      showError("Please enter a valid display name.");
+      if (nameInput) nameInput.focus();
+      return;
+    }
+
+    if (trimmedName.length > 100) {
+      showError("Display name cannot exceed 100 characters.");
+      if (nameInput) nameInput.focus();
+      return;
+    }
+
     const career = document.getElementById("settingCareer").value;
     const level = document.getElementById("settingLevel").value;
-    localStorage.setItem("careerPath", career);
-    localStorage.setItem("skillpath_career", career);
-    localStorage.setItem("skillLevel", level);
-    localStorage.setItem("skillpath_level", level);
 
-    const alertEl = document.getElementById("saveSuccessAlert");
-    alertEl.style.display = "block";
-    setTimeout(() => { alertEl.style.display = "none"; }, 3000);
+    saveBtn.disabled = true;
+    const originalBtnText = saveBtn.textContent;
+    saveBtn.textContent = "Saving...";
+
+    try {
+      if (!currentDbUser) {
+        currentDbUser = await syncUserWithBackend();
+      }
+
+      if (!currentDbUser || !currentDbUser.user_id) {
+        throw new Error("Unable to identify authenticated user account.");
+      }
+
+      // 1. Update backend MySQL database record
+      const updatedUser = await apiRequest(`/users/${currentDbUser.user_id}`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          name: trimmedName,
+          career_goal: career
+        })
+      });
+
+      // 2. Update Firebase Authentication profile displayName
+      if (auth.currentUser) {
+        try {
+          await updateProfile(auth.currentUser, { displayName: trimmedName });
+        } catch (fbErr) {
+          console.warn("Could not sync with Firebase profile:", fbErr);
+        }
+      }
+
+      // 3. Update localStorage preferences
+      localStorage.setItem("careerPath", career);
+      localStorage.setItem("skillpath_career", career);
+      localStorage.setItem("skillLevel", level);
+      localStorage.setItem("skillpath_level", level);
+
+      // 4. Update in-page UI state
+      currentDbUser = updatedUser;
+      const userNameEl = document.getElementById("userName");
+      if (userNameEl) userNameEl.textContent = trimmedName;
+      if (nameInput) nameInput.value = trimmedName;
+
+      showSuccess("✓ Profile and preferences saved successfully!");
+    } catch (err) {
+      console.error("Save settings error:", err);
+      showError("Failed to save settings: " + (err.message || "Please check your network and try again."));
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = originalBtnText;
+    }
   });
 
   const menuToggle = document.getElementById("menuToggle");
