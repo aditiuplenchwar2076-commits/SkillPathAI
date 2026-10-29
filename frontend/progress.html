@@ -54,6 +54,29 @@
   .placement-btn {
     display: inline-block; background: linear-gradient(to right, #7c5cff, #a78bfa);
     color: white; padding: 9px 18px; border-radius: 8px; font-size: 12px; font-weight: bold;
+    text-decoration: none;
+  }
+
+  .error-banner {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+  }
+  .error-banner button {
+    background: #dc2626;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 12px;
+    cursor: pointer;
   }
 
   @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
@@ -111,20 +134,38 @@
         <input type="text" placeholder="Search topics, skills..." class="search-input">
       </div>
       <div class="notification"><span class="bell-icon">🔔</span></div>
-      <div class="user-profile">
+      <div class="user-profile" id="userProfile" tabindex="0" role="button" aria-haspopup="true" aria-expanded="false">
         <img src="https://api.dicebear.com/7.x/bottts/svg?seed=SkillPathAI" alt="User profile picture" class="user-avatar">
         <div class="user-info">
-          <p class="user-name">Alex Rivera</p>
+          <p class="user-name" id="userName">Learner</p>
           <p class="user-plan">Premium Plan</p>
         </div>
         <span class="dropdown-arrow">▾</span>
+        <div class="profile-dropdown-menu" style="display: none;" id="profileDropdownMenu">
+          <div class="dropdown-user-header">
+            <p class="dropdown-user-name" id="dropdownUserName">Learner</p>
+            <p class="dropdown-user-email" id="dropdownUserEmail">user@example.com</p>
+          </div>
+          <hr class="dropdown-divider">
+          <a href="#" class="dropdown-item"><span class="dropdown-icon">&#x128100;</span> Profile</a>
+          <a href="settings.html" class="dropdown-item"><span class="dropdown-icon">&#x2699;</span> Settings</a>
+          <hr class="dropdown-divider">
+          <button type="button" class="dropdown-item logout-item" id="logoutBtn">
+            <span class="dropdown-icon">&#x128682;</span> Log Out
+          </button>
+        </div>
       </div>
     </div>
 
     <div class="content-wrap">
+      <div class="error-banner" id="progressErrorBanner" style="display: none;">
+        <span id="progressErrorMessage">Could not load progress data.</span>
+        <button type="button" id="progressRetryBtn">Retry</button>
+      </div>
+
       <div class="page-header">
         <h1>Progress & Placement</h1>
-        <p id="subtitle">Web Development • Intermediate</p>
+        <p id="subtitle">Web Development • Beginner</p>
       </div>
 
       <div class="tab-switcher">
@@ -138,51 +179,49 @@
         <div class="stat-grid">
           <div class="stat-card">
             <p class="label">Current Level</p>
-            <p class="value" id="levelValue">Intermediate</p>
+            <p class="value" id="levelValue">Beginner</p>
           </div>
           <div class="stat-card">
             <p class="label">Topics Completed</p>
-            <p class="value">18 / 30</p>
-            <div class="bar"><div class="bar-fill" style="width: 60%;"></div></div>
+            <p class="value" id="statTopicsCompletedValue">0 / 0</p>
+            <div class="bar"><div class="bar-fill" id="statTopicsCompletedBar" style="width: 0%;"></div></div>
+            <p class="sub" id="statTopicsCompletedSub" style="margin-top: 6px;">0% of roadmap completed</p>
           </div>
           <div class="stat-card">
             <p class="label">Current Topic</p>
-            <p class="value" style="font-size:16px;">JavaScript Functions</p>
-            <p class="sub">In progress</p>
+            <p class="value" id="statCurrentTopicName" style="font-size:16px;">Loading...</p>
+            <p class="sub" id="statCurrentTopicStatus">In progress</p>
           </div>
           <div class="stat-card">
             <p class="label">Learning Streak</p>
-            <p class="value">🔥 7 Days</p>
+            <p class="value" id="statStreakValue">🔥 0 Days</p>
+            <p class="sub" id="statStreakSub">0 active study days</p>
           </div>
         </div>
 
         <div class="two-col">
           <div class="box good">
             <h3>Strengths</h3>
-            <ul>
-              <li>HTML</li>
-              <li>CSS</li>
-              <li>JavaScript fundamentals</li>
+            <ul id="strengthsList">
+              <li>Loading strengths...</li>
             </ul>
           </div>
           <div class="box improve">
             <h3>Areas to Improve</h3>
-            <ul>
-              <li>DOM manipulation</li>
-              <li>APIs</li>
-              <li>Async JavaScript</li>
+            <ul id="improveList">
+              <li>Loading areas to improve...</li>
             </ul>
           </div>
         </div>
 
         <div class="box" style="margin-bottom:20px;">
           <h3>This Week's Activity</h3>
-          <div class="week-row">
-            <div class="day"><div class="day-dot on"></div>Mon</div>
-            <div class="day"><div class="day-dot on"></div>Tue</div>
-            <div class="day"><div class="day-dot on"></div>Wed</div>
-            <div class="day"><div class="day-dot on"></div>Thu</div>
-            <div class="day"><div class="day-dot on"></div>Fri</div>
+          <div class="week-row" id="weekRow">
+            <div class="day"><div class="day-dot"></div>Mon</div>
+            <div class="day"><div class="day-dot"></div>Tue</div>
+            <div class="day"><div class="day-dot"></div>Wed</div>
+            <div class="day"><div class="day-dot"></div>Thu</div>
+            <div class="day"><div class="day-dot"></div>Fri</div>
             <div class="day"><div class="day-dot"></div>Sat</div>
             <div class="day"><div class="day-dot"></div>Sun</div>
           </div>
@@ -190,7 +229,7 @@
 
         <div class="rec-box">
           <h3>🤖 AI Recommendation</h3>
-          Spend more time practicing API integration before starting advanced React.
+          <p id="aiRecText" style="margin: 0;">Loading personalized recommendation...</p>
         </div>
       </div>
 
@@ -202,7 +241,7 @@
             <span class="icon">🧮</span>
             <h3>Aptitude</h3>
             <p>Quantitative aptitude, logical reasoning and verbal ability practice.</p>
-            <a href="#" class="placement-btn">Start Practice</a>
+            <a href="practice.html" class="placement-btn">Start Practice</a>
           </div>
           <div class="placement-card">
             <span class="icon">💻</span>
@@ -220,9 +259,9 @@
 
         <div class="box">
           <h3>Placement Progress</h3>
-          <p style="font-size:12px; color:#888; margin-bottom:8px;">Complete more roadmap milestones to unlock advanced placement preparation.</p>
-          <div class="bar"><div class="bar-fill" style="width: 35%;"></div></div>
-          <p style="font-size:11px; color:#999; margin-top:6px;">35% ready</p>
+          <p style="font-size:12px; color:#888; margin-bottom:8px;" id="placementSub">Complete more roadmap milestones to unlock advanced placement preparation.</p>
+          <div class="bar"><div class="bar-fill" id="placementFill" style="width: 0%;"></div></div>
+          <p style="font-size:11px; color:#999; margin-top:6px;" id="placementText">0% ready</p>
         </div>
       </div>
 
@@ -230,26 +269,7 @@
   </main>
 </div>
 
-<script src="dashboard.js"></script>
-<script>
-  // Tab switching
-  const tabBtns = document.querySelectorAll('.tab-switcher-btn');
-  const tabPanels = document.querySelectorAll('.tab-panel');
-  tabBtns.forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      tabBtns.forEach(function(b) { b.classList.remove('active'); });
-      tabPanels.forEach(function(p) { p.classList.remove('active'); });
-      btn.classList.add('active');
-      document.getElementById(btn.getAttribute('data-tab')).classList.add('active');
-    });
-  });
-
-  // Show the real level/career saved by the quiz
-  const level = localStorage.getItem('skillLevel') || 'Intermediate';
-  const career = localStorage.getItem('careerPath') || 'Web Development';
-  document.getElementById('levelValue').textContent = level;
-  document.getElementById('subtitle').textContent = career + ' • ' + level;
-</script>
+<script type="module" src="progress.js"></script>
 <script src="search-handler.js"></script>
 </body>
 </html>

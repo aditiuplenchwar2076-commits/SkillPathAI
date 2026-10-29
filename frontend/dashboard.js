@@ -481,7 +481,7 @@ function renderDashboardRoadmap(topics, progressRecords, roadmap, level) {
     }
   }
 
-  const overallPercent = Math.round((completedCount / topics.length) * 100);
+  const overallPercent = topics.length > 0 ? Math.round((completedCount / topics.length) * 100) : 0;
   updateStatMetrics(completedCount, topics.length, overallPercent);
 }
 

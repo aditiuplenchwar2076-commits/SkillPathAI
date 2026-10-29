@@ -7,6 +7,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 
 # Initialize Firebase Admin only once
+firebase_initialized = False
 if not firebase_admin._apps:
     env_service_account = os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON")
     
@@ -16,6 +17,7 @@ if not firebase_admin._apps:
             cred_dict = json.loads(env_service_account.strip())
             credential = credentials.Certificate(cred_dict)
             firebase_admin.initialize_app(credential)
+            firebase_initialized = True
         except json.JSONDecodeError as jde:
             raise ValueError(f"Failed to parse FIREBASE_SERVICE_ACCOUNT_JSON environment variable: {jde}")
         except Exception as e:
@@ -27,21 +29,33 @@ if not firebase_admin._apps:
             "firebase-service-account.json"
         )
 
-        if not os.path.exists(credential_path):
-            raise FileNotFoundError(
-                "Firebase service account JSON file not found and FIREBASE_SERVICE_ACCOUNT_JSON is not configured."
-            )
+        if os.path.exists(credential_path):
+            credential = credentials.Certificate(credential_path)
+            firebase_admin.initialize_app(credential)
+            firebase_initialized = True
+        else:
+            # Allow module import in test/mock environments where verify_token is overridden
+            pass
 
-        credential = credentials.Certificate(credential_path)
-        firebase_admin.initialize_app(credential)
 
-
-bearer_scheme = HTTPBearer()
+bearer_scheme = HTTPBearer(auto_error=False)
 
 
 def verify_token(
     credentials_header: HTTPAuthorizationCredentials = Depends(bearer_scheme)
 ):
+    if not credentials_header or not credentials_header.credentials:
+        raise HTTPException(
+            status_code=401,
+            detail="Missing authentication token. Please provide a Bearer token in Authorization header."
+        )
+
+    if not firebase_admin._apps:
+        raise HTTPException(
+            status_code=500,
+            detail="Authentication service not configured on server."
+        )
+
     try:
         decoded_token = auth.verify_id_token(credentials_header.credentials)
         return decoded_token

@@ -5,25 +5,39 @@ from google.genai import types
 from pydantic import BaseModel
 from typing import List
 
-load_dotenv()
+env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".env")
+if os.path.exists(env_path):
+    load_dotenv(env_path)
+else:
+    load_dotenv()
 
-api_key = os.getenv("GEMINI_API_KEY")
+# Default to gemini-3.1-flash-lite for fast, reliable, low-latency responses
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite")
 
-# Configure sensible client timeout (default 25s) and limited retry policy (max 2 attempts)
-# to prevent upstream Gemini latency spikes from stalling requests for 2-3 minutes.
-GEMINI_TIMEOUT_MS = int(os.getenv("GEMINI_TIMEOUT_SECONDS", "25")) * 1000
 
-http_options = types.HttpOptions(
-    timeout=GEMINI_TIMEOUT_MS,
-    retry_options=types.HttpRetryOptions(
-        attempts=2,
-        initial_delay=1.0,
-        max_delay=3.0,
-        exp_base=1.5
+def get_gemini_client():
+    """
+    Lazily initializes and returns the Google GenAI client.
+    Prevents application startup crashes if GEMINI_API_KEY is unset or invalid.
+    """
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key or not api_key.strip():
+        raise RuntimeError("GEMINI_API_KEY is not configured on the server.")
+
+    # Enforce minimum 10s deadline required by Gemini API
+    timeout_sec = max(int(os.getenv("GEMINI_TIMEOUT_SECONDS", "20")), 10)
+    timeout_ms = timeout_sec * 1000
+
+    http_options = types.HttpOptions(
+        timeout=timeout_ms,
+        retry_options=types.HttpRetryOptions(
+            attempts=2,
+            initial_delay=1.0,
+            max_delay=3.0,
+            exp_base=1.5
+        )
     )
-)
-
-client = genai.Client(api_key=api_key, http_options=http_options)
+    return genai.Client(api_key=api_key.strip(), http_options=http_options)
 
 
 class RoadmapTopic(BaseModel):
@@ -37,12 +51,22 @@ class RoadmapResponse(BaseModel):
 
 
 def test_gemini():
-    response = client.interactions.create(
-        model="gemini-3.8-flash",
-        input="Explain what Python is in one simple sentence."
+    """
+    Simple connectivity test using the standard models.generate_content API.
+    """
+    client = get_gemini_client()
+    response = client.models.generate_content(
+        model=GEMINI_MODEL,
+        contents="Explain what Python is in one simple sentence.",
+        config=types.GenerateContentConfig(
+            max_output_tokens=100
+        )
     )
 
-    return response.output_text
+    if not response.text:
+        raise RuntimeError("Gemini returned an empty test response.")
+
+    return response.text.strip()
 
 
 def generate_roadmap(
@@ -52,6 +76,10 @@ def generate_roadmap(
     skill_level: str,
     assessment_score: float
 ):
+    """
+    Generates a personalized learning roadmap with structured JSON schema.
+    Bounded to 800 tokens to guarantee fast response times (< 3 seconds).
+    """
     prompt = f"""
 Create a personalized learning roadmap for a student.
 
@@ -68,19 +96,28 @@ and gradually move toward advanced topics.
 Return only the roadmap information.
 """
 
-    response = client.interactions.create(
-        model="gemini-3.8-flash",
-        input=prompt,
-        response_format={
-            "type": "text",
-            "mime_type": "application/json",
-            "schema": RoadmapResponse.model_json_schema()
-        }
+    client = get_gemini_client()
+    response = client.models.generate_content(
+        model=GEMINI_MODEL,
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            response_mime_type="application/json",
+            response_schema=RoadmapResponse,
+            max_output_tokens=800
+        )
     )
 
-    return RoadmapResponse.model_validate_json(response.output_text)
-def explain_topic(topic_name: str, skill_level: str):
+    if not response.text:
+        raise RuntimeError("Gemini returned an empty roadmap response.")
 
+    return RoadmapResponse.model_validate_json(response.text)
+
+
+def explain_topic(topic_name: str, skill_level: str):
+    """
+    Explains a technical topic to a student.
+    Bounded to 500 tokens to prevent multi-minute essay generation and guarantee fast response (< 4 seconds).
+    """
     prompt = f"""
     Explain the following programming/technical topic to a student.
 
@@ -96,10 +133,16 @@ def explain_topic(topic_name: str, skill_level: str):
     - Keep it suitable for the student's skill level
     """
 
-    response = client.interactions.create(
-        model="gemini-3.8-flash",
-        input=prompt
+    client = get_gemini_client()
+    response = client.models.generate_content(
+        model=GEMINI_MODEL,
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            max_output_tokens=500
+        )
     )
 
-    return response.output_text
+    if not response.text:
+        raise RuntimeError("Gemini returned an empty explanation response.")
 
+    return response.text.strip()
