@@ -220,8 +220,68 @@ const careersData = [
 ];
 
 /* ==========================================================================
-   5. Career Selection State & Details Panel Rendering (Requirements 7 & 8)
+   5. Interactive 3D Career Dice & Assessment Integration
    ========================================================================== */
+const TILT_X = -12;
+const TILT_Y = -18;
+
+const DICE_FACES_CONFIG = [
+  {
+    face: "front",
+    elementId: "cubeFaceFront",
+    careerName: "Web Developer",
+    faceNumber: "1",
+    faceLabel: "Front • Face 1",
+    rotX: TILT_X,
+    rotY: TILT_Y
+  },
+  {
+    face: "right",
+    elementId: "cubeFaceRight",
+    careerName: "Data Analyst",
+    faceNumber: "2",
+    faceLabel: "Right • Face 2",
+    rotX: TILT_X,
+    rotY: -90 + TILT_Y
+  },
+  {
+    face: "back",
+    elementId: "cubeFaceBack",
+    careerName: "Cloud Engineer",
+    faceNumber: "3",
+    faceLabel: "Back • Face 3",
+    rotX: TILT_X,
+    rotY: -180 + TILT_Y
+  },
+  {
+    face: "left",
+    elementId: "cubeFaceLeft",
+    careerName: "AI / ML Engineer",
+    faceNumber: "4",
+    faceLabel: "Left • Face 4",
+    rotX: TILT_X,
+    rotY: 90 + TILT_Y
+  },
+  {
+    face: "top",
+    elementId: "cubeFaceTop",
+    careerName: "Cybersecurity Analyst",
+    faceNumber: "5",
+    faceLabel: "Top • Face 5",
+    rotX: -76,
+    rotY: TILT_Y
+  },
+  {
+    face: "bottom",
+    elementId: "cubeFaceBottom",
+    careerName: "Software Engineer",
+    faceNumber: "6",
+    faceLabel: "Bottom • Face 6",
+    rotX: 76,
+    rotY: TILT_Y
+  }
+];
+
 let selectedCareer = localStorage.getItem("skillpath_career") || localStorage.getItem("careerPath") || "Web Developer";
 
 const panelTitle = document.getElementById("panelTitle");
@@ -232,79 +292,12 @@ const panelBadge = document.getElementById("panelBadge");
 const btnStartAssessment = document.getElementById("btnStartAssessment");
 const panelCloseBtn = document.getElementById("panelCloseBtn");
 
-function updateDetailsPanel(careerName) {
-  const careerObj = careersData.find((c) => c.name.toLowerCase() === careerName.toLowerCase()) || careersData[0];
-  selectedCareer = careerObj.name;
-
-  if (panelTitle) panelTitle.textContent = careerObj.name;
-  if (panelDesc) panelDesc.textContent = careerObj.desc;
-  if (panelOutcome) panelOutcome.textContent = careerObj.outcome;
-  if (panelBadge) panelBadge.textContent = "Selected Career";
-
-  if (panelSkills) {
-    panelSkills.innerHTML = careerObj.skills
-      .map((skill) => `<span class="career-skill-tag">${skill}</span>`)
-      .join("");
-  }
-
-  // Update selected class across 3D cube tiles and arc cards
-  document.querySelectorAll(".cube-tile").forEach((tile) => {
-    const tileName = tile.dataset.career;
-    if (tileName && tileName.toLowerCase() === selectedCareer.toLowerCase()) {
-      tile.classList.add("selected");
-      tile.setAttribute("aria-selected", "true");
-    } else {
-      tile.classList.remove("selected");
-      tile.setAttribute("aria-selected", "false");
-    }
-  });
-
-  document.querySelectorAll(".arc-card").forEach((card) => {
-    const cardName = card.dataset.career;
-    if (cardName && cardName.toLowerCase() === selectedCareer.toLowerCase()) {
-      card.classList.add("selected");
-      card.setAttribute("aria-selected", "true");
-    } else {
-      card.classList.remove("selected");
-      card.setAttribute("aria-selected", "false");
-    }
-  });
-
-  // Persist choice into existing localStorage keys
-  try {
-    localStorage.setItem("skillpath_career", selectedCareer);
-    localStorage.setItem("careerPath", selectedCareer);
-  } catch (e) {
-    console.warn("Could not save to localStorage:", e);
-  }
-}
-
-// Connect Start Skill Assessment button directly to existing assessment flow
-if (btnStartAssessment) {
-  btnStartAssessment.addEventListener("click", () => {
-    try {
-      localStorage.setItem("skillpath_career", selectedCareer);
-      localStorage.setItem("careerPath", selectedCareer);
-    } catch (e) {}
-    window.location.href = "asses.html";
-  });
-}
-
-if (panelCloseBtn) {
-  panelCloseBtn.addEventListener("click", () => {
-    updateDetailsPanel(careersData[0].name);
-  });
-}
-
-/* ==========================================================================
-   6. Render 3D Career Cube (Requirement 8)
-   ========================================================================== */
-const cubeFrontTiles = document.getElementById("cubeFrontTiles");
 const cube3D = document.getElementById("cube3D");
 const cubeViewport = document.getElementById("cubeViewport");
+const allCareersChips = document.getElementById("allCareersChips");
 
-let currentRotX = -12;
-let currentRotY = -18;
+let currentRotX = TILT_X;
+let currentRotY = TILT_Y;
 let isDragging = false;
 let startPointerX = 0;
 let startPointerY = 0;
@@ -313,47 +306,218 @@ let startRotY = 0;
 let wasDragging = false;
 let totalDragDistance = 0;
 
-function renderCubeFront() {
-  if (!cubeFrontTiles) return;
-  cubeFrontTiles.innerHTML = careersData
-    .map(
-      (career, index) => `
-    <button type="button" class="cube-tile ${career.name.toLowerCase() === selectedCareer.toLowerCase() ? "selected" : ""}"
-            data-career="${career.name}"
-            data-index="${index}"
-            tabindex="0"
-            role="button"
-            aria-selected="${career.name.toLowerCase() === selectedCareer.toLowerCase() ? "true" : "false"}"
-            aria-label="${career.name}">
-      <span class="cube-tile-icon" aria-hidden="true">${career.iconSvg}</span>
-      <span class="cube-tile-name">${career.name}</span>
-    </button>
-  `
-    )
-    .join("");
+/* Helper: shortest rotational path around Y */
+function getClosestRotation(current, target) {
+  const diff = ((target - (current % 360)) + 540) % 360 - 180;
+  return current + diff;
+}
 
-  // Tile selection event listeners
-  cubeFrontTiles.querySelectorAll(".cube-tile").forEach((tile) => {
-    tile.addEventListener("click", (e) => {
-      if (wasDragging) {
-        wasDragging = false;
-        return;
-      }
-      const career = tile.dataset.career;
-      if (career) updateDetailsPanel(career);
+/* Update Right Details Panel */
+function updateDetailsPanel(careerName) {
+  const careerObj = careersData.find((c) => c.name.toLowerCase() === careerName.toLowerCase()) || careersData[0];
+  selectedCareer = careerObj.name;
+
+  if (panelTitle) panelTitle.textContent = careerObj.name;
+  if (panelDesc) panelDesc.textContent = careerObj.desc;
+  if (panelOutcome) panelOutcome.textContent = careerObj.outcome;
+
+  const isDiceCareer = DICE_FACES_CONFIG.some((d) => d.careerName.toLowerCase() === selectedCareer.toLowerCase());
+  if (panelBadge) {
+    panelBadge.textContent = isDiceCareer ? "Selected Career • 3D Dice Track" : "Selected Career • Specialized Track";
+  }
+
+  if (panelSkills) {
+    panelSkills.innerHTML = careerObj.skills
+      .map((skill) => `<span class="career-skill-tag">${skill}</span>`)
+      .join("");
+  }
+
+  // Update selected class across 3D dice faces
+  document.querySelectorAll(".cube-face").forEach((face) => {
+    const faceCareer = face.dataset.career;
+    if (faceCareer && faceCareer.toLowerCase() === selectedCareer.toLowerCase()) {
+      face.classList.add("selected");
+      face.setAttribute("aria-selected", "true");
+    } else {
+      face.classList.remove("selected");
+      face.setAttribute("aria-selected", "false");
+    }
+  });
+
+  // Update selected class across tray chips
+  document.querySelectorAll(".career-chip").forEach((chip) => {
+    const chipCareer = chip.dataset.career;
+    if (chipCareer && chipCareer.toLowerCase() === selectedCareer.toLowerCase()) {
+      chip.classList.add("selected");
+      chip.setAttribute("aria-selected", "true");
+    } else {
+      chip.classList.remove("selected");
+      chip.setAttribute("aria-selected", "false");
+    }
+  });
+
+  // Persist choice into existing localStorage keys for asses.html compatibility
+  try {
+    localStorage.setItem("skillpath_career", selectedCareer);
+    localStorage.setItem("careerPath", selectedCareer);
+  } catch (e) {
+    console.warn("Could not save to localStorage:", e);
+  }
+}
+
+/* Rotate Cube to Face for Career */
+function rotateToFace(careerName, isRoll = false) {
+  if (!cube3D) return;
+  const diceConfig = DICE_FACES_CONFIG.find((d) => d.careerName.toLowerCase() === careerName.toLowerCase());
+  if (!diceConfig) return;
+
+  let nextY = getClosestRotation(currentRotY, diceConfig.rotY);
+  let nextX = diceConfig.rotX;
+
+  if (isRoll) {
+    cube3D.classList.remove("animating");
+    cube3D.classList.add("rolling");
+    const extraSpinsY = Math.random() > 0.5 ? 720 : -720;
+    const extraSpinsX = Math.abs(diceConfig.rotX) < 45 ? (Math.random() > 0.5 ? 360 : -360) : 0;
+    nextY += extraSpinsY;
+    nextX += extraSpinsX;
+  } else {
+    cube3D.classList.remove("rolling");
+    cube3D.classList.add("animating");
+  }
+
+  currentRotX = nextX;
+  currentRotY = nextY;
+  cube3D.style.transform = `rotateX(${currentRotX}deg) rotateY(${currentRotY}deg)`;
+}
+
+/* Select Career & Rotate Dice */
+function selectCareer(careerName, shouldRotate = true) {
+  updateDetailsPanel(careerName);
+  if (shouldRotate) {
+    rotateToFace(careerName, false);
+  }
+}
+
+/* Snap Cube to Nearest Cardinal Face & Select It */
+function snapToCardinalFace() {
+  if (!cube3D) return;
+
+  let snapX = TILT_X;
+  let snapY = TILT_Y;
+  let facingCareer = "Web Developer";
+
+  if (currentRotX <= -45) {
+    snapX = -76;
+    snapY = TILT_Y;
+    facingCareer = "Cybersecurity Analyst"; // Top
+  } else if (currentRotX >= 45) {
+    snapX = 76;
+    snapY = TILT_Y;
+    facingCareer = "Software Engineer"; // Bottom
+  } else {
+    snapX = TILT_X;
+    const quadrant = Math.round((currentRotY - TILT_Y) / 90);
+    snapY = quadrant * 90 + TILT_Y;
+    const normY = ((quadrant % 4) + 4) % 4;
+    if (normY === 0) facingCareer = "Web Developer"; // Front
+    else if (normY === 1) facingCareer = "AI / ML Engineer"; // Left (+90)
+    else if (normY === 2) facingCareer = "Cloud Engineer"; // Back (180)
+    else if (normY === 3) facingCareer = "Data Analyst"; // Right (-90)
+  }
+
+  cube3D.classList.remove("rolling");
+  cube3D.classList.add("animating");
+  currentRotX = snapX;
+  currentRotY = snapY;
+  cube3D.style.transform = `rotateX(${currentRotX}deg) rotateY(${currentRotY}deg)`;
+
+  updateDetailsPanel(facingCareer);
+}
+
+/* Render 6 Physical Dice Faces */
+function renderDiceFaces() {
+  DICE_FACES_CONFIG.forEach((cfg) => {
+    const faceEl = document.getElementById(cfg.elementId);
+    const career = careersData.find((c) => c.name === cfg.careerName);
+    if (!faceEl || !career) return;
+
+    faceEl.setAttribute("data-career", career.name);
+    faceEl.setAttribute("aria-label", `${career.name} (${cfg.faceLabel})`);
+    if (career.name.toLowerCase() === selectedCareer.toLowerCase()) {
+      faceEl.classList.add("selected");
+      faceEl.setAttribute("aria-selected", "true");
+    } else {
+      faceEl.classList.remove("selected");
+      faceEl.setAttribute("aria-selected", "false");
+    }
+
+    faceEl.innerHTML = `
+      <div class="dice-face-header">
+        <span class="dice-face-pip">${cfg.faceNumber}</span>
+        <span class="dice-face-badge">Career Track</span>
+      </div>
+      <div class="dice-face-icon-wrap" aria-hidden="true">
+        ${career.iconSvg}
+      </div>
+      <div class="dice-face-title">${career.name}</div>
+      <div class="dice-face-preview">${career.skills.slice(0, 3).join(" • ")}</div>
+      <div class="dice-face-action">Click to Select</div>
+    `;
+
+    faceEl.addEventListener("click", () => {
+      if (wasDragging) return;
+      selectCareer(career.name, true);
     });
 
-    tile.addEventListener("keydown", (e) => {
+    faceEl.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        const career = tile.dataset.career;
-        if (career) updateDetailsPanel(career);
+        selectCareer(career.name, true);
       }
     });
   });
 }
 
-// Cube Drag-to-Rotate Gesture
+/* Render Secondary Career Tray (All 9 Specializations) */
+function renderAllCareersTray() {
+  if (!allCareersChips) return;
+  allCareersChips.innerHTML = careersData
+    .map((career) => {
+      const isDice = DICE_FACES_CONFIG.some((d) => d.careerName === career.name);
+      const isSelected = career.name.toLowerCase() === selectedCareer.toLowerCase();
+      return `
+        <button type="button" class="career-chip ${isSelected ? "selected" : ""}"
+                data-career="${career.name}"
+                role="button"
+                tabindex="0"
+                aria-selected="${isSelected ? "true" : "false"}"
+                aria-label="${career.name} (${isDice ? "Dice Track" : "Specialized Track"})">
+          <span class="career-chip-icon" aria-hidden="true">${career.iconSvg}</span>
+          <span class="career-chip-name">${career.name}</span>
+          <span class="career-chip-badge-mini">${isDice ? "🎲 Dice" : "✨ Track"}</span>
+        </button>
+      `;
+    })
+    .join("");
+
+  allCareersChips.querySelectorAll(".career-chip").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      const careerName = chip.dataset.career;
+      if (careerName) selectCareer(careerName, true);
+    });
+
+    chip.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        const careerName = chip.dataset.career;
+        if (careerName) selectCareer(careerName, true);
+      }
+    });
+  });
+}
+
+/* Setup Mouse Drag & Touch Gesture on Dice Viewport */
 if (cubeViewport && cube3D) {
   cubeViewport.addEventListener("pointerdown", (e) => {
     isDragging = true;
@@ -364,7 +528,10 @@ if (cubeViewport && cube3D) {
     startRotX = currentRotX;
     startRotY = currentRotY;
     cube3D.classList.remove("animating");
-    cubeViewport.setPointerCapture(e.pointerId);
+    cube3D.classList.remove("rolling");
+    try {
+      cubeViewport.setPointerCapture(e.pointerId);
+    } catch (err) {}
   });
 
   cubeViewport.addEventListener("pointermove", (e) => {
@@ -373,12 +540,12 @@ if (cubeViewport && cube3D) {
     const dy = e.clientY - startPointerY;
     totalDragDistance = Math.hypot(dx, dy);
 
-    if (totalDragDistance > 7) {
+    if (totalDragDistance > 8) {
       wasDragging = true;
     }
 
-    currentRotY = startRotY + dx * 0.42;
-    currentRotX = Math.max(-42, Math.min(42, startRotX - dy * 0.42));
+    currentRotY = startRotY + dx * 0.45;
+    currentRotX = Math.max(-85, Math.min(85, startRotX - dy * 0.45));
     cube3D.style.transform = `rotateX(${currentRotX}deg) rotateY(${currentRotY}deg)`;
   });
 
@@ -388,9 +555,14 @@ if (cubeViewport && cube3D) {
       try {
         cubeViewport.releasePointerCapture(e.pointerId);
       } catch (err) {}
+
+      if (wasDragging) {
+        snapToCardinalFace();
+      }
+
       setTimeout(() => {
         wasDragging = false;
-      }, 50);
+      }, 60);
     }
   };
 
@@ -399,126 +571,107 @@ if (cubeViewport && cube3D) {
 
   // Rotation Control Buttons
   const btnRotateLeft = document.getElementById("btnRotateLeft");
-  const btnResetCube = document.getElementById("btnResetCube");
   const btnRotateRight = document.getElementById("btnRotateRight");
+  const btnRotateUp = document.getElementById("btnRotateUp");
+  const btnRotateDown = document.getElementById("btnRotateDown");
+  const btnRollDice = document.getElementById("btnRollDice");
+  const btnResetCube = document.getElementById("btnResetCube");
 
   if (btnRotateLeft) {
     btnRotateLeft.addEventListener("click", () => {
-      cube3D.classList.add("animating");
-      currentRotY -= 40;
-      cube3D.style.transform = `rotateX(${currentRotX}deg) rotateY(${currentRotY}deg)`;
+      currentRotY += 90;
+      currentRotX = TILT_X;
+      snapToCardinalFace();
     });
   }
 
   if (btnRotateRight) {
     btnRotateRight.addEventListener("click", () => {
-      cube3D.classList.add("animating");
-      currentRotY += 40;
-      cube3D.style.transform = `rotateX(${currentRotX}deg) rotateY(${currentRotY}deg)`;
+      currentRotY -= 90;
+      currentRotX = TILT_X;
+      snapToCardinalFace();
+    });
+  }
+
+  if (btnRotateUp) {
+    btnRotateUp.addEventListener("click", () => {
+      currentRotX = -76;
+      snapToCardinalFace();
+    });
+  }
+
+  if (btnRotateDown) {
+    btnRotateDown.addEventListener("click", () => {
+      currentRotX = 76;
+      snapToCardinalFace();
+    });
+  }
+
+  if (btnRollDice) {
+    btnRollDice.addEventListener("click", () => {
+      const diceCareers = DICE_FACES_CONFIG.map((d) => d.careerName);
+      const candidates = diceCareers.filter((c) => c.toLowerCase() !== selectedCareer.toLowerCase());
+      const targetCareer = candidates[Math.floor(Math.random() * candidates.length)] || diceCareers[0];
+      rotateToFace(targetCareer, true);
+      setTimeout(() => {
+        updateDetailsPanel(targetCareer);
+      }, 820);
     });
   }
 
   if (btnResetCube) {
     btnResetCube.addEventListener("click", () => {
-      cube3D.classList.add("animating");
-      currentRotX = -12;
-      currentRotY = -18;
-      cube3D.style.transform = `rotateX(${currentRotX}deg) rotateY(${currentRotY}deg)`;
+      selectCareer("Web Developer", true);
     });
   }
 
-  // Keyboard accessibility on cube viewport
-  cubeViewport.setAttribute("tabindex", "0");
+  // Keyboard navigation on cube viewport
   cubeViewport.addEventListener("keydown", (e) => {
-    cube3D.classList.add("animating");
     if (e.key === "ArrowLeft") {
       e.preventDefault();
-      currentRotY -= 20;
+      currentRotY += 90;
+      currentRotX = TILT_X;
+      snapToCardinalFace();
     } else if (e.key === "ArrowRight") {
       e.preventDefault();
-      currentRotY += 20;
+      currentRotY -= 90;
+      currentRotX = TILT_X;
+      snapToCardinalFace();
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      currentRotX = Math.min(42, currentRotX + 15);
+      currentRotX = -76;
+      snapToCardinalFace();
     } else if (e.key === "ArrowDown") {
       e.preventDefault();
-      currentRotX = Math.max(-42, currentRotX - 15);
+      currentRotX = 76;
+      snapToCardinalFace();
+    } else if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      if (btnRollDice) btnRollDice.click();
     }
-    cube3D.style.transform = `rotateX(${currentRotX}deg) rotateY(${currentRotY}deg)`;
   });
 }
 
-/* ==========================================================================
-   7. Render Semicircular Arc View (Requirement 7)
-   ========================================================================== */
-const arcCardsRow = document.getElementById("arcCardsRow");
-
-function renderArcCards() {
-  if (!arcCardsRow) return;
-  arcCardsRow.innerHTML = careersData
-    .map(
-      (career, index) => `
-    <button type="button" class="arc-card ${career.name.toLowerCase() === selectedCareer.toLowerCase() ? "selected" : ""}"
-            data-career="${career.name}"
-            data-index="${index}"
-            tabindex="0"
-            role="button"
-            aria-selected="${career.name.toLowerCase() === selectedCareer.toLowerCase() ? "true" : "false"}"
-            aria-label="${career.name}">
-      <span class="arc-card-icon" aria-hidden="true">${career.iconSvg}</span>
-      <span class="arc-card-title">${career.name}</span>
-    </button>
-  `
-    )
-    .join("");
-
-  arcCardsRow.querySelectorAll(".arc-card").forEach((card) => {
-    card.addEventListener("click", () => {
-      const career = card.dataset.career;
-      if (career) updateDetailsPanel(career);
-    });
-
-    card.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        const career = card.dataset.career;
-        if (career) updateDetailsPanel(career);
-      }
-    });
+// Assessment Start Button Connection
+if (btnStartAssessment) {
+  btnStartAssessment.addEventListener("click", () => {
+    try {
+      localStorage.setItem("skillpath_career", selectedCareer);
+      localStorage.setItem("careerPath", selectedCareer);
+    } catch (e) {}
+    window.location.href = "asses.html";
   });
 }
 
-/* ==========================================================================
-   8. View Switcher (3D Cube vs Semicircular Arc View)
-   ========================================================================== */
-const btnCubeView = document.getElementById("btnCubeView");
-const btnArcView = document.getElementById("btnArcView");
-const cubeContainer = document.getElementById("cubeContainer");
-const arcContainer = document.getElementById("arcContainer");
-
-if (btnCubeView && btnArcView && cubeContainer && arcContainer) {
-  btnCubeView.addEventListener("click", () => {
-    btnCubeView.classList.add("active");
-    btnCubeView.setAttribute("aria-selected", "true");
-    btnArcView.classList.remove("active");
-    btnArcView.setAttribute("aria-selected", "false");
-
-    cubeContainer.classList.remove("hidden");
-    arcContainer.classList.remove("active");
-  });
-
-  btnArcView.addEventListener("click", () => {
-    btnArcView.classList.add("active");
-    btnArcView.setAttribute("aria-selected", "true");
-    btnCubeView.classList.remove("active");
-    btnCubeView.setAttribute("aria-selected", "false");
-
-    cubeContainer.classList.add("hidden");
-    arcContainer.classList.add("active");
+// Reset selection panel close button
+if (panelCloseBtn) {
+  panelCloseBtn.addEventListener("click", () => {
+    selectCareer(careersData[0].name, true);
   });
 }
 
 // Initialize on DOM load
-renderCubeFront();
-renderArcCards();
+renderDiceFaces();
+renderAllCareersTray();
 updateDetailsPanel(selectedCareer);
+rotateToFace(selectedCareer, false);
