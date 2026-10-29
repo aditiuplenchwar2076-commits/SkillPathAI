@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 
 class UserCreate(BaseModel):
@@ -6,7 +7,10 @@ class UserCreate(BaseModel):
     email: str
     career_goal: str
 
-from typing import Optional
+
+class UserUpdate(BaseModel):
+    name: Optional[str] = None
+    career_goal: Optional[str] = None
 
 
 class UserResponse(BaseModel):

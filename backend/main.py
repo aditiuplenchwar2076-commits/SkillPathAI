@@ -6,7 +6,7 @@ from database.mysql import SessionLocal
 
 logger = logging.getLogger("skillpathai.backend")
 from models.user import User
-from schemas.user import UserCreate, UserResponse
+from schemas.user import UserCreate, UserResponse, UserUpdate
 from models.profile import Profile
 from schemas.profile import ProfileCreate, ProfileUpdate
 from models.assessment import Assessment
@@ -104,6 +104,11 @@ def sync_user(token: dict = Depends(verify_token)):
     try:
         user = db.query(User).filter(User.firebase_uid == firebase_uid).first()
         if user:
+            token_name = token.get("name")
+            if token_name and token_name.strip() and token_name.strip().lower() != "user" and user.name != token_name.strip():
+                user.name = token_name.strip()
+                db.commit()
+                db.refresh(user)
             return user
 
         if email:
@@ -168,6 +173,36 @@ def create_user(user: UserCreate, token: dict = Depends(verify_token)):
             "user_id": new_user.user_id
         }
 
+    finally:
+        db.close()
+
+@app.patch("/users/{user_id}", response_model=UserResponse)
+def update_user(user_id: int, user_update: UserUpdate, token: dict = Depends(verify_token)):
+    db = SessionLocal()
+    try:
+        current_user = get_authenticated_user(token, db)
+        if current_user.user_id != user_id:
+            raise HTTPException(
+                status_code=403,
+                detail="Forbidden: Cannot modify another user's profile."
+            )
+
+        if user_update.name is not None:
+            trimmed_name = user_update.name.strip()
+            if not trimmed_name:
+                raise HTTPException(status_code=400, detail="Name cannot be empty.")
+            if len(trimmed_name) > 100:
+                raise HTTPException(status_code=400, detail="Name cannot exceed 100 characters.")
+            current_user.name = trimmed_name
+
+        if user_update.career_goal is not None:
+            trimmed_career = user_update.career_goal.strip()
+            if trimmed_career:
+                current_user.career_goal = trimmed_career
+
+        db.commit()
+        db.refresh(current_user)
+        return current_user
     finally:
         db.close()
 

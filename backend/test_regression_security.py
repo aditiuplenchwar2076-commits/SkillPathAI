@@ -502,5 +502,91 @@ class TestSecurityAndReliability(unittest.TestCase):
         self.assertEqual(data["progress_summary"]["total_topics"], 5)
 
 
+    # 16. User name update succeeds for authenticated user
+    def test_update_user_name_success(self):
+        main.app.dependency_overrides[verify_token] = lambda: {
+            "uid": "uid_alice_123",
+            "email": "alice@example.com"
+        }
+        res = client.patch(
+            "/users/1",
+            json={"name": "Alice Wonderland", "career_goal": "Frontend Development"},
+            headers={"Authorization": "Bearer mocked_token"}
+        )
+        self.assertEqual(res.status_code, 200)
+        data = res.json()
+        self.assertEqual(data["name"], "Alice Wonderland")
+        self.assertEqual(data["career_goal"], "Frontend Development")
+
+        # Verify database commit
+        db = TestingSessionLocal()
+        try:
+            alice = db.query(User).filter(User.user_id == 1).first()
+            self.assertEqual(alice.name, "Alice Wonderland")
+            self.assertEqual(alice.career_goal, "Frontend Development")
+        finally:
+            db.close()
+
+    # 17. User name update for another user is strictly forbidden (403 BOLA/IDOR prevention)
+    def test_update_user_name_another_user_forbidden(self):
+        main.app.dependency_overrides[verify_token] = lambda: {
+            "uid": "uid_alice_123",
+            "email": "alice@example.com"
+        }
+        res = client.patch(
+            "/users/2",
+            json={"name": "Hacked Bob"},
+            headers={"Authorization": "Bearer mocked_token"}
+        )
+        self.assertEqual(res.status_code, 403)
+        self.assertIn("Forbidden", res.json()["detail"])
+
+        # Verify Bob's record in database is untouched
+        db = TestingSessionLocal()
+        try:
+            bob = db.query(User).filter(User.user_id == 2).first()
+            self.assertEqual(bob.name, "Bob User")
+        finally:
+            db.close()
+
+    # 18. User name update with empty or whitespace-only name returns 400 Bad Request
+    def test_update_user_name_empty_bad_request(self):
+        main.app.dependency_overrides[verify_token] = lambda: {
+            "uid": "uid_alice_123",
+            "email": "alice@example.com"
+        }
+        res = client.patch(
+            "/users/1",
+            json={"name": "   "},
+            headers={"Authorization": "Bearer mocked_token"}
+        )
+        self.assertEqual(res.status_code, 400)
+        self.assertIn("empty", res.json()["detail"].lower())
+
+    # 19. User name update without authentication returns 401 Unauthorized
+    def test_update_user_name_unauthorized_missing_token(self):
+        res = client.patch("/users/1", json={"name": "Alice NoAuth"})
+        self.assertEqual(res.status_code, 401)
+
+    # 20. Users sync updates database name when token contains updated display name
+    def test_users_sync_updates_name_from_token(self):
+        main.app.dependency_overrides[verify_token] = lambda: {
+            "uid": "uid_alice_123",
+            "email": "alice@example.com",
+            "name": "Alice NewDisplayName"
+        }
+        res = client.post("/users/sync", headers={"Authorization": "Bearer mocked_token"})
+        self.assertEqual(res.status_code, 200)
+        data = res.json()
+        self.assertEqual(data["name"], "Alice NewDisplayName")
+
+        db = TestingSessionLocal()
+        try:
+            alice = db.query(User).filter(User.user_id == 1).first()
+            self.assertEqual(alice.name, "Alice NewDisplayName")
+        finally:
+            db.close()
+
+
 if __name__ == "__main__":
     unittest.main()
