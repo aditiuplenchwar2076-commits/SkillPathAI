@@ -38,6 +38,7 @@ from models.roadmap import Roadmap
 from models.topic import Topic
 from models.progress import Progress
 from models.quiz_result import QuizResult
+from services.ai_services import RoadmapResponse, RoadmapTopic
 
 test_engine = create_engine(
     "sqlite:///:memory:",
@@ -363,6 +364,142 @@ class TestSecurityAndReliability(unittest.TestCase):
         self.assertEqual(summary["overall_percentage"], 0)
         self.assertEqual(summary["fraction"], "0/0")
         self.assertIsNone(summary["current_topic"])
+
+    # 13. Repeated assessment submissions reuse/update roadmap without creating duplicates
+    def test_generate_roadmap_user_deduplication(self):
+        main.app.dependency_overrides[verify_token] = lambda: {
+            "uid": "uid_alice_123",
+            "email": "alice@example.com"
+        }
+        mock_response = RoadmapResponse(
+            career_path="Web Development",
+            topics=[
+                RoadmapTopic(sequence_no=1, topic_name="HTML & CSS"),
+                RoadmapTopic(sequence_no=2, topic_name="JavaScript Fundamentals")
+            ]
+        )
+        with patch("main.generate_roadmap", return_value=mock_response):
+            # First submission (Assessment 1)
+            res1 = client.post(
+                "/generate-roadmap",
+                json={
+                    "user_id": 1,
+                    "career_goal": "Web Development",
+                    "current_skills": "",
+                    "interests": "Web Development",
+                    "skill_level": "Beginner",
+                    "assessment_score": 50.0
+                },
+                headers={"Authorization": "Bearer mocked_token"}
+            )
+            self.assertEqual(res1.status_code, 200)
+
+            # Second submission for same user & career goal (Assessment 2)
+            res2 = client.post(
+                "/generate-roadmap",
+                json={
+                    "user_id": 1,
+                    "career_goal": "Web Development",
+                    "current_skills": "",
+                    "interests": "Web Development",
+                    "skill_level": "Intermediate",
+                    "assessment_score": 85.0
+                },
+                headers={"Authorization": "Bearer mocked_token"}
+            )
+            self.assertEqual(res2.status_code, 200)
+
+        # Verify only 1 roadmap exists for Alice with career_path "Web Development"
+        db = TestingSessionLocal()
+        try:
+            roadmaps = db.query(Roadmap).filter(Roadmap.user_id == 1, Roadmap.career_path == "Web Development").all()
+            self.assertEqual(len(roadmaps), 1)
+
+            # Verify topics count is exactly 2 (not 4 duplicate topics)
+            topics = db.query(Topic).filter(Topic.roadmap_id == roadmaps[0].roadmap_id).all()
+            self.assertEqual(len(topics), 2)
+        finally:
+            db.close()
+
+    # 14. Roadmap generation succeeds even if user has no Profile row (prevents 404 defect)
+    def test_generate_roadmap_for_user_without_profile(self):
+        # Create User 3 without a Profile record
+        db = TestingSessionLocal()
+        try:
+            user3 = User(
+                user_id=3,
+                name="Charlie Learner",
+                email="charlie@example.com",
+                firebase_uid="uid_charlie_789",
+                career_goal="Web Development"
+            )
+            db.add(user3)
+            # Add an Assessment for Charlie
+            assess = Assessment(
+                user_id=3,
+                score=70.0,
+                skill_level="Beginner"
+            )
+            db.add(assess)
+            db.commit()
+        finally:
+            db.close()
+
+        main.app.dependency_overrides[verify_token] = lambda: {
+            "uid": "uid_charlie_789",
+            "email": "charlie@example.com"
+        }
+        mock_response = RoadmapResponse(
+            career_path="Web Development",
+            topics=[
+                RoadmapTopic(sequence_no=1, topic_name="Python Fundamentals")
+            ]
+        )
+        with patch("main.generate_roadmap", return_value=mock_response):
+            res = client.post("/generate-roadmap/3", headers={"Authorization": "Bearer mocked_token"})
+            self.assertEqual(res.status_code, 200)
+            data = res.json()
+            self.assertEqual(data["user_id"], 3)
+            self.assertIn("roadmap_id", data)
+
+        # Verify a Profile was automatically created for Charlie
+        db = TestingSessionLocal()
+        try:
+            p = db.query(Profile).filter(Profile.user_id == 3).first()
+            self.assertIsNotNone(p)
+            self.assertEqual(p.skill_level, "Beginner")
+        finally:
+            db.close()
+
+    # 15. Dashboard overview selects populated roadmap when an empty 0-topic roadmap exists
+    def test_dashboard_overview_selects_populated_roadmap_over_empty(self):
+        main.app.dependency_overrides[verify_token] = lambda: {
+            "uid": "uid_alice_123",
+            "email": "alice@example.com"
+        }
+        db = TestingSessionLocal()
+        try:
+            # 1. Populated roadmap (id=1, 5 topics)
+            r1 = Roadmap(roadmap_id=1, user_id=1, career_path="Web Development")
+            db.add(r1)
+            db.commit()
+            for i in range(1, 6):
+                db.add(Topic(roadmap_id=1, topic_name=f"Topic {i}", sequence_no=i, status="Not Started"))
+
+            # 2. Newer empty roadmap (id=2, 0 topics)
+            r2 = Roadmap(roadmap_id=2, user_id=1, career_path="Web Development")
+            db.add(r2)
+            db.commit()
+        finally:
+            db.close()
+
+        res = client.get("/dashboard/overview", headers={"Authorization": "Bearer mocked_token"})
+        self.assertEqual(res.status_code, 200)
+        data = res.json()
+        self.assertIsNotNone(data["active_roadmap"])
+        self.assertEqual(data["active_roadmap"]["roadmap_id"], 1)
+        self.assertEqual(len(data["topics"]), 5)
+        self.assertEqual(data["progress_summary"]["total_topics"], 5)
 
 
 if __name__ == "__main__":

@@ -131,21 +131,36 @@ async function loadUserDashboardData(firebaseUser) {
 
       renderStreakAndProjectMetrics(streakData);
 
-      if (!activeRoadmap && career && career !== "Not Set") {
-        try {
-          const created = await apiRequest("/roadmaps", {
-            method: "POST",
-            body: JSON.stringify({ user_id: userId, career_path: career })
-          });
-          if (created && created.roadmap_id) {
-            activeRoadmap = { roadmap_id: created.roadmap_id, user_id: userId, career_path: career };
+      if ((!activeRoadmap || topics.length === 0) && career && career !== "Not Set") {
+        if (latestAssessment) {
+          try {
+            const score = typeof latestAssessment.score === "number" ? latestAssessment.score : 75.0;
+            const generated = await apiRequest("/generate-roadmap", {
+              method: "POST",
+              body: JSON.stringify({
+                user_id: userId,
+                career_goal: career,
+                current_skills: "",
+                interests: career,
+                skill_level: level,
+                assessment_score: score
+              })
+            });
+            if (generated && generated.roadmap_id) {
+              activeRoadmap = { roadmap_id: generated.roadmap_id, user_id: userId, career_path: generated.career_path || career };
+              if (Array.isArray(generated.topics) && generated.topics.length > 0 && generated.topics[0].topic_id) {
+                topics = generated.topics;
+              } else {
+                topics = await apiRequest(`/topics/${generated.roadmap_id}`);
+              }
+            }
+          } catch (e) {
+            console.warn("Could not generate AI roadmap on dashboard:", e);
           }
-        } catch (e) {
-          console.warn("Could not create roadmap:", e);
         }
       }
 
-      if (!activeRoadmap) {
+      if (!activeRoadmap || topics.length === 0) {
         renderEmptyRoadmapState();
         return;
       }
@@ -220,6 +235,12 @@ async function loadUserDashboardData(firebaseUser) {
   const streakData = streakRes.status === "fulfilled" ? streakRes.value : { streak_days: 0, completed_projects: 0, week_completed_topics: 0 };
 
   renderStreakAndProjectMetrics(streakData);
+
+  if (!topics || topics.length === 0) {
+    renderEmptyRoadmapState();
+    return;
+  }
+
   renderDashboardRoadmap(topics, progressRecords, activeRoadmap, level);
   await renderQuizPerformanceMetrics(topics, quizResults, performanceData);
 }

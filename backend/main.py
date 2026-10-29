@@ -840,33 +840,105 @@ def generate_ai_roadmap(data: AIRoadmapRequest, token: dict = Depends(verify_tok
                 detail="Unable to generate AI roadmap. Please try again later."
             )
 
-        # Save roadmap
-        new_roadmap = Roadmap(
-            user_id=data.user_id,
-            career_path=roadmap.career_path
+        # Deduplication: Check if an existing roadmap for this user and career goal already exists
+        existing_roadmap = (
+            db.query(Roadmap)
+            .filter(Roadmap.user_id == data.user_id, Roadmap.career_path == roadmap.career_path)
+            .order_by(Roadmap.roadmap_id.desc())
+            .first()
         )
 
-        db.add(new_roadmap)
-        db.flush()
+        target_roadmap = None
+        if existing_roadmap:
+            existing_topics = (
+                db.query(Topic)
+                .filter(Topic.roadmap_id == existing_roadmap.roadmap_id)
+                .all()
+            )
+            topic_ids = [t.topic_id for t in existing_topics]
+            has_progress = (
+                db.query(Progress)
+                .filter(Progress.topic_id.in_(topic_ids))
+                .count() > 0
+                if topic_ids
+                else False
+            )
+
+            # If existing roadmap has no topics, or no user progress recorded yet, reuse it
+            if not has_progress:
+                target_roadmap = existing_roadmap
+                for t in existing_topics:
+                    db.delete(t)
+                db.flush()
+
+        if not target_roadmap:
+            target_roadmap = Roadmap(
+                user_id=data.user_id,
+                career_path=roadmap.career_path
+            )
+            db.add(target_roadmap)
+            db.flush()
+
+        # Clean up any other empty roadmaps with 0 topics for this user to prevent orphan shells
+        other_roadmaps = (
+            db.query(Roadmap)
+            .filter(Roadmap.user_id == data.user_id, Roadmap.roadmap_id != target_roadmap.roadmap_id)
+            .all()
+        )
+        for r in other_roadmaps:
+            t_count = db.query(Topic).filter(Topic.roadmap_id == r.roadmap_id).count()
+            if t_count == 0:
+                db.delete(r)
 
         # Save each topic
+        saved_topics = []
         for topic in roadmap.topics:
             new_topic = Topic(
-                roadmap_id=new_roadmap.roadmap_id,
+                roadmap_id=target_roadmap.roadmap_id,
                 topic_name=topic.topic_name,
                 sequence_no=topic.sequence_no,
                 status="Not Started"
             )
 
             db.add(new_topic)
+            saved_topics.append(new_topic)
+
+        # Synchronize user career_goal and profile
+        user_row = db.query(User).filter(User.user_id == data.user_id).first()
+        if user_row and data.career_goal:
+            user_row.career_goal = data.career_goal
+
+        profile_row = db.query(Profile).filter(Profile.user_id == data.user_id).first()
+        if profile_row:
+            profile_row.skill_level = data.skill_level
+            if data.current_skills:
+                profile_row.current_skills = data.current_skills
+            if data.interests:
+                profile_row.interests = data.interests
+        else:
+            db.add(Profile(
+                user_id=data.user_id,
+                skill_level=data.skill_level,
+                current_skills=data.current_skills or "",
+                interests=data.interests or data.career_goal
+            ))
 
         db.commit()
 
         return {
             "message": "AI roadmap generated and saved successfully!",
-            "roadmap_id": new_roadmap.roadmap_id,
-            "career_path": roadmap.career_path,
-            "topics": roadmap.topics
+            "roadmap_id": target_roadmap.roadmap_id,
+            "career_path": target_roadmap.career_path,
+            "topics": [
+                {
+                    "topic_id": t.topic_id,
+                    "roadmap_id": t.roadmap_id,
+                    "topic_name": t.topic_name,
+                    "sequence_no": t.sequence_no,
+                    "status": t.status
+                }
+                for t in saved_topics
+            ]
         }
 
     except HTTPException:
@@ -905,16 +977,10 @@ def generate_roadmap_for_user(user_id: int, token: dict = Depends(verify_token))
                 detail="User not found"
             )
 
-        # Get profile
+        # Get profile if present
         profile = db.query(Profile).filter(
             Profile.user_id == user_id
         ).first()
-
-        if not profile:
-            raise HTTPException(
-                status_code=404,
-                detail="Profile not found for this user"
-            )
 
         # Get latest assessment
         assessment = (
@@ -926,18 +992,31 @@ def generate_roadmap_for_user(user_id: int, token: dict = Depends(verify_token))
 
         if not assessment:
             raise HTTPException(
-                status_code=404,
-                detail="Assessment not found for this user"
+                status_code=400,
+                detail="Assessment not found for this user. Please complete the skill assessment first."
             )
+
+        # Resolve skill level and user attributes gracefully
+        skill_level = "Beginner"
+        if assessment and assessment.skill_level:
+            skill_level = assessment.skill_level
+        elif profile and profile.skill_level:
+            skill_level = profile.skill_level
+
+        current_skills = profile.current_skills if (profile and profile.current_skills) else ""
+        interests = profile.interests if (profile and profile.interests) else ""
+        assessment_score = float(assessment.score) if (assessment and assessment.score is not None) else 0.0
+
+        career_goal = user.career_goal if (user.career_goal and user.career_goal != "Not Set") else "Web Development"
 
         # Generate roadmap using user's database data
         try:
             roadmap = generate_roadmap(
-                career_goal=user.career_goal or "Software Engineering",
-                current_skills=profile.current_skills or "",
-                interests=profile.interests or "",
-                skill_level=profile.skill_level or "Beginner",
-                assessment_score=float(assessment.score) if assessment.score is not None else 0.0
+                career_goal=career_goal,
+                current_skills=current_skills,
+                interests=interests or career_goal,
+                skill_level=skill_level,
+                assessment_score=assessment_score
             )
         except Exception as e:
             err_msg = str(e)
@@ -972,34 +1051,100 @@ def generate_roadmap_for_user(user_id: int, token: dict = Depends(verify_token))
                 detail="Unable to generate AI roadmap. Please try again later."
             )
 
-        # Save roadmap
-        new_roadmap = Roadmap(
-            user_id=user_id,
-            career_path=roadmap.career_path
+        # Deduplication: Check if an existing roadmap for this user and career goal already exists
+        existing_roadmap = (
+            db.query(Roadmap)
+            .filter(Roadmap.user_id == user_id, Roadmap.career_path == roadmap.career_path)
+            .order_by(Roadmap.roadmap_id.desc())
+            .first()
         )
 
-        db.add(new_roadmap)
-        db.flush()
+        target_roadmap = None
+        if existing_roadmap:
+            existing_topics = (
+                db.query(Topic)
+                .filter(Topic.roadmap_id == existing_roadmap.roadmap_id)
+                .all()
+            )
+            topic_ids = [t.topic_id for t in existing_topics]
+            has_progress = (
+                db.query(Progress)
+                .filter(Progress.topic_id.in_(topic_ids))
+                .count() > 0
+                if topic_ids
+                else False
+            )
+
+            # If existing roadmap has no topics, or no user progress recorded yet, reuse it
+            if not has_progress:
+                target_roadmap = existing_roadmap
+                for t in existing_topics:
+                    db.delete(t)
+                db.flush()
+
+        if not target_roadmap:
+            target_roadmap = Roadmap(
+                user_id=user_id,
+                career_path=roadmap.career_path
+            )
+            db.add(target_roadmap)
+            db.flush()
+
+        # Clean up any other empty roadmaps with 0 topics for this user
+        other_roadmaps = (
+            db.query(Roadmap)
+            .filter(Roadmap.user_id == user_id, Roadmap.roadmap_id != target_roadmap.roadmap_id)
+            .all()
+        )
+        for r in other_roadmaps:
+            t_count = db.query(Topic).filter(Topic.roadmap_id == r.roadmap_id).count()
+            if t_count == 0:
+                db.delete(r)
 
         # Save topics
+        saved_topics = []
         for topic in roadmap.topics:
             new_topic = Topic(
-                roadmap_id=new_roadmap.roadmap_id,
+                roadmap_id=target_roadmap.roadmap_id,
                 topic_name=topic.topic_name,
                 sequence_no=topic.sequence_no,
                 status="Not Started"
             )
 
             db.add(new_topic)
+            saved_topics.append(new_topic)
+
+        # Synchronize Profile and User records
+        if user.career_goal != roadmap.career_path:
+            user.career_goal = roadmap.career_path
+
+        if profile:
+            profile.skill_level = skill_level
+        else:
+            db.add(Profile(
+                user_id=user_id,
+                skill_level=skill_level,
+                current_skills=current_skills,
+                interests=interests or career_goal
+            ))
 
         db.commit()
 
         return {
             "message": "Personalized roadmap generated successfully!",
             "user_id": user_id,
-            "roadmap_id": new_roadmap.roadmap_id,
-            "career_path": roadmap.career_path,
-            "topics": roadmap.topics
+            "roadmap_id": target_roadmap.roadmap_id,
+            "career_path": target_roadmap.career_path,
+            "topics": [
+                {
+                    "topic_id": t.topic_id,
+                    "roadmap_id": t.roadmap_id,
+                    "topic_name": t.topic_name,
+                    "sequence_no": t.sequence_no,
+                    "status": t.status
+                }
+                for t in saved_topics
+            ]
         }
 
     except HTTPException:
@@ -1221,24 +1366,30 @@ def get_dashboard_overview(token: dict = Depends(verify_token)):
             .first()
         )
 
-        # 2. Roadmaps
+        # 2. Roadmaps (select latest roadmap with topics, or latest roadmap)
         roadmaps = (
             db.query(Roadmap)
             .filter(Roadmap.user_id == user_id)
             .order_by(Roadmap.roadmap_id.desc())
             .all()
         )
-        active_roadmap = roadmaps[0] if roadmaps else None
-
-        # 3. Topics for active roadmap
+        active_roadmap = None
         topics = []
-        if active_roadmap:
-            topics = (
+        for r in roadmaps:
+            r_topics = (
                 db.query(Topic)
-                .filter(Topic.roadmap_id == active_roadmap.roadmap_id)
+                .filter(Topic.roadmap_id == r.roadmap_id)
                 .order_by(Topic.sequence_no.asc())
                 .all()
             )
+            if len(r_topics) > 0:
+                active_roadmap = r
+                topics = r_topics
+                break
+
+        if not active_roadmap and roadmaps:
+            active_roadmap = roadmaps[0]
+            topics = []
 
         # 4. Progress records
         progress_records = (

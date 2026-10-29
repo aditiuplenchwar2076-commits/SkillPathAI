@@ -324,70 +324,96 @@
     const userId = dbUser.user_id;
 
     // Fetch assessments and roadmaps in parallel
-    let userLevel = localStorage.getItem("skillLevel") || "Beginner";
+    let userLevel = localStorage.getItem("skillLevel") || localStorage.getItem("skillpath_level") || "Beginner";
     let activeRoadmap = null;
+    let topics = [];
 
     const [assessmentsRes, roadmapsRes] = await Promise.allSettled([
       apiRequest(`/assessments/${userId}`),
       apiRequest(`/roadmaps/${userId}`)
     ]);
 
-    if (assessmentsRes.status === "fulfilled" && assessmentsRes.value && assessmentsRes.value.length > 0) {
-      userLevel = assessmentsRes.value[0].skill_level || userLevel;
-    }
-    if (roadmapsRes.status === "fulfilled" && roadmapsRes.value && roadmapsRes.value.length > 0) {
-      activeRoadmap = roadmapsRes.value[0];
+    const assessments = (assessmentsRes.status === "fulfilled" && Array.isArray(assessmentsRes.value)) ? assessmentsRes.value : [];
+    const roadmaps = (roadmapsRes.status === "fulfilled" && Array.isArray(roadmapsRes.value)) ? roadmapsRes.value : [];
+
+    if (assessments.length > 0 && assessments[0].skill_level) {
+      userLevel = assessments[0].skill_level;
+      localStorage.setItem("skillLevel", userLevel);
+      localStorage.setItem("skillpath_level", userLevel);
     }
 
-    const career = (activeRoadmap && activeRoadmap.career_path) ||
-                   localStorage.getItem("careerPath") ||
-                   localStorage.getItem("skillpath_career") ||
-                   (dbUser.career_goal && dbUser.career_goal !== "Not Set" ? dbUser.career_goal : "Web Development");
+    let career = localStorage.getItem("careerPath") ||
+                 localStorage.getItem("skillpath_career") ||
+                 (dbUser.career_goal && dbUser.career_goal !== "Not Set" ? dbUser.career_goal : null);
 
-    // Auto-create initial roadmap if missing
-    if (!activeRoadmap && career) {
+    // Look for the latest roadmap that actually has topics
+    for (const r of roadmaps) {
       try {
-        const created = await apiRequest("/roadmaps", {
-          method: "POST",
-          body: JSON.stringify({
-            user_id: userId,
-            career_path: career
-          })
-        });
-
-        if (created && created.roadmap_id) {
-          activeRoadmap = {
-            roadmap_id: created.roadmap_id,
-            user_id: userId,
-            career_path: career
-          };
-
-          const defaultTopics = [
-            "Programming Fundamentals",
-            "Data Structures & Basic Algorithms",
-            "Advanced Data Structures",
-            "Advanced Algorithms",
-            "System Design & Projects"
-          ];
-
-          for (let i = 0; i < defaultTopics.length; i++) {
-            await apiRequest("/topics", {
-              method: "POST",
-              body: JSON.stringify({
-                roadmap_id: created.roadmap_id,
-                topic_name: defaultTopics[i],
-                sequence_no: i + 1,
-                status: i === 0 ? "In Progress" : "Not Started"
-              })
-            });
-          }
+        const tRes = await apiRequest(`/topics/${r.roadmap_id}`);
+        if (Array.isArray(tRes) && tRes.length > 0) {
+          activeRoadmap = r;
+          topics = tRes;
+          break;
         }
       } catch (err) {
-        console.warn("Auto-create roadmap error:", err);
+        console.warn("Could not check topics for roadmap", r.roadmap_id, err);
       }
     }
 
-    if (!activeRoadmap) {
+    // If no populated roadmap found, check if learner has taken the assessment or selected a career
+    if (!activeRoadmap || topics.length === 0) {
+      if (!career && roadmaps.length > 0) {
+        career = roadmaps[0].career_path;
+      }
+      career = career || "Web Development";
+
+      // If learner has no assessment on record and no assessment score in storage:
+      const hasAssessment = assessments.length > 0 || localStorage.getItem("skillpath_score") !== null;
+      if (!hasAssessment) {
+        showEmptyRoadmap();
+        return;
+      }
+
+      // Generate the personalized AI roadmap dynamically
+      showGeneratingRoadmapState();
+
+      try {
+        const score = (assessments.length > 0 && typeof assessments[0].score === "number")
+          ? assessments[0].score
+          : (Number(localStorage.getItem("skillpath_score")) || 75.0);
+
+        const generated = await apiRequest("/generate-roadmap", {
+          method: "POST",
+          body: JSON.stringify({
+            user_id: userId,
+            career_goal: career,
+            current_skills: "",
+            interests: career,
+            skill_level: userLevel,
+            assessment_score: score
+          })
+        });
+
+        if (generated && generated.roadmap_id) {
+          activeRoadmap = {
+            roadmap_id: generated.roadmap_id,
+            user_id: userId,
+            career_path: generated.career_path || career
+          };
+          if (Array.isArray(generated.topics) && generated.topics.length > 0 && generated.topics[0].topic_id) {
+            topics = generated.topics;
+          } else {
+            topics = await apiRequest(`/topics/${generated.roadmap_id}`);
+          }
+        }
+      } catch (genErr) {
+        console.error("Failed to generate AI roadmap:", genErr);
+        showRoadmapGenerationError(genErr.message || "Failed to generate roadmap from AI service.");
+        return;
+      }
+    }
+
+    if (!activeRoadmap || !topics || topics.length === 0) {
       showEmptyRoadmap();
       return;
     }
@@ -398,16 +424,54 @@
     if (titleEl) titleEl.textContent = `My Personalized Roadmap (${activeRoadmap.career_path || career})`;
     if (subEl) subEl.textContent = `${activeRoadmap.career_path || career} • ${userLevel}`;
 
-    // Fetch topics and progress in parallel
-    const [topicsRes, progressRes] = await Promise.allSettled([
-      apiRequest(`/topics/${activeRoadmap.roadmap_id}`),
-      apiRequest(`/progress/${userId}`)
-    ]);
-
-    const topics = topicsRes.status === "fulfilled" ? (topicsRes.value || []) : [];
-    const progressRecords = progressRes.status === "fulfilled" ? (progressRes.value || []) : [];
+    // Fetch user progress
+    let progressRecords = [];
+    try {
+      const pRes = await apiRequest(`/progress/${userId}`);
+      if (Array.isArray(pRes)) progressRecords = pRes;
+    } catch (e) {
+      console.warn("Could not fetch progress:", e);
+    }
 
     renderTimeline(topics, progressRecords, activeRoadmap, userId);
+  }
+
+  function showGeneratingRoadmapState() {
+    const wrap = document.getElementById("timelineWrap");
+    if (wrap) {
+      wrap.innerHTML = `
+        <div style="text-align:center; padding:50px 20px;">
+          <div style="font-size:38px; margin-bottom:14px;">✨ 🤖 ✨</div>
+          <h3 style="font-size:18px; margin-bottom:8px; color:#1a1a2e;">Generating Your Personalized AI Roadmap...</h3>
+          <p style="color:#666; font-size:13px; max-width:460px; margin:0 auto 18px; line-height:1.6;">
+            Gemini AI is analyzing your assessment results and designing your tailored curriculum milestones.
+          </p>
+        </div>
+      `;
+    }
+  }
+
+  function showRoadmapGenerationError(errorMsg) {
+    const wrap = document.getElementById("timelineWrap");
+    if (wrap) {
+      wrap.innerHTML = `
+        <div style="text-align:center; padding:40px 20px; background:#fff5f5; border:1px solid #fed7d7; border-radius:12px;">
+          <h3 style="color:#c53030; font-size:16px; margin-bottom:8px;">Roadmap Generation Interrupted</h3>
+          <p style="color:#742a2a; font-size:13px; margin-bottom:18px; max-width:480px; margin-left:auto; margin-right:auto;">
+            ${errorMsg}
+          </p>
+          <button id="retryGenBtn" style="padding:10px 22px; background:linear-gradient(to right, #7c5cff, #a78bfa); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">
+            Retry Generation
+          </button>
+        </div>
+      `;
+      const btn = document.getElementById("retryGenBtn");
+      if (btn) {
+        btn.addEventListener("click", () => {
+          loadRoadmapPageData();
+        });
+      }
+    }
   }
 
   function showRoadmapError(msg) {
