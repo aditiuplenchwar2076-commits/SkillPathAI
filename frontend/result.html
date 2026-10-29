@@ -94,6 +94,10 @@
   }
 
   @media (max-width: 600px) {
+    .simple-header { padding: 12px 16px; }
+    .simple-logo h2 { font-size: 17px; }
+    .nav-links { gap: 12px; font-size: 13px; }
+    .result-card { padding: 28px 18px; margin: 24px auto; }
     .result-split { flex-direction: column; }
   }
 </style>
@@ -145,30 +149,81 @@
   <a href="roadmap.html" class="btn-primary">View My Personalized Roadmap →</a>
 </div>
 
-<script>
+<script type="module">
+  import { auth, classifyAssessmentScore } from "./api.js";
+  import { signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+
   // Reads values saved by the assessment page, if present.
   // Falls back to sensible defaults so this page works standalone too.
-  const savedLevel = localStorage.getItem('skillLevel') || localStorage.getItem('skillpath_level') || 'Intermediate';
-  const savedCareer = localStorage.getItem('careerPath') || localStorage.getItem('skillpath_career') || 'Web Development';
+  let savedLevel = localStorage.getItem('skillLevel') || localStorage.getItem('skillpath_level');
+  if (!savedLevel) {
+    const rawScore = localStorage.getItem('skillpath_score');
+    if (rawScore !== null && rawScore !== "") {
+      savedLevel = classifyAssessmentScore(rawScore);
+    } else {
+      savedLevel = 'Intermediate';
+    }
+  }
+  const savedCareer = localStorage.getItem('careerPath') || localStorage.getItem('skillpath_career') || 'Web Developer';
 
-  document.getElementById('levelBadge').textContent = savedLevel.toUpperCase();
-  document.getElementById('careerNote').textContent = savedCareer;
+  const levelBadge = document.getElementById('levelBadge');
+  const careerNote = document.getElementById('careerNote');
+  const levelDesc = document.getElementById('levelDesc');
+  const resultHeading = document.getElementById('resultHeading');
+
+  if (levelBadge) levelBadge.textContent = savedLevel.toUpperCase();
+  if (careerNote) careerNote.textContent = savedCareer;
 
   const descriptions = {
-    'Beginner': "You're just starting out. We'll begin with the fundamentals and build your skills step by step.",
-    'Intermediate': "You have a good foundation. Your next focus should be strengthening core concepts before moving to advanced topics.",
-    'Advanced': "You have strong existing skills. We'll focus on advanced concepts, system design and real-world projects."
+    'Beginner': "You're starting fresh with a clean slate! We'll start with fundamental core principles and build your practical skills step by step.",
+    'Intermediate': "You have a solid foundation. Your next focus should be strengthening core concepts and building end-to-end projects before moving to advanced topics.",
+    'Advanced': "You have strong existing skills. We'll focus on advanced architecture, system design, and production-grade engineering practices."
   };
-  document.getElementById('levelDesc').textContent =
-    descriptions[savedLevel] || descriptions['Intermediate'];
+  if (levelDesc) {
+    levelDesc.textContent = descriptions[savedLevel] || descriptions['Intermediate'];
+  }
 
   const headings = {
     'Beginner': "🌱 Welcome, Beginner!",
     'Intermediate': "🎉 Assessment Complete!",
     'Advanced': "🚀 Impressive Skills!"
   };
-  document.getElementById('resultHeading').textContent =
-    headings[savedLevel] || headings['Intermediate'];
+  if (resultHeading) {
+    resultHeading.textContent = headings[savedLevel] || headings['Intermediate'];
+  }
+
+  const strengths = {
+    'Beginner': ["✓ High Curiosity & Motivation", "✓ Clean Slate Learning Track"],
+    'Intermediate': ["✓ Core Fundamentals", "✓ Practical Application Basics"],
+    'Advanced': ["✓ Deep Domain Knowledge", "✓ Independent Problem Solving"]
+  };
+
+  const focuses = {
+    'Beginner': ["→ Core Syntax & Building Blocks", "→ Guided Interactive Lessons", "→ First Hands-on Project"],
+    'Intermediate': ["→ Intermediate System Concepts", "→ Best Practices & Tooling", "→ Portfolio-Grade Project"],
+    'Advanced': ["→ System Architecture & Scaling", "→ Production Performance", "→ Technical Interview Prep"]
+  };
+
+  const strengthsList = document.getElementById('strengthsList');
+  if (strengthsList && strengths[savedLevel]) {
+    strengthsList.innerHTML = strengths[savedLevel].map(s => `<li>${s}</li>`).join('');
+  }
+
+  const focusList = document.getElementById('focusList');
+  if (focusList && focuses[savedLevel]) {
+    focusList.innerHTML = focuses[savedLevel].map(f => `<li>${f}</li>`).join('');
+  }
+
+  const logoutBtn = document.querySelector('.logout-btn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      try {
+        await signOut(auth);
+      } catch (err) {}
+      window.location.href = 'index.html';
+    });
+  }
 </script>
 
 </body>

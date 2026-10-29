@@ -18,7 +18,12 @@ const auth = getAuth(app);
 const navAuthBtn = document.getElementById("navAuthBtn");
 const navDashboardLink = document.getElementById("navDashboardLink");
 
+let authInitialized = false;
+let currentAuthUser = null;
+
 onAuthStateChanged(auth, (user) => {
+  authInitialized = true;
+  currentAuthUser = user;
   if (user) {
     if (navDashboardLink) navDashboardLink.style.display = "inline-block";
     if (navAuthBtn) {
@@ -45,6 +50,25 @@ onAuthStateChanged(auth, (user) => {
 });
 
 /* ================= 1. CAREER SELECTION ================= */
+const SUPPORTED_CAREERS = [
+  "Web Developer",
+  "Data Analyst",
+  "Data Scientist",
+  "AI / ML Engineer",
+  "Cybersecurity Analyst",
+  "UI/UX Designer",
+  "Cloud Engineer",
+  "Mobile App Developer",
+  "Software Engineer"
+];
+
+function validateCareer(careerName) {
+  if (!careerName || typeof careerName !== "string") return "Web Developer";
+  const trimmed = careerName.trim();
+  const match = SUPPORTED_CAREERS.find((c) => c.toLowerCase() === trimmed.toLowerCase());
+  return match || "Web Developer";
+}
+
 const cards = document.querySelectorAll('.career-card');
 const selectionText = document.getElementById('selectionText');
 const continueBtn = document.getElementById('continueBtn');
@@ -52,17 +76,52 @@ const continueBtn = document.getElementById('continueBtn');
 function selectCareer(card) {
   cards.forEach(c => c.classList.remove('selected'));
   card.classList.add('selected');
-  const career = card.dataset.career;
+  const career = validateCareer(card.dataset.career);
   selectionText.textContent = 'Selected: ' + career;
   continueBtn.disabled = false;
-  try { localStorage.setItem('skillpath_career', career); localStorage.setItem('careerPath', career); } catch (e) {}
+  try {
+    localStorage.setItem('skillpath_career', career);
+    localStorage.setItem('careerPath', career);
+    sessionStorage.setItem('skillpath_pending_career', career);
+  } catch (e) {}
 }
 
 cards.forEach(card => card.addEventListener('click', () => selectCard(card)));
 function selectCard(card) { selectCareer(card); }
 
-continueBtn.addEventListener('click', () => {
-  window.location.href = 'asses.html';   // Page 3
+continueBtn.addEventListener('click', async () => {
+  const savedCareer = validateCareer(
+    localStorage.getItem('skillpath_career') || localStorage.getItem('careerPath') || 'Web Developer'
+  );
+  try {
+    sessionStorage.setItem('skillpath_pending_career', savedCareer);
+    sessionStorage.setItem('skillpath_pending_action', 'assessment');
+  } catch (e) {}
+
+  let user = currentAuthUser;
+  if (!authInitialized) {
+    if (typeof auth.authStateReady === "function") {
+      try {
+        await auth.authStateReady();
+        user = auth.currentUser;
+      } catch (e) {}
+    }
+    if (!user) {
+      user = await new Promise((resolve) => {
+        const unsubscribe = onAuthStateChanged(auth, (u) => {
+          unsubscribe();
+          resolve(u);
+        });
+        setTimeout(() => resolve(auth.currentUser), 500);
+      });
+    }
+  }
+
+  if (user) {
+    window.location.href = 'asses.html';
+  } else {
+    window.location.href = `login.html?returnUrl=${encodeURIComponent('asses.html')}&action=assessment`;
+  }
 });
 
 // Restore an earlier choice if the user comes back

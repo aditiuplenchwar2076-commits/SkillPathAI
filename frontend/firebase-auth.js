@@ -9,7 +9,7 @@ import {
   signOut,
   getAdditionalUserInfo
 } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-import { syncUserWithBackend, apiRequest } from "./api.js";
+import { syncUserWithBackend, apiRequest, sanitizeReturnUrl } from "./api.js";
 
 // SkillPathAI Firebase project configuration
 const firebaseConfig = {
@@ -144,11 +144,36 @@ async function handleAuthSuccess(userCredential, isCreated) {
   }
 
   const urlParams = new URLSearchParams(window.location.search);
-  const returnUrl = urlParams.get("returnUrl");
+  const rawReturnUrl = urlParams.get("returnUrl");
+  const action = urlParams.get("action") || (typeof sessionStorage !== "undefined" && sessionStorage.getItem("skillpath_pending_action"));
+  const hasPendingAssessment = typeof sessionStorage !== "undefined" && Boolean(sessionStorage.getItem("skillpath_pending_assessment"));
 
-  if (returnUrl && !returnUrl.includes("login.html") && !returnUrl.includes("index.html")) {
-    window.location.replace(returnUrl);
-    return;
+  // Check candidate target: explicit returnUrl, pending action, or pending completed assessment
+  let candidateTarget = rawReturnUrl;
+  if (!candidateTarget) {
+    if (action === "beginner") {
+      candidateTarget = "asses.html?action=beginner";
+    } else if (action === "submit_assessment" || hasPendingAssessment) {
+      candidateTarget = "asses.html?action=submit_assessment";
+    } else if (action === "assessment") {
+      candidateTarget = "asses.html";
+    }
+  }
+
+  if (candidateTarget) {
+    const safeTarget = sanitizeReturnUrl(candidateTarget, null);
+    if (safeTarget) {
+      let finalRedirect = safeTarget;
+      if (action === "beginner" && !finalRedirect.includes("action=beginner")) {
+        const sep = finalRedirect.includes("?") ? "&" : "?";
+        finalRedirect = `${finalRedirect}${sep}action=beginner`;
+      } else if ((action === "submit_assessment" || hasPendingAssessment) && !finalRedirect.includes("action=submit_assessment")) {
+        const sep = finalRedirect.includes("?") ? "&" : "?";
+        finalRedirect = `${finalRedirect}${sep}action=submit_assessment`;
+      }
+      window.location.replace(finalRedirect);
+      return;
+    }
   }
 
   // Display informative status if Render cold-start takes longer than 3.5s

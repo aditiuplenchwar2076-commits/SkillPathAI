@@ -102,6 +102,21 @@
     cursor: pointer;
   }
   .btn-outline:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @media (max-width: 600px) {
+    .simple-header { padding: 12px 16px; }
+    .simple-logo h2 { font-size: 17px; }
+    .nav-links { gap: 12px; font-size: 13px; }
+    .logout-btn { padding: 6px 12px; }
+    .page-wrap { margin: 24px auto; padding: 0 16px; }
+    .quiz-card { padding: 20px 16px; }
+    .intro-buttons { flex-direction: column; align-items: stretch; }
+    .intro-buttons button { width: 100%; text-align: center; }
+  }
 </style>
 </head>
 <body>
@@ -119,6 +134,18 @@
 </div>
 
 <div class="page-wrap">
+
+  <!-- ===== BEGINNER PROCESSING SCREEN ===== -->
+  <div id="beginnerStatusCard" style="display: none;">
+    <div class="quiz-card" style="text-align: center; padding: 40px 24px;">
+      <div style="font-size: 44px; margin-bottom: 16px;">🌱</div>
+      <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">Configuring Your Beginner Path</h2>
+      <p id="beginnerStatusMessage" style="font-size: 14px; color: #555; max-width: 460px; margin: 0 auto 24px; line-height: 1.6;">
+        Setting up your customized foundational curriculum and generating your step-by-step roadmap...
+      </p>
+      <div style="display: inline-block; width: 36px; height: 36px; border: 3px solid #e0e7ff; border-top-color: #4F63D2; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+    </div>
+  </div>
 
   <!-- ===== INTRO SCREEN ===== -->
   <div id="introScreen">
@@ -153,7 +180,27 @@
 </div>
 
 <script type="module">
-  import { syncUserWithBackend, apiRequest } from "./api.js";
+  import { auth, getCurrentUser, syncUserWithBackend, apiRequest, classifyAssessmentScore } from "./api.js";
+  import { signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+
+  const SUPPORTED_CAREERS = [
+    "Web Developer",
+    "Data Analyst",
+    "Data Scientist",
+    "AI / ML Engineer",
+    "Cybersecurity Analyst",
+    "UI/UX Designer",
+    "Cloud Engineer",
+    "Mobile App Developer",
+    "Software Engineer"
+  ];
+
+  function validateCareer(careerName) {
+    if (!careerName || typeof careerName !== "string") return "Web Developer";
+    const trimmed = careerName.trim();
+    const match = SUPPORTED_CAREERS.find((c) => c.toLowerCase() === trimmed.toLowerCase());
+    return match || "Web Developer";
+  }
 
   // ===== QUESTION BANKS, KEYED BY CAREER NAME =====
   const questionBanks = {
@@ -231,11 +278,22 @@
     { q: "How confident are you explaining core concepts of this field to someone else?", options: ["Not confident", "Somewhat confident", "Confident", "Very confident"], correct: 2 }
   ];
 
-  const savedCareer = localStorage.getItem('careerPath') || 'Web Developer';
+  const rawCareer = (typeof sessionStorage !== "undefined" && sessionStorage.getItem('skillpath_pending_career')) ||
+                    localStorage.getItem('careerPath') ||
+                    localStorage.getItem('skillpath_career') ||
+                    'Web Developer';
+  const savedCareer = validateCareer(rawCareer);
+  try {
+    localStorage.setItem('careerPath', savedCareer);
+    localStorage.setItem('skillpath_career', savedCareer);
+  } catch (e) {}
+
   const questions = questionBanks[savedCareer] || genericQuestions;
 
-  document.getElementById('careerLine').textContent = 'Career: ' + savedCareer;
-  document.getElementById('careerLabel').textContent = savedCareer + ' Assessment';
+  const careerLine = document.getElementById('careerLine');
+  const careerLabel = document.getElementById('careerLabel');
+  if (careerLine) careerLine.textContent = 'Career: ' + savedCareer;
+  if (careerLabel) careerLabel.textContent = savedCareer + ' Assessment';
 
   let currentIndex = 0;
   const userAnswers = new Array(questions.length).fill(null);
@@ -286,7 +344,7 @@
     }
   });
 
-    let isSubmitting = false;
+  let isSubmitting = false;
 
   function showError(message) {
     let errEl = document.getElementById('assessErrorMsg');
@@ -306,19 +364,91 @@
     if (errEl) errEl.style.display = 'none';
   }
 
+  function showAuthRequiredPrompt(score, level) {
+    clearError();
+    let authPromptEl = document.getElementById('assessAuthPrompt');
+    if (!authPromptEl) {
+      authPromptEl = document.createElement('div');
+      authPromptEl.id = 'assessAuthPrompt';
+      authPromptEl.style.cssText = 'background: #f0f4ff; border: 2px solid #4F63D2; border-radius: 12px; padding: 24px; margin-top: 24px; text-align: center;';
+      const card = document.querySelector('.quiz-card') || document.querySelector('.page-wrap');
+      if (card) card.appendChild(authPromptEl);
+    }
+
+    const scoreDisplay = (score !== null && score !== undefined)
+      ? `<div style="font-size: 15px; font-weight: 700; color: #4F63D2; margin-bottom: 8px;">Assessment Completed — Score: ${score}% (${level || 'Beginner'})</div>`
+      : '';
+
+    authPromptEl.innerHTML = `
+      <div style="font-size: 32px; margin-bottom: 8px;">🔐</div>
+      <h3 style="font-size: 18px; font-weight: 700; color: #1a1a2e; margin-bottom: 6px;">Sign In to Save Your Results</h3>
+      ${scoreDisplay}
+      <p style="font-size: 13px; color: #555; max-width: 440px; margin: 0 auto 18px; line-height: 1.5;">
+        Your answers have been securely preserved! Sign in or create an account to save your assessment, unlock your personalized AI roadmap, and track your progress.
+      </p>
+      <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+        <a href="login.html?returnUrl=${encodeURIComponent('asses.html?action=submit_assessment')}&action=submit_assessment"
+           class="btn-primary"
+           style="text-decoration: none; padding: 11px 22px; font-size: 13px; display: inline-block;">
+          Sign In to Save Results →
+        </a>
+        <a href="login.html?signup=true&returnUrl=${encodeURIComponent('asses.html?action=submit_assessment')}&action=submit_assessment"
+           class="btn-outline"
+           style="text-decoration: none; padding: 11px 22px; font-size: 13px; display: inline-block;">
+          Create Free Account
+        </a>
+      </div>
+    `;
+    authPromptEl.style.display = 'block';
+    authPromptEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  async function runBeginnerFlow() {
+    const introScreen = document.getElementById('introScreen');
+    const quizScreen = document.getElementById('quizScreen');
+    const beginnerStatusCard = document.getElementById('beginnerStatusCard');
+
+    if (introScreen) introScreen.style.display = 'none';
+    if (quizScreen) quizScreen.style.display = 'none';
+    if (beginnerStatusCard) beginnerStatusCard.style.display = 'block';
+
+    const beginnerBtn = document.getElementById('beginnerBtn');
+    await persistAssessment(0, 'Beginner', beginnerBtn, "I'm a complete beginner");
+  }
+
   async function persistAssessment(score, level, buttonEl, originalText) {
     if (isSubmitting) return;
     isSubmitting = true;
     clearError();
+
+    const startQuizBtn = document.getElementById('startQuizBtn');
+    const beginnerBtn = document.getElementById('beginnerBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    if (startQuizBtn) startQuizBtn.disabled = true;
+    if (beginnerBtn) beginnerBtn.disabled = true;
+    if (prevBtn) prevBtn.disabled = true;
+    if (nextBtn) nextBtn.disabled = true;
+
     if (buttonEl) {
       buttonEl.disabled = true;
       buttonEl.textContent = 'Saving results...';
     }
 
+    const beginnerStatusMsg = document.getElementById('beginnerStatusMessage');
+
     try {
       const user = await syncUserWithBackend();
       if (!user || !user.user_id) {
         throw new Error('Unable to verify user identity with backend.');
+      }
+
+      if (buttonEl) {
+        buttonEl.textContent = 'Saving assessment...';
+      }
+      if (beginnerStatusMsg) {
+        beginnerStatusMsg.textContent = 'Recording your profile on the server...';
       }
 
       const result = await apiRequest('/assessments', {
@@ -345,6 +475,9 @@
       if (buttonEl) {
         buttonEl.textContent = 'Generating your AI roadmap...';
       }
+      if (beginnerStatusMsg) {
+        beginnerStatusMsg.textContent = 'Generating your personalized AI roadmap...';
+      }
 
       try {
         await apiRequest('/generate-roadmap', {
@@ -352,7 +485,7 @@
           body: JSON.stringify({
             user_id: user.user_id,
             career_goal: savedCareer,
-            current_skills: '',
+            current_skills: level === 'Beginner' ? 'Beginner fundamentals' : '',
             interests: savedCareer,
             skill_level: level,
             assessment_score: Number(score)
@@ -363,15 +496,60 @@
         // Continue to result page; roadmap page also includes resilient on-demand generation
       }
 
+      try {
+        sessionStorage.removeItem('skillpath_pending_assessment');
+        sessionStorage.removeItem('skillpath_pending_action');
+        sessionStorage.removeItem('skillpath_pending_career');
+      } catch (e) {}
+
       window.location.href = 'result.html';
 
     } catch (error) {
       isSubmitting = false;
+      if (startQuizBtn) startQuizBtn.disabled = false;
+      if (beginnerBtn) beginnerBtn.disabled = false;
+      if (prevBtn) prevBtn.disabled = currentIndex === 0;
+      if (nextBtn) nextBtn.disabled = false;
+
       if (buttonEl) {
         buttonEl.disabled = false;
-        buttonEl.textContent = originalText;
+        buttonEl.textContent = originalText || 'Submit';
       }
+
+      const beginnerStatusCard = document.getElementById('beginnerStatusCard');
+      if (beginnerStatusCard && beginnerStatusCard.style.display !== 'none') {
+        beginnerStatusCard.style.display = 'none';
+        const introScreen = document.getElementById('introScreen');
+        if (introScreen) introScreen.style.display = 'block';
+      }
+
       console.error('Assessment submission failed:', error);
+
+      if (error && (error.status === 401 || (error.message && error.message.toLowerCase().includes('unauthenticated')))) {
+        // Save pending state so user answers and progress are preserved
+        try {
+          const pendingData = {
+            career: savedCareer,
+            answers: userAnswers,
+            score: score,
+            level: level,
+            currentIndex: currentIndex,
+            timestamp: Date.now()
+          };
+          sessionStorage.setItem('skillpath_pending_assessment', JSON.stringify(pendingData));
+          sessionStorage.setItem('skillpath_pending_career', savedCareer);
+          sessionStorage.setItem('skillpath_pending_action', level === 'Beginner' ? 'beginner' : 'submit_assessment');
+        } catch (e) {}
+
+        if (level === 'Beginner') {
+          const returnUrl = 'asses.html?action=beginner';
+          window.location.href = `login.html?returnUrl=${encodeURIComponent(returnUrl)}&action=beginner`;
+        } else {
+          showAuthRequiredPrompt(score, level);
+        }
+        return;
+      }
+
       showError(error.message || 'Failed to save assessment to server. Please try again.');
     }
   }
@@ -385,14 +563,28 @@
     });
 
     const percentage = Math.round((correctCount / questions.length) * 100);
+    const level = classifyAssessmentScore(percentage);
 
-    let level;
-    if (percentage < 40) {
-      level = 'Beginner';
-    } else if (percentage < 75) {
-      level = 'Intermediate';
-    } else {
-      level = 'Advanced';
+    // Securely cache the completed assessment state
+    const pendingData = {
+      career: savedCareer,
+      answers: userAnswers,
+      score: percentage,
+      level: level,
+      currentIndex: currentIndex,
+      timestamp: Date.now()
+    };
+    try {
+      sessionStorage.setItem('skillpath_pending_assessment', JSON.stringify(pendingData));
+      sessionStorage.setItem('skillpath_pending_career', savedCareer);
+      sessionStorage.setItem('skillpath_pending_action', 'submit_assessment');
+    } catch (e) {}
+
+    // Check if the user is authenticated before attempting backend submission
+    const user = await getCurrentUser(3000);
+    if (!user) {
+      showAuthRequiredPrompt(percentage, level);
+      return;
     }
 
     const nextBtn = document.getElementById('nextBtn');
@@ -400,16 +592,133 @@
   }
 
   // ===== INTRO SCREEN BUTTONS =====
-  document.getElementById('startQuizBtn').addEventListener('click', function() {
-    document.getElementById('introScreen').style.display = 'none';
-    document.getElementById('quizScreen').style.display = 'block';
-    renderQuestion();
-  });
+  const startQuizBtn = document.getElementById('startQuizBtn');
+  if (startQuizBtn) {
+    startQuizBtn.addEventListener('click', function() {
+      document.getElementById('introScreen').style.display = 'none';
+      document.getElementById('quizScreen').style.display = 'block';
+      renderQuestion();
+    });
+  }
 
-  document.getElementById('beginnerBtn').addEventListener('click', async function() {
-    const btn = document.getElementById('beginnerBtn');
-    await persistAssessment(0, 'Beginner', btn, "I'um a complete beginner");
-  });
+  const beginnerBtn = document.getElementById('beginnerBtn');
+  if (beginnerBtn) {
+    beginnerBtn.addEventListener('click', async function() {
+      const user = await getCurrentUser(3000);
+      if (!user) {
+        try {
+          sessionStorage.setItem('skillpath_pending_career', savedCareer);
+          sessionStorage.setItem('skillpath_pending_action', 'beginner');
+        } catch (e) {}
+        window.location.href = `login.html?returnUrl=${encodeURIComponent('asses.html?action=beginner')}&action=beginner`;
+        return;
+      }
+      await runBeginnerFlow();
+    });
+  }
+
+  // ===== HEADER LOGOUT BUTTON =====
+  const logoutBtn = document.querySelector('.logout-btn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      try {
+        await signOut(auth);
+      } catch (e) {}
+      window.location.href = 'index.html';
+    });
+  }
+
+  // ===== AUTH CHECK & PENDING ACTION RESUME ON PAGE LOAD =====
+  async function checkAuthAndPendingAction() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const queryAction = urlParams.get('action');
+    const pendingAction = queryAction || (typeof sessionStorage !== "undefined" && sessionStorage.getItem('skillpath_pending_action'));
+    const pendingAssessmentRaw = typeof sessionStorage !== "undefined" ? sessionStorage.getItem('skillpath_pending_assessment') : null;
+
+    // Case 1: Pending assessment submission
+    if (pendingAction === 'submit_assessment' || pendingAssessmentRaw) {
+      let pendingData = null;
+      if (pendingAssessmentRaw) {
+        try {
+          pendingData = JSON.parse(pendingAssessmentRaw);
+        } catch (e) {
+          console.warn('Could not parse pending assessment:', e);
+        }
+      }
+
+      if (pendingData && Array.isArray(pendingData.answers)) {
+        for (let i = 0; i < pendingData.answers.length && i < userAnswers.length; i++) {
+          userAnswers[i] = pendingData.answers[i];
+        }
+        currentIndex = questions.length - 1;
+      }
+
+      const user = await getCurrentUser(3000);
+      if (user) {
+        // Authenticated! Automatically submit saved assessment and generate roadmap
+        const introScreen = document.getElementById('introScreen');
+        const quizScreen = document.getElementById('quizScreen');
+        const beginnerStatusCard = document.getElementById('beginnerStatusCard');
+        const beginnerStatusMsg = document.getElementById('beginnerStatusMessage');
+
+        if (introScreen) introScreen.style.display = 'none';
+        if (quizScreen) quizScreen.style.display = 'none';
+        if (beginnerStatusCard) {
+          beginnerStatusCard.style.display = 'block';
+          const title = beginnerStatusCard.querySelector('h2');
+          if (title) title.textContent = 'Saving Your Assessment';
+          if (beginnerStatusMsg) {
+            beginnerStatusMsg.textContent = 'Authenticated! Saving your assessment results and generating your personalized AI roadmap...';
+          }
+        }
+
+        const scoreToSubmit = pendingData && typeof pendingData.score === 'number' ? pendingData.score : 0;
+        const levelToSubmit = pendingData && pendingData.level ? pendingData.level : classifyAssessmentScore(scoreToSubmit);
+
+        await persistAssessment(scoreToSubmit, levelToSubmit, null, 'Submit Assessment');
+        return;
+      } else {
+        // Not authenticated yet - show quiz on question 5 with preserved answers and sign-in prompt
+        const introScreen = document.getElementById('introScreen');
+        const quizScreen = document.getElementById('quizScreen');
+        if (introScreen) introScreen.style.display = 'none';
+        if (quizScreen) quizScreen.style.display = 'block';
+        renderQuestion();
+        showAuthRequiredPrompt(
+          pendingData && typeof pendingData.score === 'number' ? pendingData.score : null,
+          pendingData && pendingData.level ? pendingData.level : null
+        );
+        return;
+      }
+    }
+
+    // Case 2: Pending Beginner Mode
+    if (pendingAction === 'beginner') {
+      const user = await getCurrentUser(3000);
+      if (user) {
+        try {
+          sessionStorage.removeItem('skillpath_pending_action');
+        } catch (e) {}
+        if (window.history && window.history.replaceState) {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+        await runBeginnerFlow();
+      } else {
+        try {
+          sessionStorage.setItem('skillpath_pending_career', savedCareer);
+          sessionStorage.setItem('skillpath_pending_action', 'beginner');
+        } catch (e) {}
+        const returnUrl = 'asses.html?action=beginner';
+        window.location.replace(`login.html?returnUrl=${encodeURIComponent(returnUrl)}&action=beginner`);
+      }
+      return;
+    }
+
+    // Case 3: Normal direct entry to assessment - do not redirect! User can take the assessment freely.
+  }
+
+  checkAuthAndPendingAction();
 </script>
 
 </body>

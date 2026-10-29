@@ -40,7 +40,12 @@ if (mobileToggle && navMenu) {
 const navAuthBtn = document.getElementById("navAuthBtn");
 const navGetStartedBtn = document.getElementById("navGetStartedBtn");
 
+let authInitialized = false;
+let currentAuthUser = null;
+
 onAuthStateChanged(auth, (user) => {
+  authInitialized = true;
+  currentAuthUser = user;
   if (user) {
     if (navAuthBtn) {
       navAuthBtn.textContent = "Dashboard";
@@ -282,7 +287,26 @@ const DICE_FACES_CONFIG = [
   }
 ];
 
-let selectedCareer = localStorage.getItem("skillpath_career") || localStorage.getItem("careerPath") || "Web Developer";
+const SUPPORTED_CAREERS = [
+  "Web Developer",
+  "Data Analyst",
+  "Data Scientist",
+  "AI / ML Engineer",
+  "Cybersecurity Analyst",
+  "UI/UX Designer",
+  "Cloud Engineer",
+  "Mobile App Developer",
+  "Software Engineer"
+];
+
+function validateCareer(careerName) {
+  if (!careerName || typeof careerName !== "string") return "Web Developer";
+  const trimmed = careerName.trim();
+  const match = SUPPORTED_CAREERS.find((c) => c.toLowerCase() === trimmed.toLowerCase());
+  return match || "Web Developer";
+}
+
+let selectedCareer = validateCareer(localStorage.getItem("skillpath_career") || localStorage.getItem("careerPath") || "Web Developer");
 
 const panelTitle = document.getElementById("panelTitle");
 const panelDesc = document.getElementById("panelDesc");
@@ -654,12 +678,39 @@ if (cubeViewport && cube3D) {
 
 // Assessment Start Button Connection
 if (btnStartAssessment) {
-  btnStartAssessment.addEventListener("click", () => {
+  btnStartAssessment.addEventListener("click", async () => {
+    const validCareer = validateCareer(selectedCareer);
     try {
-      localStorage.setItem("skillpath_career", selectedCareer);
-      localStorage.setItem("careerPath", selectedCareer);
+      localStorage.setItem("skillpath_career", validCareer);
+      localStorage.setItem("careerPath", validCareer);
+      sessionStorage.setItem("skillpath_pending_career", validCareer);
+      sessionStorage.setItem("skillpath_pending_action", "assessment");
     } catch (e) {}
-    window.location.href = "asses.html";
+
+    let user = currentAuthUser;
+    if (!authInitialized) {
+      if (typeof auth.authStateReady === "function") {
+        try {
+          await auth.authStateReady();
+          user = auth.currentUser;
+        } catch (e) {}
+      }
+      if (!user) {
+        user = await new Promise((resolve) => {
+          const unsubscribe = onAuthStateChanged(auth, (u) => {
+            unsubscribe();
+            resolve(u);
+          });
+          setTimeout(() => resolve(auth.currentUser), 500);
+        });
+      }
+    }
+
+    if (user) {
+      window.location.href = "asses.html";
+    } else {
+      window.location.href = `login.html?returnUrl=${encodeURIComponent("asses.html")}&action=assessment`;
+    }
   });
 }
 
