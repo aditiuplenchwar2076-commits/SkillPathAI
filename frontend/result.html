@@ -142,14 +142,14 @@
     </div>
   </div>
 
-  <a href="dashboard.html" class="btn-primary">View My Personalized Roadmap →</a>
+  <a href="roadmap.html" class="btn-primary">View My Personalized Roadmap →</a>
 </div>
 
 <script>
   // Reads values saved by the assessment page, if present.
   // Falls back to sensible defaults so this page works standalone too.
-  const savedLevel = localStorage.getItem('skillLevel') || 'Intermediate';
-  const savedCareer = localStorage.getItem('careerPath') || 'Web Development';
+  const savedLevel = localStorage.getItem('skillLevel') || localStorage.getItem('skillpath_level') || 'Intermediate';
+  const savedCareer = localStorage.getItem('careerPath') || localStorage.getItem('skillpath_career') || 'Web Development';
 
   document.getElementById('levelBadge').textContent = savedLevel.toUpperCase();
   document.getElementById('careerNote').textContent = savedCareer;

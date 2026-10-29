@@ -334,10 +334,34 @@
         throw new Error('Backend did not confirm saving the assessment.');
       }
 
+      // Synchronize localStorage keys consistently across legacy and modern formats
       localStorage.setItem('skillLevel', level);
-      localStorage.setItem('careerPath', savedCareer);
-      localStorage.setItem('skillpath_score', score);
       localStorage.setItem('skillpath_level', level);
+      localStorage.setItem('careerPath', savedCareer);
+      localStorage.setItem('skillpath_career', savedCareer);
+      localStorage.setItem('skillpath_score', String(score));
+
+      // Trigger AI roadmap generation immediately so the roadmap is ready
+      if (buttonEl) {
+        buttonEl.textContent = 'Generating your AI roadmap...';
+      }
+
+      try {
+        await apiRequest('/generate-roadmap', {
+          method: 'POST',
+          body: JSON.stringify({
+            user_id: user.user_id,
+            career_goal: savedCareer,
+            current_skills: '',
+            interests: savedCareer,
+            skill_level: level,
+            assessment_score: Number(score)
+          })
+        });
+      } catch (genErr) {
+        console.warn('Initial roadmap generation note:', genErr);
+        // Continue to result page; roadmap page also includes resilient on-demand generation
+      }
 
       window.location.href = 'result.html';
 
