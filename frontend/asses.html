@@ -135,7 +135,25 @@
 
 <div class="page-wrap">
 
-  <!-- ===== BEGINNER PROCESSING SCREEN ===== -->
+  <!-- ===== SAVING / PROCESSING STATUS SCREEN ===== -->
+  <div id="savingStatusCard" style="display: none;">
+    <div class="quiz-card" style="text-align: center; padding: 40px 24px;">
+      <div id="savingStatusIcon" style="font-size: 44px; margin-bottom: 16px;">🚀</div>
+      <h2 id="savingStatusTitle" style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">Saving your assessment and building your personalized roadmap...</h2>
+      <p id="savingStatusMessage" style="font-size: 14px; color: #555; max-width: 480px; margin: 0 auto 20px; line-height: 1.6;">
+        Analyzing your responses, recording your score, and creating your custom learning path...
+      </p>
+      <div id="savingSpinner" style="display: inline-block; width: 36px; height: 36px; border: 3px solid #e0e7ff; border-top-color: #4F63D2; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 8px;"></div>
+      <div id="savingDelayedNotice" style="display: none; background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 8px; padding: 12px 16px; font-size: 13px; color: #3730a3; max-width: 480px; margin: 16px auto 0; text-align: left; line-height: 1.5;">
+        ⏱️ <strong>Still generating your roadmap:</strong> Your assessment score has been saved. We're still crafting your AI-personalized learning modules, almost ready...
+      </div>
+      <div id="savingRetryWrap" style="display: none; margin-top: 20px;">
+        <button id="savingRetryBtn" class="btn-primary" style="padding: 11px 24px; font-size: 14px; cursor: pointer;">Retry Submission</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== BEGINNER PROCESSING SCREEN (COMPATIBILITY ALIAS) ===== -->
   <div id="beginnerStatusCard" style="display: none;">
     <div class="quiz-card" style="text-align: center; padding: 40px 24px;">
       <div style="font-size: 44px; margin-bottom: 16px;">🌱</div>
@@ -180,7 +198,7 @@
 </div>
 
 <script type="module">
-  import { auth, getCurrentUser, syncUserWithBackend, apiRequest, classifyAssessmentScore } from "./api.js";
+  import { auth, getCurrentUser, syncUserWithBackend, getOrSyncBackendUser, apiRequest, classifyAssessmentScore } from "./api.js?v=2";
   import { signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 
   const SUPPORTED_CAREERS = [
@@ -403,15 +421,9 @@
     authPromptEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
+  let delayedNoticeTimer = null;
+
   async function runBeginnerFlow() {
-    const introScreen = document.getElementById('introScreen');
-    const quizScreen = document.getElementById('quizScreen');
-    const beginnerStatusCard = document.getElementById('beginnerStatusCard');
-
-    if (introScreen) introScreen.style.display = 'none';
-    if (quizScreen) quizScreen.style.display = 'none';
-    if (beginnerStatusCard) beginnerStatusCard.style.display = 'block';
-
     const beginnerBtn = document.getElementById('beginnerBtn');
     await persistAssessment(0, 'Beginner', beginnerBtn, "I'm a complete beginner");
   }
@@ -420,6 +432,11 @@
     if (isSubmitting) return;
     isSubmitting = true;
     clearError();
+
+    // Prevent duplicate submissions from double clicks or page refresh
+    try {
+      sessionStorage.setItem('skillpath_submitting', 'true');
+    } catch (e) {}
 
     const startQuizBtn = document.getElementById('startQuizBtn');
     const beginnerBtn = document.getElementById('beginnerBtn');
@@ -436,76 +453,131 @@
       buttonEl.textContent = 'Saving results...';
     }
 
-    const beginnerStatusMsg = document.getElementById('beginnerStatusMessage');
+    // Activate loading status card
+    const introScreen = document.getElementById('introScreen');
+    const quizScreen = document.getElementById('quizScreen');
+    const savingStatusCard = document.getElementById('savingStatusCard');
+    const savingStatusTitle = document.getElementById('savingStatusTitle');
+    const savingStatusMsg = document.getElementById('savingStatusMessage');
+    const savingSpinner = document.getElementById('savingSpinner');
+    const savingDelayedNotice = document.getElementById('savingDelayedNotice');
+    const savingRetryWrap = document.getElementById('savingRetryWrap');
+    const savingStatusIcon = document.getElementById('savingStatusIcon');
+
+    if (introScreen) introScreen.style.display = 'none';
+    if (quizScreen) quizScreen.style.display = 'none';
+
+    if (savingStatusCard) {
+      savingStatusCard.style.display = 'block';
+      if (savingSpinner) savingSpinner.style.display = 'inline-block';
+      if (savingDelayedNotice) savingDelayedNotice.style.display = 'none';
+      if (savingRetryWrap) savingRetryWrap.style.display = 'none';
+
+      if (level === 'Beginner') {
+        if (savingStatusIcon) savingStatusIcon.textContent = '🌱';
+        if (savingStatusTitle) savingStatusTitle.textContent = 'Configuring your beginner curriculum and building your roadmap...';
+        if (savingStatusMsg) savingStatusMsg.textContent = 'Setting up foundational concepts and preparing your step-by-step personalized curriculum...';
+      } else {
+        if (savingStatusIcon) savingStatusIcon.textContent = '🚀';
+        if (savingStatusTitle) savingStatusTitle.textContent = 'Saving your assessment and building your personalized roadmap...';
+        if (savingStatusMsg) savingStatusMsg.textContent = 'Analyzing your responses, recording your score, and creating your custom learning path...';
+      }
+    }
+
+    // Schedule 5-second non-blocking status notification
+    if (delayedNoticeTimer) clearTimeout(delayedNoticeTimer);
+    delayedNoticeTimer = setTimeout(() => {
+      if (savingDelayedNotice && isSubmitting) {
+        savingDelayedNotice.style.display = 'block';
+      }
+    }, 5000);
 
     try {
-      const user = await syncUserWithBackend();
-      if (!user || !user.user_id) {
+      // 1. Resolve authenticated user and token
+      const user = await getCurrentUser(3000);
+      if (!user) {
+        throw new Error('Unauthenticated: You must be signed in to save results.');
+      }
+      const token = await user.getIdToken();
+
+      // 2. Fetch or reuse synced backend MySQL user record
+      let dbUser;
+      try {
+        dbUser = await getOrSyncBackendUser(user, { user, token });
+      } catch (syncErr) {
+        console.warn('Cached user verification note, falling back to direct sync:', syncErr);
+        dbUser = await syncUserWithBackend({ user, token, forceSync: true });
+      }
+
+      if (!dbUser || !dbUser.user_id) {
         throw new Error('Unable to verify user identity with backend.');
       }
 
-      if (buttonEl) {
-        buttonEl.textContent = 'Saving assessment...';
-      }
-      if (beginnerStatusMsg) {
-        beginnerStatusMsg.textContent = 'Recording your profile on the server...';
-      }
-
-      const result = await apiRequest('/assessments', {
+      // 3. Initiate assessment save and roadmap generation in parallel
+      const assessmentPromise = apiRequest('/assessments', {
         method: 'POST',
+        user,
+        token,
         body: JSON.stringify({
-          user_id: user.user_id,
+          user_id: dbUser.user_id,
           score: score,
           skill_level: level
         })
       });
 
+      const roadmapPromise = apiRequest('/generate-roadmap', {
+        method: 'POST',
+        user,
+        token,
+        body: JSON.stringify({
+          user_id: dbUser.user_id,
+          career_goal: savedCareer,
+          current_skills: level === 'Beginner' ? 'Beginner fundamentals' : '',
+          interests: savedCareer,
+          skill_level: level,
+          assessment_score: Number(score)
+        })
+      });
+
+      // 4. Verify assessment is successfully written to database
+      const result = await assessmentPromise;
       if (!result || !result.assessment_id) {
         throw new Error('Backend did not confirm saving the assessment.');
       }
 
-      // Synchronize localStorage keys consistently across legacy and modern formats
+      // Synchronize localStorage keys immediately so result page is completely ready
       localStorage.setItem('skillLevel', level);
       localStorage.setItem('skillpath_level', level);
       localStorage.setItem('careerPath', savedCareer);
       localStorage.setItem('skillpath_career', savedCareer);
       localStorage.setItem('skillpath_score', String(score));
 
-      // Trigger AI roadmap generation immediately so the roadmap is ready
-      if (buttonEl) {
-        buttonEl.textContent = 'Generating your AI roadmap...';
-      }
-      if (beginnerStatusMsg) {
-        beginnerStatusMsg.textContent = 'Generating your personalized AI roadmap...';
-      }
-
+      // 5. Await roadmap generation
       try {
-        await apiRequest('/generate-roadmap', {
-          method: 'POST',
-          body: JSON.stringify({
-            user_id: user.user_id,
-            career_goal: savedCareer,
-            current_skills: level === 'Beginner' ? 'Beginner fundamentals' : '',
-            interests: savedCareer,
-            skill_level: level,
-            assessment_score: Number(score)
-          })
-        });
+        await roadmapPromise;
       } catch (genErr) {
         console.warn('Initial roadmap generation note:', genErr);
-        // Continue to result page; roadmap page also includes resilient on-demand generation
+        // Continue: assessment is safely committed, and roadmap.html includes resilient on-demand generation
       }
+
+      if (delayedNoticeTimer) clearTimeout(delayedNoticeTimer);
 
       try {
         sessionStorage.removeItem('skillpath_pending_assessment');
         sessionStorage.removeItem('skillpath_pending_action');
         sessionStorage.removeItem('skillpath_pending_career');
+        sessionStorage.removeItem('skillpath_submitting');
       } catch (e) {}
 
       window.location.href = 'result.html';
 
     } catch (error) {
+      if (delayedNoticeTimer) clearTimeout(delayedNoticeTimer);
       isSubmitting = false;
+      try {
+        sessionStorage.removeItem('skillpath_submitting');
+      } catch (e) {}
+
       if (startQuizBtn) startQuizBtn.disabled = false;
       if (beginnerBtn) beginnerBtn.disabled = false;
       if (prevBtn) prevBtn.disabled = currentIndex === 0;
@@ -514,13 +586,6 @@
       if (buttonEl) {
         buttonEl.disabled = false;
         buttonEl.textContent = originalText || 'Submit';
-      }
-
-      const beginnerStatusCard = document.getElementById('beginnerStatusCard');
-      if (beginnerStatusCard && beginnerStatusCard.style.display !== 'none') {
-        beginnerStatusCard.style.display = 'none';
-        const introScreen = document.getElementById('introScreen');
-        if (introScreen) introScreen.style.display = 'block';
       }
 
       console.error('Assessment submission failed:', error);
@@ -541,16 +606,36 @@
           sessionStorage.setItem('skillpath_pending_action', level === 'Beginner' ? 'beginner' : 'submit_assessment');
         } catch (e) {}
 
+        if (savingStatusCard) savingStatusCard.style.display = 'none';
+
         if (level === 'Beginner') {
           const returnUrl = 'asses.html?action=beginner';
           window.location.href = `login.html?returnUrl=${encodeURIComponent(returnUrl)}&action=beginner`;
         } else {
+          if (quizScreen) quizScreen.style.display = 'block';
           showAuthRequiredPrompt(score, level);
         }
         return;
       }
 
-      showError(error.message || 'Failed to save assessment to server. Please try again.');
+      // Recoverable error with retry option
+      if (savingStatusCard && savingStatusCard.style.display !== 'none') {
+        if (savingSpinner) savingSpinner.style.display = 'none';
+        if (savingDelayedNotice) savingDelayedNotice.style.display = 'none';
+        if (savingStatusTitle) savingStatusTitle.textContent = 'Submission Interrupted';
+        if (savingStatusMsg) savingStatusMsg.textContent = error.message || 'There was a temporary issue saving your assessment. Your answers are saved.';
+        if (savingRetryWrap) savingRetryWrap.style.display = 'block';
+
+        const retryBtn = document.getElementById('savingRetryBtn');
+        if (retryBtn) {
+          retryBtn.onclick = () => {
+            savingRetryWrap.style.display = 'none';
+            persistAssessment(score, level, buttonEl, originalText);
+          };
+        }
+      } else {
+        showError(error.message || 'Failed to save assessment to server. Please try again.');
+      }
     }
   }
 
