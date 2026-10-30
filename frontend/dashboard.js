@@ -133,6 +133,15 @@ onAuthStateChanged(auth, async (user) => {
     dropdownUserEmailEl.textContent = user.email;
   }
 
+  // Apply saved avatar
+  const userAvatar = user.photoURL || localStorage.getItem("skillpath_user_avatar");
+  if (userAvatar) {
+    document.querySelectorAll(".user-avatar").forEach(img => {
+      img.src = userAvatar;
+    });
+    localStorage.setItem("skillpath_user_avatar", userAvatar);
+  }
+
   // Populate career path & skill level from localStorage as immediate placeholders
   const savedCareer = localStorage.getItem("careerPath") || localStorage.getItem("skillpath_career") || "Web Development";
   const savedLevel = localStorage.getItem("skillLevel") || localStorage.getItem("skillpath_level") || "Intermediate";

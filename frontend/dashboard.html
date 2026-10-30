@@ -9,29 +9,32 @@
 <body>
 <div class="dashboard-container">
   <aside class="sidebar">
-    <div class="logo">
-      <span class="logo-icon">🚀</span>
-      <div class="logo-text">
-        <h2>SkillPath <span class="highlight-ai">AI</span></h2>
-        <p>Learn. Practice. Get Placed.</p>
+    <div class="sidebar-header">
+      <div class="logo">
+        <span class="logo-icon">🚀</span>
+        <div class="logo-text">
+          <h2>SkillPath <span class="highlight-ai">AI</span></h2>
+          <p>Learn. Practice. Get Placed.</p>
+        </div>
       </div>
+      <button id="menuToggle" class="sidebar-toggle menu-toggle" aria-label="Toggle navigation menu" aria-expanded="true">
+        <span class="toggle-icon">☰</span>
+      </button>
     </div>
-
-    <button id="menuToggle" class="menu-toggle">☰</button>
 
     <nav class="nav-menu">
       <ul>
-        <li class="active"><a href="dashboard.html"><span class="nav-icon">🏠</span> Home</a></li>
-        <li><a href="roadmap.html"><span class="nav-icon">🗺️</span> Roadmap</a></li>
-        <li><a href="practice.html?tab=quiz"><span class="nav-icon">📖</span> Learn</a></li>
-        <li><a href="practice.html?tab=practice"><span class="nav-icon">💻</span> Practice</a></li>
-        <li><a href="progress.html"><span class="nav-icon">📊</span> Progress</a></li>
-        <li><a href="practice.html?tab=projects"><span class="nav-icon">💼</span> Projects</a></li>
-        <li><a href="interview.html"><span class="nav-icon">🎙️</span> Interview Prep</a></li>
-        <li><a href="resources.html"><span class="nav-icon">📚</span> Resources</a></li>
-        <li><a href="community.html"><span class="nav-icon">👥</span> Community</a></li>
-        <li><a href="certificates.html"><span class="nav-icon">🎖️</span> Certificates</a></li>
-        <li><a href="settings.html"><span class="nav-icon">⚙️</span> Settings</a></li>
+        <li class="active"><a href="dashboard.html" data-tooltip="Home"><span class="nav-icon">🏠</span> <span class="nav-label">Home</span></a></li>
+        <li><a href="roadmap.html" data-tooltip="Roadmap"><span class="nav-icon">🗺️</span> <span class="nav-label">Roadmap</span></a></li>
+        <li><a href="practice.html?tab=quiz" data-tooltip="Learn"><span class="nav-icon">📖</span> <span class="nav-label">Learn</span></a></li>
+        <li><a href="practice.html?tab=practice" data-tooltip="Practice"><span class="nav-icon">💻</span> <span class="nav-label">Practice</span></a></li>
+        <li><a href="progress.html" data-tooltip="Progress"><span class="nav-icon">📊</span> <span class="nav-label">Progress</span></a></li>
+        <li><a href="practice.html?tab=projects" data-tooltip="Projects"><span class="nav-icon">💼</span> <span class="nav-label">Projects</span></a></li>
+        <li><a href="interview.html" data-tooltip="Interview Prep"><span class="nav-icon">🎙️</span> <span class="nav-label">Interview Prep</span></a></li>
+        <li><a href="resources.html" data-tooltip="Resources"><span class="nav-icon">📚</span> <span class="nav-label">Resources</span></a></li>
+        <li><a href="community.html" data-tooltip="Community"><span class="nav-icon">👥</span> <span class="nav-label">Community</span></a></li>
+        <li><a href="certificates.html" data-tooltip="Certificates"><span class="nav-icon">🎖️</span> <span class="nav-label">Certificates</span></a></li>
+        <li><a href="settings.html" data-tooltip="Settings"><span class="nav-icon">⚙️</span> <span class="nav-label">Settings</span></a></li>
       </ul>
     </nav>
 
@@ -41,18 +44,13 @@
       <button type="button" class="upgrade-btn" onclick="window.location.href='pricing.html'">Upgrade Now →</button>
     </div>
 
-    <div class="help-box">
-      <span class="help-icon">🤖</span>
-      <div class="help-text">
-        <p class="help-title">Need Help?</p>
-        <p class="help-subtitle">Chat with our AI Assistant</p>
-      </div>
-    </div>
+
   </aside>
 
   <main class="main-content">
 
     <div class="topbar">
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open navigation menu">☰</button>
       <div class="topbar-logo">
         <span class="topbar-logo-icon">🚀</span>
         <h2>SkillPath <span class="highlight-ai">AI</span></h2>
