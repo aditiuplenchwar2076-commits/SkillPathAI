@@ -189,6 +189,11 @@ async function handleAuthSuccess(userCredential, isCreated) {
   let dbUser = null;
   try {
     dbUser = await syncUserWithBackend();
+    if (dbUser && dbUser.user_id && uid) {
+      try {
+        sessionStorage.setItem(`skillpath_db_user_${uid}`, JSON.stringify(dbUser));
+      } catch (e) {}
+    }
   } catch (syncErr) {
     console.warn("Backend user sync during auth:", syncErr);
   } finally {

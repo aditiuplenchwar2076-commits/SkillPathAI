@@ -93,15 +93,21 @@ export async function getCurrentUser(timeoutMs = 4000) {
  * Automatically retries once with force-refreshed token on 401.
  */
 export async function apiRequest(endpoint, options = {}) {
-  const user = await getCurrentUser();
+  let user = options.user;
+  if (!user) {
+    user = await getCurrentUser();
+  }
   if (!user) {
     const unauthErr = new Error("Unauthenticated: You must be signed in to call the backend API.");
     unauthErr.status = 401;
     throw unauthErr;
   }
 
-  // Retrieve fresh ID token directly from Firebase Auth
-  const token = await user.getIdToken(options.forceRefresh === true);
+  // Retrieve or reuse valid ID token
+  let token = (options.token && !options.forceRefresh) ? options.token : null;
+  if (!token) {
+    token = await user.getIdToken(options.forceRefresh === true);
+  }
 
   const url = `${API_BASE_URL}${endpoint.startsWith("/") ? endpoint : "/" + endpoint}`;
 
@@ -133,7 +139,7 @@ export async function apiRequest(endpoint, options = {}) {
     }
   }
 
-  const { timeout: _unusedTimeout, signal: _unusedSignal, forceRefresh: _unusedForceRefresh, _isRetry: _unusedIsRetry, ...fetchOptions } = options;
+  const { timeout: _unusedTimeout, signal: _unusedSignal, forceRefresh: _unusedForceRefresh, _isRetry: _unusedIsRetry, user: _unusedUser, token: _unusedToken, ...fetchOptions } = options;
 
   let response;
   try {
@@ -162,6 +168,8 @@ export async function apiRequest(endpoint, options = {}) {
       const refreshedToken = await user.getIdToken(true);
       return await apiRequest(endpoint, {
         ...options,
+        user,
+        token: refreshedToken,
         _isRetry: true,
         headers: {
           ...(options.headers || {}),
@@ -202,6 +210,39 @@ export async function syncUserWithBackend(options = {}) {
     timeout: 35000,
     ...options
   });
+}
+
+/**
+ * Retrieves the synced MySQL user record from sessionStorage cache if available,
+ * or synchronizes with POST /users/sync and caches the result for the session.
+ * Cache key is strictly scoped to the user's Firebase UID.
+ */
+export async function getOrSyncBackendUser(user = null, options = {}) {
+  const currentUser = user || await getCurrentUser();
+  if (!currentUser || !currentUser.uid) {
+    return await syncUserWithBackend(options);
+  }
+
+  const cacheKey = `skillpath_db_user_${currentUser.uid}`;
+  if (!options.forceSync) {
+    try {
+      const cached = typeof sessionStorage !== "undefined" ? sessionStorage.getItem(cacheKey) : null;
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && parsed.user_id) {
+          return parsed;
+        }
+      }
+    } catch (e) {}
+  }
+
+  const dbUser = await syncUserWithBackend({ ...options, user: currentUser });
+  if (dbUser && dbUser.user_id && typeof sessionStorage !== "undefined") {
+    try {
+      sessionStorage.setItem(cacheKey, JSON.stringify(dbUser));
+    } catch (e) {}
+  }
+  return dbUser;
 }
 
 /**
