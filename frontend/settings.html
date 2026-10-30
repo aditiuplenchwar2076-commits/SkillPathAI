@@ -6,104 +6,167 @@
 <title>SkillPath AI | Account & Learning Settings</title>
 <link rel="stylesheet" href="dashboard.css">
 <style>
-  .content-wrap { max-width: 800px; }
+  .content-wrap { max-width: 840px; width: 100%; }
+
   .settings-section {
-    background: white;
     border-radius: 16px;
     padding: 26px;
-    border: 1px solid #eee;
     margin-bottom: 24px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
   }
-  .settings-section h2 { font-size: 18px; margin-bottom: 6px; }
-  .settings-section p.sub { font-size: 13px; color: #6b7280; margin-bottom: 20px; }
+  .settings-section:hover {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+  }
+
+  /* Subtle, restrained blue and lavender color palette */
+  .settings-section-avatar {
+    background: #f5f8ff;
+    border-color: #dbeafe;
+  }
+  .settings-section-profile {
+    background: #f8f6ff;
+    border-color: #ede9fe;
+  }
+  .settings-section-goal {
+    background: #f0f7ff;
+    border-color: #e0e7ff;
+  }
+
+  .settings-section h2 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .settings-section p.sub {
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 20px;
+  }
 
   .form-group { margin-bottom: 18px; }
-  .form-group label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 6px; color: #374151; }
+  .form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #1e293b;
+  }
   .form-control {
     width: 100%;
     padding: 10px 14px;
     border: 1px solid #d1d5db;
     border-radius: 8px;
     font-size: 14px;
+    background: #ffffff;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
   }
-  .form-control:disabled { background: #f3f4f6; color: #6b7280; }
+  .form-control:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  }
+  .form-control:disabled {
+    background: #f1f5f9;
+    color: #64748b;
+    cursor: not-allowed;
+  }
 
   .btn-save {
-    background: linear-gradient(to right, #7c5cff, #a78bfa);
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
     color: white;
     border: none;
-    padding: 11px 24px;
+    padding: 12px 28px;
     border-radius: 8px;
-    font-weight: bold;
+    font-weight: 700;
     cursor: pointer;
     font-size: 14px;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
   }
-  .save-alert {
-    display: none;
-    margin-top: 14px;
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-size: 13px;
-    background: #dcfce7;
-    color: #166534;
-  }
-  .error-alert {
-    display: none;
-    margin-top: 14px;
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-size: 13px;
-    background: #fee2e2;
-    color: #991b1b;
+  .btn-save:hover {
+    opacity: 0.95;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
   }
   .btn-save:disabled {
     opacity: 0.65;
     cursor: not-allowed;
+    transform: none;
+  }
+
+  .save-alert {
+    display: none;
+    margin-top: 14px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    background: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+  }
+  .error-alert {
+    display: none;
+    margin-top: 14px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
   }
 </style>
 </head>
 <body>
 <div class="dashboard-container">
   <aside class="sidebar">
-    <div class="logo">
-      <span class="logo-icon">🚀</span>
-      <div class="logo-text">
-        <h2>SkillPath <span class="highlight-ai">AI</span></h2>
-        <p>Learn. Practice. Get Placed.</p>
+    <div class="sidebar-header">
+      <div class="logo">
+        <span class="logo-icon">🚀</span>
+        <div class="logo-text">
+          <h2>SkillPath <span class="highlight-ai">AI</span></h2>
+          <p>Learn. Practice. Get Placed.</p>
+        </div>
       </div>
+      <button id="menuToggle" class="sidebar-toggle menu-toggle" aria-label="Toggle navigation menu" aria-expanded="true">
+        <span class="toggle-icon">☰</span>
+      </button>
     </div>
-    <button id="menuToggle" class="menu-toggle">☰</button>
+
     <nav class="nav-menu">
       <ul>
-        <li><a href="dashboard.html"><span class="nav-icon">🏠</span> Home</a></li>
-        <li><a href="roadmap.html"><span class="nav-icon">🗺️</span> Roadmap</a></li>
-        <li><a href="practice.html"><span class="nav-icon">📖</span> Learn</a></li>
-        <li><a href="practice.html"><span class="nav-icon">💻</span> Practice</a></li>
-        <li><a href="progress.html"><span class="nav-icon">📊</span> Progress</a></li>
-        <li><a href="practice.html?tab=projects"><span class="nav-icon">💼</span> Projects</a></li>
-        <li><a href="interview.html"><span class="nav-icon">🎙️</span> Interview Prep</a></li>
-        <li><a href="resources.html"><span class="nav-icon">📚</span> Resources</a></li>
-        <li><a href="community.html"><span class="nav-icon">👥</span> Community</a></li>
-        <li><a href="certificates.html"><span class="nav-icon">🎖️</span> Certificates</a></li>
-        <li class="active"><a href="settings.html"><span class="nav-icon">⚙️</span> Settings</a></li>
+        <li><a href="dashboard.html" data-tooltip="Home"><span class="nav-icon">🏠</span> <span class="nav-label">Home</span></a></li>
+        <li><a href="roadmap.html" data-tooltip="Roadmap"><span class="nav-icon">🗺️</span> <span class="nav-label">Roadmap</span></a></li>
+        <li><a href="practice.html?tab=quiz" data-tooltip="Learn"><span class="nav-icon">📖</span> <span class="nav-label">Learn</span></a></li>
+        <li><a href="practice.html?tab=practice" data-tooltip="Practice"><span class="nav-icon">💻</span> <span class="nav-label">Practice</span></a></li>
+        <li><a href="progress.html" data-tooltip="Progress"><span class="nav-icon">📊</span> <span class="nav-label">Progress</span></a></li>
+        <li><a href="practice.html?tab=projects" data-tooltip="Projects"><span class="nav-icon">💼</span> <span class="nav-label">Projects</span></a></li>
+        <li><a href="interview.html" data-tooltip="Interview Prep"><span class="nav-icon">🎙️</span> <span class="nav-label">Interview Prep</span></a></li>
+        <li><a href="resources.html" data-tooltip="Resources"><span class="nav-icon">📚</span> <span class="nav-label">Resources</span></a></li>
+        <li><a href="community.html" data-tooltip="Community"><span class="nav-icon">👥</span> <span class="nav-label">Community</span></a></li>
+        <li><a href="certificates.html" data-tooltip="Certificates"><span class="nav-icon">🎖️</span> <span class="nav-label">Certificates</span></a></li>
+        <li class="active"><a href="settings.html" data-tooltip="Settings"><span class="nav-icon">⚙️</span> <span class="nav-label">Settings</span></a></li>
       </ul>
     </nav>
+
     <div class="premium-box">
       <p class="premium-title">👑 Go Premium</p>
       <p class="premium-text">Unlock all features, AI interviews & premium content.</p>
-      <button class="upgrade-btn">Upgrade Now →</button>
-    </div>
-    <div class="help-box">
-      <span class="help-icon">🤖</span>
-      <div class="help-text">
-        <p class="help-title">Need Help?</p>
-        <p class="help-subtitle">Chat with our AI Assistant</p>
-      </div>
+      <button class="upgrade-btn" onclick="window.location.href='pricing.html'">Upgrade Now →</button>
     </div>
   </aside>
 
   <main class="main-content">
     <div class="topbar">
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open navigation menu">☰</button>
       <div class="topbar-logo">
         <span class="topbar-logo-icon">🚀</span>
         <h2>SkillPath <span class="highlight-ai">AI</span></h2>
@@ -114,7 +177,7 @@
       </div>
       <div class="notification"><span class="bell-icon">🔔</span></div>
       <div class="user-profile" id="userProfile">
-        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=SkillPathAI" alt="Avatar" class="user-avatar">
+        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=SkillPathAI" alt="Avatar" class="user-avatar" id="topbarAvatar">
         <div class="user-info">
           <p class="user-name" id="userName">Learner</p>
           <p class="user-plan">Premium Plan</p>
@@ -125,29 +188,41 @@
     <div class="content-wrap">
       <div class="page-header" style="margin-bottom: 24px;">
         <h1 style="font-size: 22px; margin-bottom: 6px;">Account & Preferences</h1>
-        <p style="font-size: 14px; color: #6b7280;">Manage your profile, target career track, and notifications.</p>
+        <p style="font-size: 14px; color: #64748b;">Manage your profile avatar, target career track, and personal details.</p>
       </div>
 
-      <div class="settings-section">
-        <h2>Profile Details</h2>
-        <p class="sub">Your authenticated account identity and email.</p>
+      <!-- CARD 1: PROFILE AVATAR SELECTION -->
+      <div class="settings-section settings-section-avatar">
+        <h2><span>👤</span> Profile Avatar Selection</h2>
+        <p class="sub">Select a learning persona for your dashboard, navigation, and community posts.</p>
+
+        <div class="avatar-selection-grid" id="avatarGrid">
+          <!-- Populated dynamically with 6 preset avatars -->
+        </div>
+      </div>
+
+      <!-- CARD 2: PROFILE DETAILS -->
+      <div class="settings-section settings-section-profile">
+        <h2><span>📝</span> Profile Details</h2>
+        <p class="sub">Your authenticated account identity and contact information.</p>
 
         <div class="form-group">
-          <label>Email Address</label>
+          <label for="settingEmail">Email Address</label>
           <input type="text" id="settingEmail" class="form-control" disabled>
         </div>
         <div class="form-group">
-          <label>Display Name</label>
-          <input type="text" id="settingDisplayName" class="form-control" placeholder="Your Name">
+          <label for="settingDisplayName">Display Name</label>
+          <input type="text" id="settingDisplayName" class="form-control" placeholder="Your Name" maxlength="100">
         </div>
       </div>
 
-      <div class="settings-section">
-        <h2>Career & Learning Goal</h2>
-        <p class="sub">Change your active career path or skill assessment level.</p>
+      <!-- CARD 3: CAREER & LEARNING GOAL -->
+      <div class="settings-section settings-section-goal">
+        <h2><span>🎯</span> Career & Learning Goal</h2>
+        <p class="sub">Update your active career curriculum or skill proficiency level.</p>
 
         <div class="form-group">
-          <label>Active Career Path</label>
+          <label for="settingCareer">Active Career Path</label>
           <select id="settingCareer" class="form-control">
             <option value="Web Development">Web Development</option>
             <option value="Frontend Development">Frontend Development</option>
@@ -159,7 +234,7 @@
         </div>
 
         <div class="form-group">
-          <label>Skill Level</label>
+          <label for="settingLevel">Skill Level</label>
           <select id="settingLevel" class="form-control">
             <option value="Beginner">Beginner</option>
             <option value="Intermediate">Intermediate</option>
@@ -167,7 +242,9 @@
           </select>
         </div>
 
-        <button type="button" id="saveSettingsBtn" class="btn-save">Save Preferences</button>
+        <button type="button" id="saveSettingsBtn" class="btn-save">
+          <span>💾</span> Save Preferences
+        </button>
         <div id="saveSuccessAlert" class="save-alert">✓ Preferences saved successfully!</div>
         <div id="saveErrorAlert" class="error-alert"></div>
       </div>
@@ -179,6 +256,7 @@
   import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
   import { getAuth, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
   import { syncUserWithBackend, apiRequest } from "./api.js";
+  import { AVATAR_PRESETS, getActiveAvatar, applyAvatarToDOM } from "./avatar-presets.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyCQ9YRQV9edVS0D-Lb6ORl9HX6E0oL4ECQ",
@@ -193,9 +271,69 @@
   const auth = getAuth(app);
 
   let currentDbUser = null;
+  let selectedAvatarUrl = getActiveAvatar();
+
+  // Render 6 avatar options in grid
+  const avatarGrid = document.getElementById("avatarGrid");
+  function renderAvatarGrid() {
+    if (!avatarGrid) return;
+    avatarGrid.innerHTML = "";
+
+    AVATAR_PRESETS.forEach((preset) => {
+      const isSelected = selectedAvatarUrl === preset.dataUrl;
+      const card = document.createElement("div");
+      card.className = `avatar-option ${isSelected ? "selected" : ""}`;
+      card.setAttribute("role", "button");
+      card.setAttribute("tabindex", "0");
+      card.setAttribute("aria-label", `Select ${preset.name} avatar`);
+
+      card.innerHTML = `
+        <div class="avatar-img-wrap">
+          <img src="${preset.dataUrl}" alt="${preset.name}">
+        </div>
+        <span class="avatar-name">${preset.name}</span>
+        <span class="avatar-role">${preset.role}</span>
+      `;
+
+      const selectAvatar = () => {
+        selectedAvatarUrl = preset.dataUrl;
+        document.querySelectorAll(".avatar-option").forEach(el => el.classList.remove("selected"));
+        card.classList.add("selected");
+        try {
+          localStorage.setItem("skillpath_user_avatar", selectedAvatarUrl);
+        } catch (e) {}
+        applyAvatarToDOM(selectedAvatarUrl);
+      };
+
+      card.addEventListener("click", selectAvatar);
+      card.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          selectAvatar();
+        }
+      });
+
+      avatarGrid.appendChild(card);
+    });
+  }
+
+  renderAvatarGrid();
 
   onAuthStateChanged(auth, async (user) => {
     if (!user) { window.location.href = "login.html"; return; }
+
+    // If user has a photoURL stored in Firebase Auth, prioritize it
+    if (user.photoURL && user.photoURL.startsWith("data:image/svg+xml")) {
+      selectedAvatarUrl = user.photoURL;
+      localStorage.setItem("skillpath_user_avatar", user.photoURL);
+    } else {
+      const stored = localStorage.getItem("skillpath_user_avatar");
+      if (stored) {
+        selectedAvatarUrl = stored;
+      }
+    }
+    renderAvatarGrid();
+    applyAvatarToDOM(selectedAvatarUrl);
 
     try {
       currentDbUser = await syncUserWithBackend();
@@ -294,10 +432,16 @@
         })
       });
 
-      // 2. Update Firebase Authentication profile displayName
+      // 2. Save avatar locally and in Firebase Auth profile
+      localStorage.setItem("skillpath_user_avatar", selectedAvatarUrl);
+      applyAvatarToDOM(selectedAvatarUrl);
+
       if (auth.currentUser) {
         try {
-          await updateProfile(auth.currentUser, { displayName: trimmedName });
+          await updateProfile(auth.currentUser, {
+            displayName: trimmedName,
+            photoURL: selectedAvatarUrl
+          });
         } catch (fbErr) {
           console.warn("Could not sync with Firebase profile:", fbErr);
         }
@@ -315,7 +459,7 @@
       if (userNameEl) userNameEl.textContent = trimmedName;
       if (nameInput) nameInput.value = trimmedName;
 
-      showSuccess("✓ Profile and preferences saved successfully!");
+      showSuccess("✓ Profile avatar and preferences saved successfully!");
     } catch (err) {
       console.error("Save settings error:", err);
       showError("Failed to save settings: " + (err.message || "Please check your network and try again."));
@@ -324,12 +468,6 @@
       saveBtn.textContent = originalBtnText;
     }
   });
-
-  const menuToggle = document.getElementById("menuToggle");
-  const navMenu = document.querySelector(".nav-menu");
-  if (menuToggle && navMenu) {
-    menuToggle.addEventListener("click", () => navMenu.classList.toggle("show"));
-  }
 </script>
 <script src="search-handler.js"></script>
 </body>

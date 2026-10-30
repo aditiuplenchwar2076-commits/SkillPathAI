@@ -6,28 +6,47 @@
 <title>SkillPath AI | Community Hub</title>
 <link rel="stylesheet" href="dashboard.css">
 <style>
-  .content-wrap { max-width: 900px; }
+  .content-wrap { max-width: 900px; width: 100%; }
   .community-hero {
     background: linear-gradient(135deg, #4f46e5, #7c5cff);
     color: white;
     padding: 30px;
     border-radius: 16px;
     margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(79, 70, 229, 0.2);
   }
   .community-stats {
     display: flex;
-    gap: 30px;
-    margin-top: 18px;
+    gap: 32px;
+    margin-top: 20px;
+    flex-wrap: wrap;
   }
-  .community-stat p { font-size: 24px; font-weight: 800; }
-  .community-stat span { font-size: 12px; opacity: 0.85; }
+  .community-stat {
+    min-width: 110px;
+  }
+  .community-stat p {
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 4px;
+    letter-spacing: -0.5px;
+  }
+  .community-stat span {
+    font-size: 12px;
+    opacity: 0.9;
+  }
 
   .post-card {
     background: white;
     border-radius: 14px;
-    padding: 20px;
-    margin-bottom: 16px;
-    border: 1px solid #eee;
+    padding: 22px;
+    margin-bottom: 18px;
+    border: 1px solid #e2e8f0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .post-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
   }
   .post-header {
     display: flex;
@@ -36,66 +55,92 @@
     margin-bottom: 12px;
   }
   .post-avatar {
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
+    object-fit: cover;
+    background: #f1f5f9;
   }
-  .post-author { font-size: 14px; font-weight: bold; }
-  .post-time { font-size: 11px; color: #9ca3af; }
-  .post-title { font-size: 16px; font-weight: bold; margin-bottom: 6px; }
-  .post-body { font-size: 14px; color: #4b5563; line-height: 1.6; margin-bottom: 14px; }
-  .post-tags { display: flex; gap: 8px; }
+  .post-author {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+  }
+  .post-time {
+    font-size: 11px;
+    color: #64748b;
+  }
+  .post-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #0f172a;
+    line-height: 1.4;
+  }
+  .post-body {
+    font-size: 14px;
+    color: #334155;
+    line-height: 1.6;
+    margin-bottom: 14px;
+    white-space: pre-wrap;
+  }
+  .post-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
   .post-tag {
     font-size: 11px;
-    background: #f3f4f6;
-    color: #4b5563;
+    background: #eef2ff;
+    color: #4338ca;
     padding: 3px 10px;
     border-radius: 12px;
+    font-weight: 600;
   }
 </style>
 </head>
 <body>
 <div class="dashboard-container">
   <aside class="sidebar">
-    <div class="logo">
-      <span class="logo-icon">🚀</span>
-      <div class="logo-text">
-        <h2>SkillPath <span class="highlight-ai">AI</span></h2>
-        <p>Learn. Practice. Get Placed.</p>
+    <div class="sidebar-header">
+      <div class="logo">
+        <span class="logo-icon">🚀</span>
+        <div class="logo-text">
+          <h2>SkillPath <span class="highlight-ai">AI</span></h2>
+          <p>Learn. Practice. Get Placed.</p>
+        </div>
       </div>
+      <button id="menuToggle" class="sidebar-toggle menu-toggle" aria-label="Toggle navigation menu" aria-expanded="true">
+        <span class="toggle-icon">☰</span>
+      </button>
     </div>
-    <button id="menuToggle" class="menu-toggle">☰</button>
+
     <nav class="nav-menu">
       <ul>
-        <li><a href="dashboard.html"><span class="nav-icon">🏠</span> Home</a></li>
-        <li><a href="roadmap.html"><span class="nav-icon">🗺️</span> Roadmap</a></li>
-        <li><a href="practice.html"><span class="nav-icon">📖</span> Learn</a></li>
-        <li><a href="practice.html"><span class="nav-icon">💻</span> Practice</a></li>
-        <li><a href="progress.html"><span class="nav-icon">📊</span> Progress</a></li>
-        <li><a href="practice.html?tab=projects"><span class="nav-icon">💼</span> Projects</a></li>
-        <li><a href="interview.html"><span class="nav-icon">🎙️</span> Interview Prep</a></li>
-        <li><a href="resources.html"><span class="nav-icon">📚</span> Resources</a></li>
-        <li class="active"><a href="community.html"><span class="nav-icon">👥</span> Community</a></li>
-        <li><a href="certificates.html"><span class="nav-icon">🎖️</span> Certificates</a></li>
-        <li><a href="settings.html"><span class="nav-icon">⚙️</span> Settings</a></li>
+        <li><a href="dashboard.html" data-tooltip="Home"><span class="nav-icon">🏠</span> <span class="nav-label">Home</span></a></li>
+        <li><a href="roadmap.html" data-tooltip="Roadmap"><span class="nav-icon">🗺️</span> <span class="nav-label">Roadmap</span></a></li>
+        <li><a href="practice.html?tab=quiz" data-tooltip="Learn"><span class="nav-icon">📖</span> <span class="nav-label">Learn</span></a></li>
+        <li><a href="practice.html?tab=practice" data-tooltip="Practice"><span class="nav-icon">💻</span> <span class="nav-label">Practice</span></a></li>
+        <li><a href="progress.html" data-tooltip="Progress"><span class="nav-icon">📊</span> <span class="nav-label">Progress</span></a></li>
+        <li><a href="practice.html?tab=projects" data-tooltip="Projects"><span class="nav-icon">💼</span> <span class="nav-label">Projects</span></a></li>
+        <li><a href="interview.html" data-tooltip="Interview Prep"><span class="nav-icon">🎙️</span> <span class="nav-label">Interview Prep</span></a></li>
+        <li><a href="resources.html" data-tooltip="Resources"><span class="nav-icon">📚</span> <span class="nav-label">Resources</span></a></li>
+        <li class="active"><a href="community.html" data-tooltip="Community"><span class="nav-icon">👥</span> <span class="nav-label">Community</span></a></li>
+        <li><a href="certificates.html" data-tooltip="Certificates"><span class="nav-icon">🎖️</span> <span class="nav-label">Certificates</span></a></li>
+        <li><a href="settings.html" data-tooltip="Settings"><span class="nav-icon">⚙️</span> <span class="nav-label">Settings</span></a></li>
       </ul>
     </nav>
+
     <div class="premium-box">
       <p class="premium-title">👑 Go Premium</p>
       <p class="premium-text">Unlock all features, AI interviews & premium content.</p>
-      <button class="upgrade-btn">Upgrade Now →</button>
-    </div>
-    <div class="help-box">
-      <span class="help-icon">🤖</span>
-      <div class="help-text">
-        <p class="help-title">Need Help?</p>
-        <p class="help-subtitle">Chat with our AI Assistant</p>
-      </div>
+      <button class="upgrade-btn" onclick="window.location.href='pricing.html'">Upgrade Now →</button>
     </div>
   </aside>
 
   <main class="main-content">
     <div class="topbar">
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open navigation menu">☰</button>
       <div class="topbar-logo">
         <span class="topbar-logo-icon">🚀</span>
         <h2>SkillPath <span class="highlight-ai">AI</span></h2>
@@ -106,7 +151,7 @@
       </div>
       <div class="notification"><span class="bell-icon">🔔</span></div>
       <div class="user-profile" id="userProfile">
-        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=SkillPathAI" alt="Avatar" class="user-avatar">
+        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=SkillPathAI" alt="Avatar" class="user-avatar" id="topbarAvatar">
         <div class="user-info">
           <p class="user-name" id="userName">Learner</p>
           <p class="user-plan">Premium Plan</p>
@@ -115,45 +160,114 @@
     </div>
 
     <div class="content-wrap">
+      <!-- HERO & ANIMATED STATS -->
       <div class="community-hero">
         <h1 style="font-size: 24px; margin-bottom: 6px;">SkillPath Learner Community</h1>
-        <p style="font-size: 14px; opacity: 0.9;">Collaborate, share solutions, and get peer feedback across all career tracks.</p>
+        <p style="font-size: 14px; opacity: 0.9;">Collaborate, share breakthroughs, and get peer feedback across all career tracks.</p>
         <div class="community-stats">
-          <div class="community-stat"><p>1,240+</p><span>Active Learners</span></div>
-          <div class="community-stat"><p>3,800+</p><span>Topics Solved</span></div>
-          <div class="community-stat"><p>98%</p><span>Questions Answered</span></div>
+          <div class="community-stat">
+            <p id="statLearners" data-target="1240" data-suffix="+">0</p>
+            <span>Active Learners</span>
+          </div>
+          <div class="community-stat">
+            <p id="statTopics" data-target="3800" data-suffix="+">0</p>
+            <span>Topics Solved</span>
+          </div>
+          <div class="community-stat">
+            <p id="statAnswered" data-target="98" data-suffix="%">0</p>
+            <span>Questions Answered</span>
+          </div>
         </div>
       </div>
 
-      <div class="post-card">
-        <div class="post-header">
-          <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Aditi" class="post-avatar" alt="Avatar">
+      <!-- CREATE POST COMPONENT -->
+      <div class="create-post-card">
+        <div class="create-post-header">
+          <img src="https://api.dicebear.com/7.x/bottts/svg?seed=SkillPathAI" alt="Avatar" class="user-avatar" style="width: 40px; height: 40px; border-radius: 50%;">
           <div>
-            <p class="post-author">Aditi U.</p>
-            <p class="post-time">2 hours ago • Web Development Track</p>
+            <h3>Share with the Community</h3>
+            <p class="create-post-author" id="createPostAuthor">Posting as Learner</p>
           </div>
         </div>
-        <h3 class="post-title">Key takeaways from finishing the DSA & Algorithms Roadmap Milestone</h3>
-        <p class="post-body">Practicing two-pointer techniques on arrays helped significantly when solving palindrome and two-sum style questions. Don't skip tracing loops by hand!</p>
-        <div class="post-tags">
-          <span class="post-tag">#algorithms</span>
-          <span class="post-tag">#study-tips</span>
-        </div>
+
+        <form id="createPostForm" class="create-post-form">
+          <div class="form-group">
+            <input type="text" id="postTitleInput" placeholder="Post title (e.g., Key takeaways from learning Async/Await or SQL joins)" maxlength="140">
+          </div>
+
+          <div style="display: flex; gap: 12px; margin-bottom: 14px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 200px;">
+              <select id="postTrackSelect">
+                <option value="Web Development Track">Web Development Track</option>
+                <option value="Full Stack AI Track">Full Stack AI Track</option>
+                <option value="Data Science & ML Track">Data Science & ML Track</option>
+                <option value="Algorithms & DSA Track">Algorithms & DSA Track</option>
+                <option value="Career & Interview Prep">Career & Interview Prep</option>
+                <option value="General Discussion">General Discussion</option>
+              </select>
+            </div>
+            <div style="flex: 1; min-width: 200px;">
+              <input type="text" id="postTagsInput" placeholder="Tags: #study-tips #algorithms #react" maxlength="80">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <textarea id="postBodyInput" placeholder="What are you learning, building, or curious about? Ask questions or share insights..." rows="4"></textarea>
+          </div>
+
+          <!-- Preview Card (Toggled via Preview button) -->
+          <div id="postPreviewWrap" class="post-preview-card" style="display: none;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span style="font-size: 11px; font-weight: 700; color: #4338ca; text-transform: uppercase;">Preview Mode</span>
+            </div>
+            <h4 id="previewTitle" style="font-size: 15px; font-weight: 700; margin-bottom: 6px; color: #0f172a;"></h4>
+            <p id="previewBody" style="font-size: 13.5px; color: #334155; line-height: 1.6; margin-bottom: 10px; white-space: pre-wrap;"></p>
+            <div id="previewTags" class="post-tags"></div>
+          </div>
+
+          <div id="postAlertMsg" style="display: none; padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-top: 12px;"></div>
+
+          <div class="create-post-actions">
+            <button type="button" id="previewToggleBtn" class="btn-secondary">Preview</button>
+            <button type="submit" id="publishPostBtn" class="btn-publish">Publish Post</button>
+          </div>
+        </form>
       </div>
 
-      <div class="post-card">
-        <div class="post-header">
-          <img src="https://api.dicebear.com/7.x/bottts/svg?seed=DevLearner" class="post-avatar" alt="Avatar">
-          <div>
-            <p class="post-author">Carlos M.</p>
-            <p class="post-time">5 hours ago • Full Stack AI Track</p>
+      <!-- COMMUNITY FEED -->
+      <div id="communityFeed">
+        <!-- New posts prepended here -->
+
+        <div class="post-card">
+          <div class="post-header">
+            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Aditi" class="post-avatar" alt="Avatar">
+            <div>
+              <p class="post-author">Aditi U.</p>
+              <p class="post-time">2 hours ago • Web Development Track</p>
+            </div>
+          </div>
+          <h3 class="post-title">Key takeaways from finishing the DSA & Algorithms Roadmap Milestone</h3>
+          <p class="post-body">Practicing two-pointer techniques on arrays helped significantly when solving palindrome and two-sum style questions. Don't skip tracing loops by hand!</p>
+          <div class="post-tags">
+            <span class="post-tag">#algorithms</span>
+            <span class="post-tag">#study-tips</span>
           </div>
         </div>
-        <h3 class="post-title">How to best structure a full-stack REST API with FastAPI & MySQL</h3>
-        <p class="post-body">Separating schemas (Pydantic models) from database ORM models made unit tests and validation much cleaner. Highly recommend using dependency injection for database sessions.</p>
-        <div class="post-tags">
-          <span class="post-tag">#fastapi</span>
-          <span class="post-tag">#architecture</span>
+
+        <div class="post-card">
+          <div class="post-header">
+            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=DevLearner" class="post-avatar" alt="Avatar">
+            <div>
+              <p class="post-author">Carlos M.</p>
+              <p class="post-time">5 hours ago • Full Stack AI Track</p>
+            </div>
+          </div>
+          <h3 class="post-title">How to best structure a full-stack REST API with FastAPI & MySQL</h3>
+          <p class="post-body">Separating schemas (Pydantic models) from database ORM models made unit tests and validation much cleaner. Highly recommend using dependency injection for database sessions.</p>
+          <div class="post-tags">
+            <span class="post-tag">#fastapi</span>
+            <span class="post-tag">#architecture</span>
+          </div>
         </div>
       </div>
     </div>
@@ -163,6 +277,7 @@
 <script type="module">
   import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+  import { getActiveAvatar, applyAvatarToDOM } from "./avatar-presets.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyCQ9YRQV9edVS0D-Lb6ORl9HX6E0oL4ECQ",
@@ -176,17 +291,230 @@
   const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
+  let currentUserName = "Learner";
+
+  // Apply stored avatar immediately
+  applyAvatarToDOM();
+
   onAuthStateChanged(auth, (user) => {
     if (!user) { window.location.href = "index.html"; return; }
-    const displayName = user.displayName || (user.email ? user.email.split("@")[0] : "Learner");
+    currentUserName = user.displayName || (user.email ? user.email.split("@")[0] : "Learner");
     const el = document.getElementById("userName");
-    if (el) el.textContent = displayName;
+    if (el) el.textContent = currentUserName;
+    const authorEl = document.getElementById("createPostAuthor");
+    if (authorEl) authorEl.textContent = `Posting as ${currentUserName}`;
+
+    if (user.photoURL) {
+      applyAvatarToDOM(user.photoURL);
+    }
   });
 
-  const menuToggle = document.getElementById("menuToggle");
-  const navMenu = document.querySelector(".nav-menu");
-  if (menuToggle && navMenu) {
-    menuToggle.addEventListener("click", () => navMenu.classList.toggle("show"));
+  /* ==========================================================================
+     ANIMATED STATISTICS (0.3s duration, count up, no layout shift, runs once)
+     ========================================================================== */
+  let statsAnimated = false;
+  function animateStatistics() {
+    if (statsAnimated) return;
+    statsAnimated = true;
+
+    const statElements = [
+      document.getElementById("statLearners"),
+      document.getElementById("statTopics"),
+      document.getElementById("statAnswered")
+    ].filter(Boolean);
+
+    const duration = 300; // ~0.3s
+    const startTime = performance.now();
+
+    function update(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // Ease out quad
+      const easeProgress = 1 - (1 - progress) * (1 - progress);
+
+      statElements.forEach(el => {
+        const target = parseFloat(el.getAttribute("data-target")) || 0;
+        const suffix = el.getAttribute("data-suffix") || "";
+        const currentVal = Math.round(target * easeProgress);
+        el.textContent = currentVal.toLocaleString() + suffix;
+      });
+
+      if (progress < 1) {
+        requestAnimationFrame(update);
+      }
+    }
+
+    requestAnimationFrame(update);
+  }
+
+  // Trigger animation on load
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", animateStatistics);
+  } else {
+    animateStatistics();
+  }
+
+  /* ==========================================================================
+     COMMUNITY CREATE & PUBLISH FUNCTIONALITY
+     ========================================================================== */
+  const postForm = document.getElementById("createPostForm");
+  const titleInput = document.getElementById("postTitleInput");
+  const trackSelect = document.getElementById("postTrackSelect");
+  const tagsInput = document.getElementById("postTagsInput");
+  const bodyInput = document.getElementById("postBodyInput");
+  const previewBtn = document.getElementById("previewToggleBtn");
+  const previewWrap = document.getElementById("postPreviewWrap");
+  const previewTitle = document.getElementById("previewTitle");
+  const previewBody = document.getElementById("previewBody");
+  const previewTags = document.getElementById("previewTags");
+  const alertMsg = document.getElementById("postAlertMsg");
+  const feed = document.getElementById("communityFeed");
+
+  function showAlert(msg, isError = true) {
+    if (!alertMsg) return;
+    alertMsg.textContent = msg;
+    alertMsg.style.display = "block";
+    if (isError) {
+      alertMsg.style.background = "#fef2f2";
+      alertMsg.style.color = "#991b1b";
+      alertMsg.style.border = "1px solid #fecaca";
+    } else {
+      alertMsg.style.background = "#ecfdf5";
+      alertMsg.style.color = "#065f46";
+      alertMsg.style.border = "1px solid #a7f3d0";
+      setTimeout(() => { if (alertMsg) alertMsg.style.display = "none"; }, 4000);
+    }
+  }
+
+  // Preview Toggle
+  if (previewBtn && previewWrap) {
+    previewBtn.addEventListener("click", () => {
+      const isVisible = previewWrap.style.display !== "none";
+      if (isVisible) {
+        previewWrap.style.display = "none";
+        previewBtn.textContent = "Preview";
+      } else {
+        const t = (titleInput?.value || "").trim() || "Untitled Post";
+        const b = (bodyInput?.value || "").trim() || "No content entered yet...";
+        const rawTags = (tagsInput?.value || "").trim();
+        const tagList = rawTags ? rawTags.split(/\s+/).filter(Boolean) : ["#learning"];
+
+        previewTitle.textContent = t;
+        previewBody.textContent = b;
+        previewTags.innerHTML = tagList.map(tag => `<span class="post-tag">${tag.startsWith("#") ? tag : "#" + tag}</span>`).join("");
+
+        previewWrap.style.display = "block";
+        previewBtn.textContent = "Hide Preview";
+      }
+    });
+  }
+
+  // Render Post Card Helper
+  function createPostElement(post) {
+    const card = document.createElement("div");
+    card.className = "post-card";
+    const tagHtml = (post.tags || []).map(t => `<span class="post-tag">${t}</span>`).join("");
+
+    card.innerHTML = `
+      <div class="post-header">
+        <img src="${post.avatar || getActiveAvatar()}" class="post-avatar" alt="Avatar">
+        <div>
+          <p class="post-author">${escapeHtml(post.author || "Learner")}</p>
+          <p class="post-time">${escapeHtml(post.time || "Just now")} • ${escapeHtml(post.track || "General")}</p>
+        </div>
+      </div>
+      <h3 class="post-title">${escapeHtml(post.title)}</h3>
+      <p class="post-body">${escapeHtml(post.body)}</p>
+      <div class="post-tags">${tagHtml}</div>
+    `;
+    return card;
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // Load saved local community posts
+  function loadLocalPosts() {
+    try {
+      const saved = localStorage.getItem("skillpath_community_posts");
+      if (saved) {
+        const posts = JSON.parse(saved);
+        if (Array.isArray(posts)) {
+          posts.forEach(p => {
+            const el = createPostElement(p);
+            feed.insertBefore(el, feed.firstChild);
+          });
+        }
+      }
+    } catch (e) {
+      console.warn("Could not load local community posts:", e);
+    }
+  }
+
+  loadLocalPosts();
+
+  // Submit Post
+  if (postForm) {
+    postForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (alertMsg) alertMsg.style.display = "none";
+
+      const title = (titleInput?.value || "").trim();
+      const body = (bodyInput?.value || "").trim();
+      const track = trackSelect?.value || "General Discussion";
+      const rawTags = (tagsInput?.value || "").trim();
+
+      // Form validation
+      if (!title || title.length < 3) {
+        showAlert("Please enter a post title with at least 3 characters.");
+        titleInput?.focus();
+        return;
+      }
+
+      if (!body || body.length < 10) {
+        showAlert("Please enter post content with at least 10 characters.");
+        bodyInput?.focus();
+        return;
+      }
+
+      const tags = rawTags
+        ? rawTags.split(/\s+/).map(t => (t.startsWith("#") ? t : "#" + t))
+        : ["#discussion"];
+
+      const newPost = {
+        title,
+        body,
+        track,
+        tags,
+        author: currentUserName,
+        avatar: getActiveAvatar(),
+        time: "Just now",
+        timestamp: Date.now()
+      };
+
+      // Note: Backend currently has no shared /community API routes.
+      // Persisting to client feed storage and displaying live in the feed.
+      try {
+        const existing = JSON.parse(localStorage.getItem("skillpath_community_posts") || "[]");
+        existing.unshift(newPost);
+        localStorage.setItem("skillpath_community_posts", JSON.stringify(existing.slice(0, 30)));
+      } catch (err) {
+        console.warn("Error caching community post:", err);
+      }
+
+      const postEl = createPostElement(newPost);
+      feed.insertBefore(postEl, feed.firstChild);
+
+      // Reset form
+      postForm.reset();
+      if (previewWrap) previewWrap.style.display = "none";
+      if (previewBtn) previewBtn.textContent = "Preview";
+
+      showAlert("✓ Your post has been published to the community feed!", false);
+    });
   }
 </script>
 <script src="search-handler.js"></script>
