@@ -123,19 +123,127 @@
     color: #991b1b;
     border: 1px solid #fecaca;
   }
+
+  /* Career Sync Modal Styles */
+  .sync-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+  }
+  .sync-modal-card {
+    background: #ffffff;
+    border-radius: 16px;
+    max-width: 520px;
+    width: 100%;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    padding: 28px;
+    border: 1px solid #e2e8f0;
+  }
+  .sync-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .sync-modal-header h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+  }
+  .sync-modal-icon { font-size: 22px; }
+  .sync-modal-body p {
+    font-size: 14px;
+    color: #334155;
+    margin: 0 0 8px 0;
+    line-height: 1.5;
+  }
+  .sync-modal-body p.sync-modal-sub {
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 20px;
+  }
+  .sync-modal-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .sync-option-btn {
+    text-align: left;
+    padding: 14px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border: 1px solid transparent;
+    background: #f8fafc;
+  }
+  .sync-option-btn strong {
+    font-size: 14px;
+    color: #0f172a;
+  }
+  .sync-option-btn span {
+    font-size: 12px;
+    color: #64748b;
+  }
+  .sync-option-btn.primary {
+    background: #eef2ff;
+    border-color: #c7d2fe;
+  }
+  .sync-option-btn.primary:hover {
+    background: #e0e7ff;
+    border-color: #a5b4fc;
+    transform: translateY(-1px);
+  }
+  .sync-option-btn.primary strong {
+    color: #3730a3;
+  }
+  .sync-option-btn.secondary {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+  }
+  .sync-option-btn.secondary:hover {
+    background: #dcfce7;
+    border-color: #86efac;
+    transform: translateY(-1px);
+  }
+  .sync-option-btn.secondary strong {
+    color: #166534;
+  }
+  .sync-option-btn.outline {
+    background: #ffffff;
+    border-color: #e2e8f0;
+  }
+  .sync-option-btn.outline:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+  }
 </style>
 </head>
 <body>
 <div class="dashboard-container">
   <aside class="sidebar">
     <div class="sidebar-header">
-      <div class="logo">
-        <span class="logo-icon">🚀</span>
+      <a href="index.html" class="logo">
+        <span class="logo-icon">
+          <svg class="logo-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>
+        </span>
         <div class="logo-text">
           <h2>SkillPath <span class="highlight-ai">AI</span></h2>
           <p>Learn. Practice. Get Placed.</p>
         </div>
-      </div>
+      </a>
       <button id="menuToggle" class="sidebar-toggle menu-toggle" aria-label="Toggle navigation menu" aria-expanded="true">
         <span class="toggle-icon">☰</span>
       </button>
@@ -143,22 +251,22 @@
 
     <nav class="nav-menu">
       <ul>
-        <li><a href="dashboard.html" data-tooltip="Home"><span class="nav-icon">🏠</span> <span class="nav-label">Home</span></a></li>
-        <li><a href="roadmap.html" data-tooltip="Roadmap"><span class="nav-icon">🗺️</span> <span class="nav-label">Roadmap</span></a></li>
-        <li><a href="practice.html?tab=quiz" data-tooltip="Learn"><span class="nav-icon">📖</span> <span class="nav-label">Learn</span></a></li>
-        <li><a href="practice.html?tab=practice" data-tooltip="Practice"><span class="nav-icon">💻</span> <span class="nav-label">Practice</span></a></li>
-        <li><a href="progress.html" data-tooltip="Progress"><span class="nav-icon">📊</span> <span class="nav-label">Progress</span></a></li>
-        <li><a href="practice.html?tab=projects" data-tooltip="Projects"><span class="nav-icon">💼</span> <span class="nav-label">Projects</span></a></li>
-        <li><a href="interview.html" data-tooltip="Interview Prep"><span class="nav-icon">🎙️</span> <span class="nav-label">Interview Prep</span></a></li>
-        <li><a href="resources.html" data-tooltip="Resources"><span class="nav-icon">📚</span> <span class="nav-label">Resources</span></a></li>
-        <li><a href="community.html" data-tooltip="Community"><span class="nav-icon">👥</span> <span class="nav-label">Community</span></a></li>
-        <li><a href="certificates.html" data-tooltip="Certificates"><span class="nav-icon">🎖️</span> <span class="nav-label">Certificates</span></a></li>
-        <li class="active"><a href="settings.html" data-tooltip="Settings"><span class="nav-icon">⚙️</span> <span class="nav-label">Settings</span></a></li>
+        <li><a href="dashboard.html" data-tooltip="Home"><span class="nav-icon"><svg class="nav-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span> <span class="nav-label">Home</span></a></li>
+        <li><a href="roadmap.html" data-tooltip="Roadmap"><span class="nav-icon"><svg class="nav-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg></span> <span class="nav-label">Roadmap</span></a></li>
+        <li><a href="practice.html?tab=quiz" data-tooltip="Learn"><span class="nav-icon"><svg class="nav-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span> <span class="nav-label">Learn</span></a></li>
+        <li><a href="practice.html?tab=practice" data-tooltip="Practice"><span class="nav-icon"><svg class="nav-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></span> <span class="nav-label">Practice</span></a></li>
+        <li><a href="progress.html" data-tooltip="Progress"><span class="nav-icon"><svg class="nav-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg></span> <span class="nav-label">Progress</span></a></li>
+        <li><a href="practice.html?tab=projects" data-tooltip="Projects"><span class="nav-icon"><svg class="nav-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span> <span class="nav-label">Projects</span></a></li>
+        <li><a href="interview.html" data-tooltip="Interview Prep"><span class="nav-icon"><svg class="nav-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg></span> <span class="nav-label">Interview Prep</span></a></li>
+        <li><a href="resources.html" data-tooltip="Resources"><span class="nav-icon"><svg class="nav-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg></span> <span class="nav-label">Resources</span></a></li>
+        <li><a href="community.html" data-tooltip="Community"><span class="nav-icon"><svg class="nav-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> <span class="nav-label">Community</span></a></li>
+        <li><a href="certificates.html" data-tooltip="Certificates"><span class="nav-icon"><svg class="nav-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg></span> <span class="nav-label">Certificates</span></a></li>
+        <li class="active"><a href="settings.html" data-tooltip="Settings"><span class="nav-icon"><svg class="nav-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span> <span class="nav-label">Settings</span></a></li>
       </ul>
     </nav>
 
     <div class="premium-box">
-      <p class="premium-title">👑 Go Premium</p>
+      <p class="premium-title"><svg class="premium-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/></svg> Go Premium</p>
       <p class="premium-text">Unlock all features, AI interviews & premium content.</p>
       <button class="upgrade-btn" onclick="window.location.href='pricing.html'">Upgrade Now →</button>
     </div>
@@ -167,15 +275,19 @@
   <main class="main-content">
     <div class="topbar">
       <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open navigation menu">☰</button>
-      <div class="topbar-logo">
-        <span class="topbar-logo-icon">🚀</span>
+      <a href="index.html" class="topbar-logo">
+        <span class="topbar-logo-icon">
+          <svg class="logo-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>
+        </span>
         <h2>SkillPath <span class="highlight-ai">AI</span></h2>
-      </div>
+      </a>
       <div class="search-bar">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
         <input type="text" placeholder="Search settings..." class="search-input">
       </div>
-      <div class="notification"><span class="bell-icon">🔔</span></div>
+      <div class="notification">
+        <span class="bell-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></span>
+      </div>
       <div class="user-profile" id="userProfile">
         <img src="https://api.dicebear.com/7.x/bottts/svg?seed=SkillPathAI" alt="Avatar" class="user-avatar" id="topbarAvatar">
         <div class="user-info">
@@ -249,26 +361,41 @@
         <div id="saveErrorAlert" class="error-alert"></div>
       </div>
     </div>
+
+    <!-- Career Roadmap Sync Modal -->
+    <div id="careerSyncModalBackdrop" class="sync-modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="syncModalTitle">
+      <div class="sync-modal-card">
+        <div class="sync-modal-header">
+          <span class="sync-modal-icon">🔄</span>
+          <h3 id="syncModalTitle">Career Track Updated</h3>
+        </div>
+        <div class="sync-modal-body">
+          <p>Your target career goal is now set to <strong id="syncModalNewCareer"></strong>.</p>
+          <p class="sync-modal-sub">Your existing active roadmap was created for <strong id="syncModalOldCareer"></strong>. What would you like to do?</p>
+          <div class="sync-modal-options">
+            <button type="button" id="btnSyncAssessment" class="sync-option-btn primary">
+              <strong>📝 Take Diagnostic Assessment</strong>
+              <span>Evaluate your current knowledge and generate a calibrated roadmap for <span class="syncNewCareerName">this track</span>.</span>
+            </button>
+            <button type="button" id="btnSyncInstantRoadmap" class="sync-option-btn secondary">
+              <strong>⚡ Generate Instant Roadmap</strong>
+              <span>Create an immediate curriculum for <span class="syncNewCareerName">this track</span> without taking a test.</span>
+            </button>
+            <button type="button" id="btnSyncKeepRoadmap" class="sync-option-btn outline">
+              <strong>📌 Keep Current Roadmap for Now</strong>
+              <span>Retain your existing active roadmap. You can switch or regenerate anytime.</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 </div>
 
 <script type="module">
-  import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-  import { getAuth, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-  import { syncUserWithBackend, apiRequest } from "./api.js";
+  import { onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+  import { auth, syncUserWithBackend, apiRequest } from "./api.js";
   import { AVATAR_PRESETS, getActiveAvatar, applyAvatarToDOM } from "./avatar-presets.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyCQ9YRQV9edVS0D-Lb6ORl9HX6E0oL4ECQ",
-    authDomain: "skillpathai-2e1c7.firebaseapp.com",
-    projectId: "skillpathai-2e1c7",
-    storageBucket: "skillpathai-2e1c7.firebasestorage.app",
-    messagingSenderId: "41899784962",
-    appId: "1:41899784962:web:1fe188cfca7f6fa7d201b"
-  };
-
-  const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-  const auth = getAuth(app);
 
   let currentDbUser = null;
   let selectedAvatarUrl = getActiveAvatar();
@@ -423,6 +550,18 @@
         throw new Error("Unable to identify authenticated user account.");
       }
 
+      // Check existing active roadmap before updating preferences
+      let userRoadmaps = [];
+      try {
+        userRoadmaps = await apiRequest(`/roadmaps/${currentDbUser.user_id}`);
+      } catch (rErr) {
+        console.warn("Could not fetch roadmaps for sync check:", rErr);
+      }
+
+      const activeRoadmap = (Array.isArray(userRoadmaps) && userRoadmaps.length > 0) ? userRoadmaps[0] : null;
+      const previousCareer = (activeRoadmap && activeRoadmap.career_path) ? activeRoadmap.career_path : null;
+      const isCareerChanged = previousCareer && previousCareer.trim().toLowerCase() !== career.trim().toLowerCase();
+
       // 1. Update backend MySQL database record
       const updatedUser = await apiRequest(`/users/${currentDbUser.user_id}`, {
         method: "PATCH",
@@ -459,7 +598,12 @@
       if (userNameEl) userNameEl.textContent = trimmedName;
       if (nameInput) nameInput.value = trimmedName;
 
-      showSuccess("✓ Profile avatar and preferences saved successfully!");
+      // 5. Handle career change synchronization
+      if (isCareerChanged) {
+        openCareerSyncModal(career, previousCareer, level);
+      } else {
+        showSuccess("✓ Profile avatar and preferences saved successfully!");
+      }
     } catch (err) {
       console.error("Save settings error:", err);
       showError("Failed to save settings: " + (err.message || "Please check your network and try again."));
@@ -468,6 +612,78 @@
       saveBtn.textContent = originalBtnText;
     }
   });
+
+  const syncModal = document.getElementById("careerSyncModalBackdrop");
+  const syncModalNewCareer = document.getElementById("syncModalNewCareer");
+  const syncModalOldCareer = document.getElementById("syncModalOldCareer");
+  const newCareerNames = document.querySelectorAll(".syncNewCareerName");
+  const btnSyncAssessment = document.getElementById("btnSyncAssessment");
+  const btnSyncInstantRoadmap = document.getElementById("btnSyncInstantRoadmap");
+  const btnSyncKeepRoadmap = document.getElementById("btnSyncKeepRoadmap");
+
+  function openCareerSyncModal(newCareer, oldCareer, level) {
+    if (!syncModal) return;
+    if (syncModalNewCareer) syncModalNewCareer.textContent = newCareer;
+    if (syncModalOldCareer) syncModalOldCareer.textContent = oldCareer;
+    newCareerNames.forEach(el => { el.textContent = newCareer; });
+    syncModal.style.display = "flex";
+
+    if (btnSyncAssessment) {
+      btnSyncAssessment.onclick = () => {
+        window.location.href = `asses.html?career=${encodeURIComponent(newCareer)}`;
+      };
+    }
+
+    if (btnSyncInstantRoadmap) {
+      btnSyncInstantRoadmap.onclick = async () => {
+        btnSyncInstantRoadmap.disabled = true;
+        const origBtnText = btnSyncInstantRoadmap.innerHTML;
+        btnSyncInstantRoadmap.innerHTML = "<strong>⚡ Generating Roadmap...</strong><span>Please wait a moment...</span>";
+        try {
+          await apiRequest("/generate-roadmap", {
+            method: "POST",
+            body: JSON.stringify({
+              user_id: currentDbUser.user_id,
+              career_goal: newCareer,
+              current_skills: "",
+              interests: newCareer,
+              skill_level: level,
+              assessment_score: 75.0
+            })
+          });
+          window.location.href = "dashboard.html";
+        } catch (genErr) {
+          console.error("Instant roadmap generation error:", genErr);
+          alert("Could not generate roadmap at this time. Please try taking the diagnostic assessment.");
+          btnSyncInstantRoadmap.disabled = false;
+          btnSyncInstantRoadmap.innerHTML = origBtnText;
+        }
+      };
+    }
+
+    if (btnSyncKeepRoadmap) {
+      btnSyncKeepRoadmap.onclick = () => {
+        syncModal.style.display = "none";
+        showSuccess(`✓ Preferences saved! Your active roadmap for ${oldCareer} has been preserved.`);
+      };
+    }
+  }
+
+  if (btnSyncKeepRoadmap) {
+    btnSyncKeepRoadmap.addEventListener("click", () => {
+      if (syncModal) syncModal.style.display = "none";
+      const old = (syncModalOldCareer && syncModalOldCareer.textContent) ? syncModalOldCareer.textContent : "previous career";
+      showSuccess(`✓ Preferences saved! Your active roadmap for ${old} has been preserved.`);
+    });
+  }
+
+  if (syncModal) {
+    syncModal.addEventListener("click", (e) => {
+      if (e.target === syncModal) {
+        syncModal.style.display = "none";
+      }
+    });
+  }
 </script>
 <script src="search-handler.js"></script>
 </body>
