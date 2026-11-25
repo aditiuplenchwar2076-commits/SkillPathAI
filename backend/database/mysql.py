@@ -1,40 +1,26 @@
 import os
+import re
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import sessionmaker, declarative_base
 
+# Load environment from backend/.env or root .env
+_backend_dir = os.path.dirname(os.path.abspath(__file__))
+_env_path = os.path.join(_backend_dir, "..", ".env")
+if os.path.exists(_env_path):
+    load_dotenv(_env_path)
 load_dotenv()
 
 raw_database_url = os.getenv("DATABASE_URL")
 
-# Resolve CA certificate path: DB_SSL_CA, backend/ca.pem, or embedded project Aiven CA
-default_ca_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "ca.pem")
+# Resolve optional custom CA certificate path: DB_SSL_CA or backend/ca.pem
+default_ca_path = os.path.join(_backend_dir, "..", "ca.pem")
 if not os.path.exists(default_ca_path):
-    default_ca_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ca.pem")
+    default_ca_path = os.path.join(_backend_dir, "ca.pem")
 
 env_ca_path = os.getenv("DB_SSL_CA")
 ssl_ca_path = env_ca_path if (env_ca_path and os.path.exists(env_ca_path)) else (default_ca_path if os.path.exists(default_ca_path) else None)
-
-# If ca.pem is not found on container disk (e.g. omitted by gitignore in production container),
-# automatically write the embedded Aiven project CA cert to a temporary file
-if not ssl_ca_path or not os.path.exists(ssl_ca_path):
-    try:
-        from aiven_ca_embedded import AIVEN_CA_PEM
-    except ImportError:
-        try:
-            from backend.aiven_ca_embedded import AIVEN_CA_PEM
-        except ImportError:
-            AIVEN_CA_PEM = None
-
-    if AIVEN_CA_PEM and AIVEN_CA_PEM.strip():
-        temp_ca_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "aiven_ca_runtime.pem")
-        try:
-            with open(temp_ca_path, "w", encoding="utf-8") as f:
-                f.write(AIVEN_CA_PEM.strip())
-            ssl_ca_path = temp_ca_path
-        except Exception as _ca_write_err:
-            print(f"Warning: unable to write runtime CA certificate: {_ca_write_err}")
 
 ssl_mode = os.getenv("DB_SSL_MODE", "").lower()
 
@@ -43,39 +29,59 @@ connect_args = {
 }
 
 if raw_database_url and raw_database_url.strip():
-    # If a full DATABASE_URL is provided (e.g. from Aiven or cloud host)
-    raw_str = raw_database_url.strip()
-    if raw_str.startswith("mysql://"):
-        raw_str = raw_str.replace("mysql://", "mysql+pymysql://", 1)
+    # Primary configuration: Environment-based DATABASE_URL (TiDB Cloud Starter / Cloud MySQL)
+    # Strip any whitespace and quotes (e.g. from pasted environment variables)
+    raw_str = raw_database_url.strip().strip("'\"")
+
+    # Normalize scheme to mysql+pymysql (handles mysql://, mysql+mysqldb://, mysql+pymysql://, etc.)
+    raw_str = re.sub(r"^mysql(\+[a-zA-Z0-9_]+)?://", "mysql+pymysql://", raw_str, flags=re.IGNORECASE)
 
     parsed_url = make_url(raw_str)
-    query_dict = dict(parsed_url.query)
-    
-    # PyMySQL does not accept 'ssl-mode' as a connection keyword argument; strip it safely
-    ssl_mode_in_url = query_dict.pop("ssl-mode", None) or query_dict.pop("ssl_mode", None)
-    clean_url = parsed_url._replace(query=query_dict)
-    database_url = clean_url.render_as_string(hide_password=False)
 
-    # Configure SSL for hosted/remote database
-    if ssl_ca_path and os.path.exists(ssl_ca_path):
-        connect_args["ssl"] = {"ca": ssl_ca_path}
-    elif ssl_mode in ("required", "true", "1") or ssl_mode_in_url or "aivencloud.com" in database_url:
+    # Explicitly enforce drivername='mysql+pymysql' on the SQLAlchemy URL object to prevent
+    # SQLAlchemy from ever attempting to import the C-extension 'MySQLdb'
+    if parsed_url.get_backend_name() == "mysql":
+        parsed_url = parsed_url.set(drivername="mysql+pymysql")
+
+    query_dict = dict(parsed_url.query)
+
+    # PyMySQL does not accept 'ssl-mode' or 'ssl_mode' as direct keyword arguments; strip safely
+    ssl_mode_in_url = query_dict.pop("ssl-mode", None) or query_dict.pop("ssl_mode", None)
+
+    # If ssl_ca is specified in URL query, ensure the file actually exists on this host OS
+    url_ssl_ca = query_dict.get("ssl_ca")
+    if url_ssl_ca and not os.path.exists(url_ssl_ca):
         import certifi
-        connect_args["ssl"] = {"ca": certifi.where()}
+        query_dict["ssl_ca"] = certifi.where()
+
+    clean_url = parsed_url._replace(query=query_dict)
+
+    # Configure SSL/TLS for TiDB Cloud and hosted/remote databases
+    host_lower = (clean_url.host or "").lower()
+    is_remote_host = host_lower not in ("localhost", "127.0.0.1", "")
+    is_cloud_db = "tidbcloud.com" in host_lower or clean_url.port == 4000 or "aivencloud.com" in host_lower
+
+    if "ssl_ca" not in query_dict:
+        if ssl_ca_path and os.path.exists(ssl_ca_path):
+            connect_args["ssl"] = {"ca": ssl_ca_path}
+        elif is_cloud_db or is_remote_host or ssl_mode in ("required", "true", "1") or ssl_mode_in_url:
+            import certifi
+            connect_args["ssl"] = {"ca": certifi.where()}
+
+    target_engine_url = clean_url
 else:
-    # Fallback to discrete environment variables (local development default)
+    # Fallback configuration: Discrete environment variables (Local development default)
     DB_USER = os.getenv("DB_USER", "root")
     DB_PASSWORD = os.getenv("DB_PASSWORD", "")
     DB_HOST = os.getenv("DB_HOST", "localhost")
     DB_PORT = os.getenv("DB_PORT", "3306")
     DB_NAME = os.getenv("DB_NAME", "skillpathai")
 
-    database_url = (
+    target_engine_url = (
         f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}"
         f"@{DB_HOST}:{DB_PORT}/{DB_NAME}"
     )
 
-    # For local discrete variables, only apply SSL if explicitly requested or if connecting to a remote host
     is_remote_host = DB_HOST.lower() not in ("localhost", "127.0.0.1", "")
     if is_remote_host or ssl_mode in ("required", "true", "1") or env_ca_path:
         if ssl_ca_path and os.path.exists(ssl_ca_path):
@@ -84,14 +90,17 @@ else:
             import certifi
             connect_args["ssl"] = {"ca": certifi.where()}
 
+# TiDB Cloud Serverless / Starter recommends pool_recycle=300 (5 mins) and pool_pre_ping=True
+# to prevent stale dropped connections from cloud load balancers.
 engine_kwargs = {
     "pool_pre_ping": True,
-    "pool_recycle": 1800,
+    "pool_recycle": 300,
 }
 if connect_args:
     engine_kwargs["connect_args"] = connect_args
 
-engine = create_engine(database_url, **engine_kwargs)
+# Create the engine using the validated mysql+pymysql URL
+engine = create_engine(target_engine_url, **engine_kwargs)
 
 Base = declarative_base()
 
@@ -101,4 +110,4 @@ SessionLocal = sessionmaker(
     bind=engine
 )
 
-print("MySQL connection configured successfully!")
+print("Database connection engine configured successfully!")
