@@ -5,105 +5,171 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SkillPath AI | Skill Assessment</title>
 <style>
+  :root {
+    --brand-primary: #4f46e5;
+    --brand-primary-hover: #4338ca;
+    --brand-primary-light: #eef2ff;
+    --brand-primary-border: #c7d2fe;
+    --brand-gradient: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+    --bg-page: #f8fafc;
+    --bg-card: #ffffff;
+    --border-default: #e2e8f0;
+    --text-primary: #0f172a;
+    --text-secondary: #334155;
+    --text-muted: #64748b;
+    --shadow-card: 0 4px 20px rgba(15, 23, 42, 0.05);
+  }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Segoe UI', sans-serif; background-color: #f4f5fa; color: #1a1a2e; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background-color: var(--bg-page); color: var(--text-primary); -webkit-font-smoothing: antialiased; }
   a { text-decoration: none; color: inherit; }
 
   .simple-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 40px;
-    background-color: white;
-    border-bottom: 1px solid #eee;
+    padding: 16px 40px;
+    background-color: var(--bg-card);
+    border-bottom: 1px solid var(--border-default);
   }
   .simple-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit; cursor: pointer; }
   a.simple-logo, a.simple-logo:hover, a.simple-logo:visited, a.simple-logo:active, a.simple-logo:focus { text-decoration: none; color: inherit; }
   .simple-logo-icon { display: inline-flex; align-items: center; font-size: 24px; }
-  .simple-logo-icon svg { width: 24px; height: 24px; stroke: #4f46e5; stroke-width: 2; fill: none; }
+  .simple-logo-icon svg { width: 24px; height: 24px; stroke: var(--brand-primary); stroke-width: 2; fill: none; }
   .simple-logo h2 { font-size: 20px; font-weight: 800; letter-spacing: -0.3px; }
-  .highlight-ai { color: #4f46e5; }
-  .nav-links { display: flex; gap: 25px; align-items: center; font-size: 14px; color: #555; }
-  .logout-btn { border: 1px solid #ddd; padding: 8px 16px; border-radius: 8px; font-weight: bold; }
+  .highlight-ai { color: var(--brand-primary); }
+  .nav-links { display: flex; gap: 25px; align-items: center; font-size: 14px; color: var(--text-secondary); font-weight: 500; }
+  .nav-links a:hover { color: var(--brand-primary); }
+  .logout-btn { border: 1px solid var(--border-default); padding: 7px 16px; border-radius: 8px; font-weight: 600; transition: all 0.15s ease; }
+  .logout-btn:hover { background: #f1f5f9; border-color: #cbd5e1; }
 
-  .page-wrap { max-width: 640px; margin: 50px auto; padding: 0 20px; }
+  .page-wrap { max-width: 660px; margin: 44px auto; padding: 0 20px; }
+
+  /* Stepper */
+  .assess-stepper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 24px;
+    padding: 12px 16px;
+    background: #f8fafc;
+    border: 1px solid var(--border-default);
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+  .step-pill { display: flex; align-items: center; gap: 6px; }
+  .step-num {
+    width: 20px; height: 20px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+    background: #e2e8f0; color: var(--text-muted);
+  }
+  .step-pill.done .step-num { background: #10b981; color: white; }
+  .step-pill.active { color: var(--brand-primary); }
+  .step-pill.active .step-num { background: var(--brand-primary); color: white; }
+  .step-sep { flex: 1; height: 1px; background: var(--border-default); max-width: 36px; }
 
   /* ===== INTRO SCREEN ===== */
-  #introScreen h1 { font-size: 26px; margin-bottom: 6px; }
-  #introScreen .career-line { font-size: 14px; color: #4f46e5; font-weight: bold; margin-bottom: 14px; }
-  #introScreen p.sub { font-size: 14px; color: #666; margin-bottom: 25px; }
-  .intro-buttons { display: flex; gap: 14px; flex-wrap: wrap; }
+  #introScreen h1 { font-size: 26px; font-weight: 800; margin-bottom: 8px; color: var(--text-primary); }
+  #introScreen .career-line {
+    display: inline-block;
+    font-size: 13px; color: var(--brand-primary); font-weight: 700;
+    background: var(--brand-primary-light); border: 1px solid var(--brand-primary-border);
+    padding: 4px 12px; border-radius: 9999px; margin-bottom: 14px;
+  }
+  #introScreen p.sub { font-size: 14.5px; color: var(--text-secondary); margin-bottom: 26px; line-height: 1.6; }
+  .intro-buttons { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
   .btn-primary {
-    background: linear-gradient(135deg, #4f46e5, #6366f1);
+    background: var(--brand-gradient);
     color: white;
-    padding: 13px 24px;
-    border-radius: 8px;
+    padding: 13px 26px;
+    border-radius: 10px;
     font-size: 14px;
-    font-weight: bold;
+    font-weight: 700;
     border: none;
     cursor: pointer;
+    box-shadow: 0 2px 6px rgba(79, 70, 229, 0.24);
+    transition: all 0.18s ease;
   }
+  .btn-primary:hover { background: linear-gradient(135deg, #4338ca, #4f46e5); transform: translateY(-1px); }
   .btn-text {
     background: none;
     border: none;
-    color: #555;
+    color: var(--text-secondary);
     font-size: 14px;
+    font-weight: 600;
     text-decoration: underline;
     cursor: pointer;
+    padding: 8px 4px;
   }
+  .btn-text:hover { color: var(--brand-primary); }
 
   /* ===== QUIZ SCREEN ===== */
   #quizScreen { display: none; }
   .quiz-card {
-    background: white;
+    background: var(--bg-card);
     border-radius: 16px;
     padding: 32px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    border: 1px solid var(--border-default);
+    box-shadow: var(--shadow-card);
   }
   .quiz-top {
     display: flex;
     justify-content: space-between;
     font-size: 13px;
-    color: #888;
+    font-weight: 600;
+    color: var(--text-muted);
     margin-bottom: 10px;
   }
   .progress-track {
     height: 8px;
-    background-color: #eee;
+    background-color: #f1f5f9;
     border-radius: 10px;
     overflow: hidden;
     margin-bottom: 28px;
   }
   .progress-track-fill {
     height: 100%;
-    background: linear-gradient(135deg, #4f46e5, #6366f1);
+    background: var(--brand-gradient);
     border-radius: 10px;
     transition: width 0.3s ease;
   }
-  .assessment-question { font-size: 17px; font-weight: bold; margin-bottom: 20px; }
+  .assessment-question { font-size: 17.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; line-height: 1.45; }
   .assessment-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
   .assessment-option {
-    background: #f8f9ff;
-    border: 2px solid #eee;
+    background: #f8fafc;
+    border: 2px solid var(--border-default);
     border-radius: 10px;
-    padding: 13px 16px;
+    padding: 14px 16px;
     font-size: 14px;
+    color: var(--text-primary);
     cursor: pointer;
     text-align: left;
+    transition: all 0.15s ease;
   }
-  .assessment-option:hover { border-color: #c7d0f7; }
-  .assessment-option.selected { border-color: #4f46e5; background: #eef1ff; }
-  .assessment-nav { display: flex; justify-content: space-between; }
+  .assessment-option:hover { border-color: var(--brand-primary-border); background: #fafbff; }
+  .assessment-option.selected { border-color: var(--brand-primary); background: var(--brand-primary-light); font-weight: 600; }
+  .assessment-nav { display: flex; justify-content: space-between; gap: 12px; }
   .btn-outline {
     background: white;
-    border: 1px solid #ccc;
-    color: #555;
+    border: 1px solid #cbd5e1;
+    color: var(--text-secondary);
     padding: 11px 22px;
     border-radius: 8px;
-    font-size: 13px;
+    font-size: 13.5px;
+    font-weight: 600;
     cursor: pointer;
+    transition: all 0.15s ease;
   }
-  .btn-outline:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-outline:hover:not(:disabled) { background: #f8fafc; border-color: #94a3b8; }
+  .btn-outline:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
 
   @keyframes spin {
     to { transform: rotate(360deg); }
@@ -116,6 +182,7 @@
     .logout-btn { padding: 6px 12px; }
     .page-wrap { margin: 24px auto; padding: 0 16px; }
     .quiz-card { padding: 20px 16px; }
+    .assess-stepper { font-size: 11px; padding: 10px; }
     .intro-buttons { flex-direction: column; align-items: stretch; }
     .intro-buttons button { width: 100%; text-align: center; }
   }
@@ -170,13 +237,20 @@
   </div>
 
   <!-- ===== INTRO SCREEN ===== -->
-  <div id="introScreen">
-    <h1>Skill assessment</h1>
+  <div id="introScreen" class="quiz-card">
+    <div class="assess-stepper" aria-label="Onboarding steps">
+      <div class="step-pill done"><span class="step-num">✓</span><span>Career</span></div>
+      <div class="step-sep"></div>
+      <div class="step-pill active"><span class="step-num">2</span><span>Assessment</span></div>
+      <div class="step-sep"></div>
+      <div class="step-pill"><span class="step-num">3</span><span>Roadmap</span></div>
+    </div>
+    <h1>Skill Assessment</h1>
     <p class="career-line" id="careerLine">Career: Web Development</p>
-    <p class="sub">Answer a few questions so we can find your level and build your roadmap.</p>
+    <p class="sub">Answer 5 quick questions so we can calibrate your skill level and generate a personalized learning roadmap.</p>
     <div class="intro-buttons">
-      <button class="btn-primary" id="startQuizBtn">Take the assessment</button>
-      <button class="btn-text" id="beginnerBtn">I'm a complete beginner</button>
+      <button type="button" class="btn-primary" id="startQuizBtn">Take the assessment</button>
+      <button type="button" class="btn-text" id="beginnerBtn">I'm a complete beginner</button>
     </div>
   </div>
 

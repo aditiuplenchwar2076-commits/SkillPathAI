@@ -8,12 +8,17 @@
 <style>
   .content-wrap { max-width: 900px; width: 100%; }
   .community-hero {
-    background: linear-gradient(135deg, #4f46e5, #7c5cff);
+    background: var(--brand-gradient);
     color: white;
     padding: 30px;
     border-radius: 16px;
     margin-bottom: 24px;
     box-shadow: 0 4px 20px rgba(79, 70, 229, 0.2);
+  }
+  @media (max-width: 600px) {
+    .community-hero { padding: 22px 18px; }
+    .community-stats { gap: 18px; }
+    .post-card { padding: 18px 16px; }
   }
   .community-stats {
     display: flex;

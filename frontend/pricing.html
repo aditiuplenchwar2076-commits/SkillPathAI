@@ -25,35 +25,42 @@
     background: white;
     border-radius: 18px;
     padding: 32px 24px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border-default);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     position: relative;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .pricing-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
   }
   .pricing-card.featured {
-    border: 2px solid #7c5cff;
-    box-shadow: 0 10px 25px -5px rgba(124, 92, 255, 0.2);
+    border: 2px solid var(--brand-primary);
+    box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.18);
   }
   .featured-tag {
     position: absolute;
     top: -12px;
     right: 24px;
-    background: linear-gradient(to right, #7c5cff, #a78bfa);
+    background: var(--brand-gradient);
     color: white;
     font-size: 11px;
     font-weight: 800;
     padding: 4px 14px;
     border-radius: 20px;
     text-transform: uppercase;
+    letter-spacing: 0.4px;
   }
-  .price { font-size: 36px; font-weight: 800; color: #111827; margin: 16px 0 8px; }
-  .price span { font-size: 14px; font-weight: normal; color: #6b7280; }
+  .price { font-size: 36px; font-weight: 800; color: var(--text-primary); margin: 16px 0 8px; }
+  .price span { font-size: 14px; font-weight: normal; color: var(--text-muted); }
   .feature-list {
     list-style: none;
     margin: 20px 0;
     font-size: 14px;
-    color: #4b5563;
+    color: var(--text-secondary);
     line-height: 2;
   }
   .feature-list li::before {
@@ -66,20 +73,31 @@
     width: 100%;
     padding: 12px;
     border-radius: 8px;
-    font-weight: bold;
+    font-weight: 700;
     font-size: 14px;
     cursor: pointer;
     border: none;
     text-align: center;
+    transition: all 0.18s ease;
   }
   .plan-btn.primary {
-    background: linear-gradient(to right, #7c5cff, #a78bfa);
+    background: var(--brand-gradient);
     color: white;
+  }
+  .plan-btn.primary:hover {
+    background: var(--brand-gradient-hover);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
   }
   .plan-btn.outline {
     background: white;
-    border: 1px solid #d1d5db;
-    color: #374151;
+    border: 1px solid #cbd5e1;
+    color: var(--text-secondary);
+  }
+  .plan-btn.outline:hover { background: #f8fafc; }
+  @media (max-width: 600px) {
+    .pricing-hero { padding: 20px 10px; }
+    .pricing-hero h1 { font-size: 22px; }
+    .pricing-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>

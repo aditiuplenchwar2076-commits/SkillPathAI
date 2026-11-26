@@ -12,24 +12,26 @@
     border-radius: 16px;
     padding: 28px;
     margin-bottom: 24px;
-    border: 1px solid #eee;
+    border: 1px solid var(--border-default);
+    box-shadow: var(--shadow-sm);
   }
   .project-badge-row {
     display: flex;
     gap: 10px;
     align-items: center;
     margin-bottom: 12px;
+    flex-wrap: wrap;
   }
   .difficulty-badge {
     display: inline-block;
     font-size: 11px;
-    font-weight: bold;
+    font-weight: 700;
     padding: 4px 12px;
     border-radius: 20px;
   }
-  .difficulty-badge.beginner { background: #dcfce7; color: #22c55e; }
-  .difficulty-badge.intermediate { background: #dbeafe; color: #3b82f6; }
-  .difficulty-badge.advanced { background: #fee2e2; color: #ef4444; }
+  .difficulty-badge.beginner { background: #dcfce7; color: #059669; }
+  .difficulty-badge.intermediate { background: #dbeafe; color: #2563eb; }
+  .difficulty-badge.advanced { background: #fee2e2; color: #dc2626; }
 
   .project-grid-two {
     display: grid;
@@ -38,17 +40,22 @@
     margin-bottom: 24px;
   }
   @media (max-width: 768px) {
+    .project-header-card { padding: 20px 16px; }
     .project-grid-two { grid-template-columns: 1fr; }
+    .workspace-box { padding: 18px 16px; }
+    .action-btn-row { flex-direction: column; }
   }
 
   .workspace-box {
     background: white;
     border-radius: 14px;
     padding: 24px;
-    border: 1px solid #eee;
+    border: 1px solid var(--border-default);
+    box-shadow: var(--shadow-xs);
   }
   .workspace-box h3 {
     font-size: 16px;
+    color: var(--text-primary);
     margin-bottom: 12px;
     display: flex;
     align-items: center;
@@ -56,7 +63,7 @@
   }
   .workspace-box ul {
     margin-left: 20px;
-    color: #4b5563;
+    color: var(--text-secondary);
     font-size: 14px;
     line-height: 1.8;
   }
@@ -64,23 +71,31 @@
   .editor-area {
     width: 100%;
     min-height: 180px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border-default);
     border-radius: 10px;
     padding: 14px;
     font-family: 'Consolas', monospace;
     font-size: 13px;
-    background: #fafafa;
+    background: #f8fafc;
+    color: var(--text-primary);
     resize: vertical;
     margin-top: 10px;
+  }
+  .editor-area:focus,
+  .repo-input:focus {
+    outline: none;
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.14);
   }
 
   .repo-input {
     width: 100%;
     padding: 12px 14px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border-default);
     border-radius: 8px;
     font-size: 14px;
     margin: 10px 0 16px;
+    color: var(--text-primary);
   }
 
   .action-btn-row {

@@ -65,13 +65,19 @@
     <form class="login-form">
     <div class="form-group">
       <label for="email">Email</label>
-      <input type="email" id="email" name="email">
-      <span class="error-message" id="emailError"></span>
+      <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email">
+      <span class="error-message" id="emailError" aria-live="polite"></span>
     </div>
     <div class="form-group">
       <label for="password">Password</label>
-      <input type="password" id="password" name="password" placeholder="Enter your password">
-      <span class="error-message" id="passwordError"></span>
+      <div class="password-input-wrap">
+        <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password">
+        <button type="button" class="password-toggle-btn" id="togglePasswordBtn" aria-label="Show password" aria-pressed="false">
+          <svg id="eyeIconShow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+          <svg id="eyeIconHide" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
+        </button>
+      </div>
+      <span class="error-message" id="passwordError" aria-live="polite"></span>
     </div>
     <a href="#" class="forgot-password">Forgot Password?</a>
   <button type="submit" class="login-btn">Login</button>
@@ -81,7 +87,12 @@
   </div>
 
   <button type="button" class="google-btn">
-    <img src="https://www.google.com/favicon.ico" alt="Google icon" class="google-icon">
+    <svg class="google-icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+      <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.29v3.14C3.26 21.3 7.31 24 12 24z"/>
+      <path fill="#FBBC05" d="M5.28 14.24c-.24-.72-.38-1.49-.38-2.24s.14-1.52.38-2.24V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.99-3.14z"/>
+      <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.99 3.14c.95-2.85 3.6-4.96 6.72-4.96z"/>
+    </svg>
     Google
   </button>
   
@@ -94,6 +105,24 @@
 
 
  </div>
+<script>
+  (function () {
+    const pwdInput = document.getElementById("password");
+    const toggleBtn = document.getElementById("togglePasswordBtn");
+    const eyeShow = document.getElementById("eyeIconShow");
+    const eyeHide = document.getElementById("eyeIconHide");
+    if (pwdInput && toggleBtn) {
+      toggleBtn.addEventListener("click", function () {
+        const isPassword = pwdInput.type === "password";
+        pwdInput.type = isPassword ? "text" : "password";
+        toggleBtn.setAttribute("aria-label", isPassword ? "Hide password" : "Show password");
+        toggleBtn.setAttribute("aria-pressed", isPassword ? "true" : "false");
+        if (eyeShow) eyeShow.style.display = isPassword ? "none" : "block";
+        if (eyeHide) eyeHide.style.display = isPassword ? "block" : "none";
+      });
+    }
+  })();
+</script>
 <script type="module" src="firebase-auth.js"></script>
 </body>
 </html>

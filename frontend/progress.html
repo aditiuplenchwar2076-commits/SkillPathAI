@@ -24,30 +24,30 @@
   .tab-panel.active { display: block; }
 
   .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
-  .stat-card { background: white; border-radius: 14px; padding: 18px; }
-  .stat-card .label { font-size: 12px; color: #888; margin-bottom: 8px; }
-  .stat-card .value { font-size: 22px; font-weight: bold; }
-  .stat-card .sub { font-size: 11px; color: #999; margin-top: 4px; }
-  .bar { height: 6px; background: #eee; border-radius: 10px; overflow: hidden; margin-top: 10px; }
+  .stat-card { background: white; border-radius: 14px; padding: 18px; border: 1px solid var(--border-default); box-shadow: var(--shadow-xs); }
+  .stat-card .label { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; font-weight: 500; }
+  .stat-card .value { font-size: 22px; font-weight: 800; color: var(--text-primary); }
+  .stat-card .sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+  .bar { height: 6px; background: var(--color-slate-100); border-radius: 10px; overflow: hidden; margin-top: 10px; }
   .bar-fill { height: 100%; background: var(--brand-gradient); border-radius: 10px; }
 
   .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-  .box { background: white; border-radius: 14px; padding: 20px; }
-  .box h3 { font-size: 14px; margin-bottom: 12px; }
-  .box ul { list-style: none; font-size: 13px; color: #555; line-height: 2; }
-  .good li::before { content: "✓ "; color: #22c55e; font-weight: bold; }
+  .box { background: white; border-radius: 14px; padding: 20px; border: 1px solid var(--border-default); box-shadow: var(--shadow-xs); }
+  .box h3 { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; }
+  .box ul { list-style: none; font-size: 13px; color: var(--text-secondary); line-height: 2; }
+  .good li::before { content: "✓ "; color: #10b981; font-weight: bold; }
   .improve li::before { content: "→ "; color: #f59e0b; font-weight: bold; }
 
-  .week-row { display: flex; gap: 10px; margin-top: 8px; }
-  .day { flex: 1; text-align: center; font-size: 11px; color: #888; }
-  .day-dot { width: 28px; height: 28px; margin: 0 auto 6px; border-radius: 50%; background: #eee; }
-  .day-dot.on { background: #f97316; }
+  .week-row { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .day { flex: 1; min-width: 34px; text-align: center; font-size: 11px; color: var(--text-muted); }
+  .day-dot { width: 28px; height: 28px; margin: 0 auto 6px; border-radius: 50%; background: var(--color-slate-100); }
+  .day-dot.on { background: var(--brand-primary); }
 
-  .rec-box { background: linear-gradient(135deg, #f8f6ff, #fdf2f8); border-radius: 14px; padding: 20px; font-size: 13px; color: #555; line-height: 1.6; }
-  .rec-box h3 { font-size: 14px; color: #1a1a2e; margin-bottom: 8px; }
+  .rec-box { background: linear-gradient(135deg, #fafbff, #eef2ff); border: 1px solid var(--brand-primary-border); border-radius: 14px; padding: 20px; font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; }
+  .rec-box h3 { font-size: 14.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
 
   .placement-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 20px; }
-  .placement-card { background: white; border-radius: 14px; padding: 22px; text-align: center; }
+  .placement-card { background: white; border-radius: 14px; padding: 22px; text-align: center; border: 1px solid var(--border-default); box-shadow: var(--shadow-xs); }
   .placement-card .icon { font-size: 28px; display: block; margin-bottom: 10px; }
   .placement-card h3 { font-size: 15px; margin-bottom: 8px; }
   .placement-card p { font-size: 12px; color: #888; line-height: 1.6; margin-bottom: 14px; }

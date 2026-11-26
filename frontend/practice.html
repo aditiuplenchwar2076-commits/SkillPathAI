@@ -31,60 +31,66 @@
   .tab-panel.active { display: block; }
 
   /* ===== QUIZ TAB ===== */
-  .quiz-card { background: white; border-radius: 16px; padding: 30px; }
-  .quiz-top { display: flex; justify-content: space-between; font-size: 13px; color: #888; margin-bottom: 15px; }
-  .quiz-progress { height: 8px; background: #eee; border-radius: 10px; overflow: hidden; margin-bottom: 25px; }
+  .quiz-card { background: white; border-radius: 16px; padding: 30px; border: 1px solid var(--border-default); box-shadow: var(--shadow-sm); }
+  .quiz-top { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-muted); margin-bottom: 15px; font-weight: 500; }
+  .quiz-progress { height: 8px; background: var(--color-slate-100); border-radius: 10px; overflow: hidden; margin-bottom: 25px; }
   .quiz-progress-fill { height: 100%; background: var(--brand-gradient); border-radius: 10px; transition: width 0.3s; }
-  .quiz-question { font-size: 16px; font-weight: bold; margin-bottom: 20px; }
+  .quiz-question { font-size: 16.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; line-height: 1.45; }
   .quiz-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
-  .quiz-option { background: #f8f6ff; border: 2px solid #eee; border-radius: 10px; padding: 12px 16px; font-size: 14px; cursor: pointer; }
-  .quiz-option.selected { border-color: var(--brand-primary); background: #eef2ff; }
-  .quiz-option.correct { border-color: #22c55e; background: #dcfce7; }
-  .quiz-option.incorrect { border-color: #ef4444; background: #fee2e2; }
+  .quiz-option { background: #f8fafc; border: 2px solid var(--border-default); border-radius: 10px; padding: 13px 16px; font-size: 14px; color: var(--text-primary); cursor: pointer; text-align: left; transition: all 0.15s ease; }
+  .quiz-option:hover { border-color: var(--brand-primary-border); background: #f8faff; }
+  .quiz-option.selected { border-color: var(--brand-primary); background: var(--brand-primary-light); font-weight: 600; }
+  .quiz-option.correct { border-color: #10b981; background: #ecfdf5; color: #065f46; }
+  .quiz-option.incorrect { border-color: #ef4444; background: #fef2f2; color: #991b1b; }
   .quiz-feedback { font-size: 13px; font-weight: bold; margin-bottom: 15px; display: none; }
   .quiz-feedback.show { display: block; }
-  .quiz-feedback.good { color: #22c55e; }
+  .quiz-feedback.good { color: #059669; }
   .quiz-feedback.retry { color: #d97706; }
   .quiz-next-btn {
     background: var(--brand-gradient);
     color: white; border: none; padding: 12px 24px; border-radius: 8px;
-    font-size: 13px; font-weight: bold; cursor: pointer;
+    font-size: 13.5px; font-weight: 700; cursor: pointer; transition: all 0.18s ease;
   }
+  .quiz-next-btn:hover:not(:disabled) { background: var(--brand-gradient-hover); box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25); }
   .quiz-next-btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
   }
 
   /* ===== PRACTICE TAB ===== */
-  .practice-card { background: white; border-radius: 16px; padding: 30px; }
-  .practice-card h3 { font-size: 16px; margin-bottom: 10px; }
-  .practice-task { background: #f8f6ff; border-radius: 10px; padding: 18px; font-size: 14px; color: #444; margin-bottom: 18px; line-height: 1.6; }
+  .practice-card { background: white; border-radius: 16px; padding: 30px; border: 1px solid var(--border-default); box-shadow: var(--shadow-sm); }
+  .practice-card h3 { font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; }
+  .practice-task { background: #fafbff; border: 1px solid var(--brand-primary-border); border-radius: 10px; padding: 18px; font-size: 14px; color: var(--text-secondary); margin-bottom: 18px; line-height: 1.6; }
   .practice-card textarea {
     width: 100%; min-height: 160px;
-    border: 1px solid #eee; border-radius: 10px;
+    border: 1px solid var(--border-default); border-radius: 10px;
     padding: 14px; font-family: 'Consolas', monospace; font-size: 13px;
-    resize: vertical; margin-bottom: 15px;
+    resize: vertical; margin-bottom: 15px; color: var(--text-primary);
   }
+  .practice-card textarea:focus { outline: none; border-color: var(--brand-primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.14); }
   .practice-submit-btn {
     background: var(--brand-gradient);
     color: white; border: none; padding: 12px 24px; border-radius: 8px;
-    font-size: 13px; font-weight: bold; cursor: pointer;
+    font-size: 13.5px; font-weight: 700; cursor: pointer; transition: all 0.18s ease;
   }
+  .practice-submit-btn:hover:not(:disabled) { background: var(--brand-gradient-hover); box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25); }
 
   /* ===== PROJECTS TAB ===== */
   .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
-  .project-card { background: white; border-radius: 14px; padding: 20px; border: 1px solid #eee; }
+  .project-card { background: white; border-radius: 14px; padding: 20px; border: 1px solid var(--border-default); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+  .project-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
   .difficulty-badge { display: inline-block; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 20px; margin-bottom: 10px; }
-  .difficulty-badge.beginner { background: #dcfce7; color: #22c55e; }
-  .difficulty-badge.intermediate { background: #dbeafe; color: #3b82f6; }
-  .difficulty-badge.advanced { background: #fee2e2; color: #ef4444; }
-  .project-card h3 { font-size: 15px; margin-bottom: 6px; }
-  .project-card .skills-line { font-size: 11px; color: #999; margin-bottom: 10px; }
-  .project-card p { font-size: 13px; color: #666; margin-bottom: 15px; }
+  .difficulty-badge.beginner { background: #dcfce7; color: #059669; }
+  .difficulty-badge.intermediate { background: #dbeafe; color: #2563eb; }
+  .difficulty-badge.advanced { background: #fee2e2; color: #dc2626; }
+  .project-card h3 { font-size: 15px; margin-bottom: 6px; color: var(--text-primary); }
+  .project-card .skills-line { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; }
+  .project-card p { font-size: 13px; color: var(--text-secondary); margin-bottom: 15px; line-height: 1.5; }
   .project-start-btn {
-    width: 100%; background: white; border: 1px solid var(--brand-primary); color: var(--brand-primary);
-    padding: 10px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer;
+    width: 100%; background: white; border: 1.5px solid var(--brand-primary); color: var(--brand-primary);
+    padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s ease;
   }
+  .project-start-btn:hover { background: var(--brand-primary-light); }
 
   .topic-notice-badge {
     display: inline-block;
@@ -100,6 +106,11 @@
   .topic-notice-badge.standalone {
     background: #fef3c7;
     color: #92400e;
+  }
+  @media (max-width: 768px) {
+    .quiz-card, .practice-card { padding: 20px 16px; }
+    .tab-switcher { flex-wrap: wrap; }
+    .tab-switcher-btn { flex: 1; padding: 9px 14px; }
   }
 </style>
 </head>
@@ -672,9 +683,9 @@
 
         ${savedBadge}
 
-        <div style="display: flex; gap: 12px; justify-content: center; margin-top: 30px;">
-          <a href="roadmap.html" style="padding: 11px 20px; background: linear-gradient(to right, #7c5cff, #a78bfa); color: white; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px;">View Roadmap →</a>
-          <a href="dashboard.html" style="padding: 11px 20px; background: white; border: 1px solid #7c5cff; color: #7c5cff; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px;">Back to Dashboard</a>
+        <div style="display: flex; gap: 12px; justify-content: center; margin-top: 30px; flex-wrap: wrap;">
+          <a href="roadmap.html" style="padding: 11px 20px; background: var(--brand-gradient); color: white; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px;">View Roadmap →</a>
+          <a href="dashboard.html" style="padding: 11px 20px; background: white; border: 1.5px solid var(--brand-primary); color: var(--brand-primary); border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px;">Back to Dashboard</a>
         </div>
       </div>
     `;

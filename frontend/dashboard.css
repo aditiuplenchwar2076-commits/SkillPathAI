@@ -5,8 +5,17 @@
   --brand-primary-hover: #4338ca;
   --brand-primary-light: #eef2ff;
   --brand-primary-border: #c7d2fe;
+  --brand-secondary: #6366f1;
   --brand-gradient: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
   --brand-gradient-hover: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%);
+
+  --bg-page: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-subtle: #f1f5f9;
+  --border-default: #e2e8f0;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
 
   --color-slate-900: #0f172a;
   --color-slate-800: #1e293b;
@@ -21,8 +30,15 @@
   --color-white: #ffffff;
 
   --color-success: #10b981;
+  --color-success-light: #ecfdf5;
   --color-warning: #f59e0b;
   --color-danger: #ef4444;
+
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
 
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -34,6 +50,9 @@
   --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 1px 2px -1px rgba(15, 23, 42, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
   --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ===== RESET ===== */
@@ -3506,6 +3525,22 @@ a.topbar-logo:focus {
     box-shadow: 6px 0 24px rgba(0, 0, 0, 0.22) !important;
   }
 
+  .sidebar.drawer-open .sidebar-toggle,
+  .sidebar.drawer-open .menu-toggle,
+  .sidebar-toggle.drawer-close-active {
+    background: var(--bg-subtle);
+    color: var(--text-primary);
+    border-color: var(--color-slate-300);
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .sidebar.drawer-open .sidebar-toggle:hover,
+  .sidebar.drawer-open .menu-toggle:hover {
+    background: #e2e8f0;
+    color: var(--text-primary);
+  }
+
   .nav-menu {
     display: block !important;
     width: 100% !important;
@@ -3937,81 +3972,81 @@ a.topbar-logo:focus {
   line-height: 1.6 !important;
 }
 
-/* ===== 6. ROADMAP COHESIVE PALETTE (DARK BLUE, BLUE, LIGHT BLUE) ===== */
+/* ===== 6. ROADMAP COHESIVE PALETTE (EMERALD COMPLETED, INDIGO ACTIVE, SLATE UPCOMING) ===== */
 .timeline-item.completed .timeline-marker {
-  background-color: #1e40af !important;
-  color: #ffffff !important;
+  background-color: var(--color-success);
+  color: #ffffff;
 }
 
 .timeline-item.current .timeline-marker {
-  background: linear-gradient(135deg, #1d4ed8, #2563eb) !important;
-  color: #ffffff !important;
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2) !important;
+  background: var(--brand-gradient);
+  color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.18);
 }
 
 .timeline-item.upcoming .timeline-marker {
-  background-color: #e2e8f0 !important;
-  color: #64748b !important;
+  background-color: var(--color-slate-200);
+  color: var(--color-slate-500);
 }
 
 .timeline-item.completed .timeline-status {
-  background: #dbeafe !important;
-  color: #1e40af !important;
-  border: 1px solid #bfdbfe !important;
+  background: var(--color-success-light);
+  color: #047857;
+  border: 1px solid #a7f3d0;
 }
 
 .timeline-item.current .timeline-status {
-  background: #eff6ff !important;
-  color: #1d4ed8 !important;
-  border: 1px solid #93c5fd !important;
+  background: var(--brand-primary-light);
+  color: var(--brand-primary);
+  border: 1px solid var(--brand-primary-border);
 }
 
 .timeline-item.upcoming .timeline-status {
-  background: #f8fafc !important;
-  color: #64748b !important;
-  border: 1px solid #e2e8f0 !important;
+  background: var(--color-slate-50);
+  color: var(--color-slate-500);
+  border: 1px solid var(--color-slate-200);
 }
 
 .lesson-panel {
-  background: #f8faff !important;
-  border: 1px solid #dbeafe !important;
-  border-radius: 12px !important;
+  background: #fafbff;
+  border: 1px solid var(--brand-primary-border);
+  border-radius: 12px;
 }
 
 .lesson-panel code {
-  background: #0f172a !important;
-  color: #93c5fd !important;
-  border: 1px solid #1e293b !important;
+  background: #0f172a;
+  color: #c7d2fe;
+  border: 1px solid #1e293b;
 }
 
 .lesson-actions .complete-btn {
-  background: linear-gradient(135deg, #1e40af, #2563eb) !important;
-  color: #ffffff !important;
+  background: var(--brand-gradient);
+  color: #ffffff;
 }
 
 .lesson-actions .complete-btn:hover {
-  background: linear-gradient(135deg, #1e3a8a, #1d4ed8) !important;
+  background: var(--brand-gradient-hover);
 }
 
 .lesson-actions .quiz-btn,
 .lesson-actions .practice-btn {
-  background: #ffffff !important;
-  border: 1.5px solid #2563eb !important;
-  color: #1e40af !important;
+  background: #ffffff;
+  border: 1.5px solid var(--brand-primary);
+  color: var(--brand-primary);
 }
 
 .lesson-actions .quiz-btn:hover,
 .lesson-actions .practice-btn:hover {
-  background: #eff6ff !important;
+  background: var(--brand-primary-light);
 }
 
 .tab.active {
-  color: #2563eb !important;
-  border-bottom: 2px solid #2563eb !important;
+  color: var(--brand-primary);
+  border-bottom: 2px solid var(--brand-primary);
 }
 
 .dot.completed {
-  background-color: #1e40af !important;
+  background-color: var(--color-success);
 }
 
 .dot.in-progress {
@@ -4129,4 +4164,26 @@ a.topbar-logo:focus {
   border-radius: 12px;
   padding: 18px;
   margin-top: 14px;
+}
+
+/* ===== ACCESSIBILITY: KEYBOARD FOCUS & REDUCED MOTION ===== */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

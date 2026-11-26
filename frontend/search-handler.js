@@ -58,32 +58,55 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (e) {}
     }
 
-    // Update ARIA on toggle buttons
-    const updateAriaState = () => {
+    // Synchronize ARIA states and drawer toggle/close button presentation
+    const syncDrawerUi = () => {
       const isDesktop = window.innerWidth > 768;
+      const isDrawerOpen = !isDesktop && sidebar.classList.contains("drawer-open");
       const isExpanded = isDesktop
         ? !sidebar.classList.contains("collapsed")
-        : sidebar.classList.contains("drawer-open");
-      const toggles = document.querySelectorAll("#menuToggle, .sidebar-toggle, .mobile-menu-btn");
-      toggles.forEach((btn) => {
+        : isDrawerOpen;
+
+      document.querySelectorAll("#menuToggle, .sidebar-toggle, .mobile-menu-btn").forEach((btn) => {
         btn.setAttribute("aria-expanded", String(isExpanded));
       });
-    };
-    updateAriaState();
 
-    // Open/Close Mobile Drawer helpers
+      document.querySelectorAll("#menuToggle, .sidebar-toggle").forEach((btn) => {
+        const icon = btn.querySelector(".toggle-icon");
+        if (icon) {
+          icon.textContent = isDrawerOpen ? "✕" : "☰";
+        } else {
+          btn.textContent = isDrawerOpen ? "✕" : "☰";
+        }
+        btn.setAttribute("aria-label", isDrawerOpen ? "Close navigation menu" : "Toggle navigation menu");
+        btn.classList.toggle("drawer-close-active", isDrawerOpen);
+      });
+
+      document.querySelectorAll(".mobile-menu-btn").forEach((btn) => {
+        btn.setAttribute("aria-label", isDrawerOpen ? "Close navigation menu" : "Open navigation menu");
+        if (isDrawerOpen) {
+          btn.setAttribute("aria-hidden", "true");
+          btn.setAttribute("tabindex", "-1");
+        } else {
+          btn.removeAttribute("aria-hidden");
+          btn.removeAttribute("tabindex");
+        }
+      });
+    };
+
+    // Open/Close Mobile Drawer helpers (single source of truth for drawer classes)
     const openMobileDrawer = () => {
+      sidebar.classList.remove("collapsed", "active", "mobile-open");
       sidebar.classList.add("drawer-open");
       backdrop.classList.add("active");
       document.body.style.overflow = "hidden";
-      updateAriaState();
+      syncDrawerUi();
     };
 
     const closeMobileDrawer = () => {
-      sidebar.classList.remove("drawer-open");
+      sidebar.classList.remove("drawer-open", "active", "mobile-open");
       backdrop.classList.remove("active");
       document.body.style.overflow = "";
-      updateAriaState();
+      syncDrawerUi();
     };
 
     // Toggle Desktop Sidebar Collapse
@@ -97,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         localStorage.setItem("skillpath_sidebar_collapsed", String(willBeCollapsed));
       } catch (e) {}
-      updateAriaState();
+      syncDrawerUi();
     };
 
     // Unified toggle click handler
@@ -132,6 +155,8 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.addEventListener("click", handleToggleClick);
     });
 
+    syncDrawerUi();
+
     // Close mobile drawer when clicking backdrop
     backdrop.addEventListener("click", closeMobileDrawer);
 
@@ -153,8 +178,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Reset drawer state on window resize
     window.addEventListener("resize", () => {
-      if (window.innerWidth > 768 && sidebar.classList.contains("drawer-open")) {
+      if (window.innerWidth > 768 && (sidebar.classList.contains("drawer-open") || sidebar.classList.contains("mobile-open") || sidebar.classList.contains("active"))) {
         closeMobileDrawer();
+      } else {
+        syncDrawerUi();
       }
     });
   }

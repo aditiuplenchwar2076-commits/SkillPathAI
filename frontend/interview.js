@@ -37,15 +37,6 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// Mobile menu toggle
-const menuToggle = document.getElementById("menuToggle");
-const sidebar = document.querySelector(".sidebar");
-if (menuToggle && sidebar) {
-  menuToggle.addEventListener("click", () => {
-    sidebar.classList.toggle("active");
-  });
-}
-
 // Career and skill level personalization
 const level = localStorage.getItem("skillLevel") || localStorage.getItem("skillpath_level") || "Intermediate";
 const career = localStorage.getItem("careerPath") || localStorage.getItem("skillpath_career") || "Web Development";

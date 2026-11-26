@@ -19,14 +19,57 @@
     border: 1px solid #e2e8f0;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
   }
+  /* Coordinated SkillPathAI Palette: Emerald (Completed), Indigo (Current), Slate (Upcoming) */
+  .roadmap-summary-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #eef2ff 0%, #f8faff 100%);
+    border: 1px solid var(--brand-primary-border);
+    border-radius: 14px;
+    flex-wrap: wrap;
+  }
+  .roadmap-summary-info h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-slate-900);
+    margin-bottom: 4px;
+  }
+  .roadmap-summary-info p {
+    font-size: 12.5px;
+    color: var(--color-slate-600);
+  }
+  .roadmap-summary-progress {
+    flex: 1;
+    min-width: 180px;
+    max-width: 280px;
+  }
+  .roadmap-progress-track {
+    height: 8px;
+    background: var(--color-slate-200);
+    border-radius: 9999px;
+    overflow: hidden;
+  }
+  .roadmap-progress-fill {
+    height: 100%;
+    background: var(--brand-gradient);
+    border-radius: 9999px;
+    transition: width 0.35s ease;
+  }
   .timeline-item {
     display: flex;
+    align-items: center;
     gap: 16px;
-    padding: 16px 0;
+    padding: 16px 10px;
     border-bottom: 1px solid #f1f5f9;
     cursor: pointer;
+    border-radius: 10px;
     transition: background-color 0.15s ease;
   }
+  .timeline-item:hover { background-color: #f8fafc; }
   .timeline-item:last-child { border-bottom: none; }
   .timeline-marker {
     width: 32px; height: 32px; min-width: 32px;
@@ -36,18 +79,17 @@
     transition: all 0.2s ease;
   }
 
-  /* Coordinated Palette: Dark Blue, Blue, Light Blue */
   .timeline-item.completed .timeline-marker {
-    background-color: #1e40af; /* Dark Blue */
+    background-color: var(--color-success);
     color: #ffffff;
   }
   .timeline-item.current .timeline-marker {
-    background: linear-gradient(135deg, #1d4ed8, #2563eb); /* Vibrant Blue */
+    background: var(--brand-gradient);
     color: #ffffff;
-    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.18);
   }
   .timeline-item.upcoming .timeline-marker {
-    background-color: #e2e8f0; /* Muted slate blue */
+    background-color: #e2e8f0;
     color: #64748b;
   }
 
@@ -75,14 +117,14 @@
     letter-spacing: 0.3px;
   }
   .timeline-item.completed .timeline-status {
-    background: #dbeafe; /* Light Blue */
-    color: #1e40af; /* Dark Blue */
-    border: 1px solid #bfdbfe;
+    background: var(--color-success-light);
+    color: #047857;
+    border: 1px solid #a7f3d0;
   }
   .timeline-item.current .timeline-status {
-    background: #eff6ff; /* Very Light Blue */
-    color: #1d4ed8; /* Blue */
-    border: 1px solid #93c5fd;
+    background: var(--brand-primary-light);
+    color: var(--brand-primary);
+    border: 1px solid var(--brand-primary-border);
   }
   .timeline-item.upcoming .timeline-status {
     background: #f8fafc;
@@ -92,8 +134,8 @@
 
   .lesson-panel {
     display: none;
-    background: #f8faff; /* Subtle light blue tint */
-    border: 1px solid #dbeafe;
+    background: #fafbff;
+    border: 1px solid var(--brand-primary-border);
     border-radius: 12px;
     padding: 22px;
     margin: 4px 0 16px 48px;
@@ -110,12 +152,13 @@
   .lesson-panel code {
     display: block;
     background: #0f172a;
-    color: #93c5fd;
+    color: #c7d2fe;
     padding: 14px;
     border-radius: 8px;
     font-size: 12.5px;
     margin: 10px 0;
     white-space: pre-wrap;
+    word-break: break-word;
     font-family: 'Consolas', monospace;
     border: 1px solid #1e293b;
   }
@@ -136,27 +179,33 @@
   }
   .lesson-actions .quiz-btn {
     background: white;
-    border: 1.5px solid #2563eb;
-    color: #1e40af;
+    border: 1.5px solid var(--brand-primary);
+    color: var(--brand-primary);
   }
   .lesson-actions .quiz-btn:hover {
-    background: #eff6ff;
+    background: var(--brand-primary-light);
   }
   .lesson-actions .practice-btn {
     background: white;
-    border: 1.5px solid #3b82f6;
-    color: #1d4ed8;
+    border: 1.5px solid var(--brand-secondary);
+    color: var(--brand-primary);
   }
   .lesson-actions .practice-btn:hover {
-    background: #eff6ff;
+    background: var(--brand-primary-light);
   }
   .lesson-actions .complete-btn {
-    background: linear-gradient(135deg, #1e40af, #2563eb);
+    background: var(--brand-gradient);
     color: white;
   }
   .lesson-actions .complete-btn:hover {
-    background: linear-gradient(135deg, #1e3a8a, #1d4ed8);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    background: var(--brand-gradient-hover);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+  }
+  @media (max-width: 768px) {
+    .timeline-wrap { padding: 16px; }
+    .timeline-item { flex-wrap: wrap; gap: 12px; padding: 14px 6px; }
+    .lesson-panel { margin: 4px 0 16px 0; padding: 16px; }
+    .lesson-actions button, .lesson-actions a { min-width: 100%; }
   }
 </style>
 </head>
@@ -537,7 +586,7 @@
           <p style="color:#742a2a; font-size:13px; margin-bottom:18px; max-width:480px; margin-left:auto; margin-right:auto;">
             ${errorMsg}
           </p>
-          <button id="retryGenBtn" style="padding:10px 22px; background:linear-gradient(to right, #7c5cff, #a78bfa); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">
+          <button type="button" id="retryGenBtn" style="padding:10px 22px; background:var(--brand-gradient); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">
             Retry Generation
           </button>
         </div>
@@ -565,7 +614,7 @@
         <div style="text-align:center; padding:40px 20px;">
           <h3 style="margin-bottom:8px;">No Roadmap Generated Yet</h3>
           <p style="color:#666; margin-bottom:20px;">Take our skill assessment to unlock your custom personalized roadmap.</p>
-          <a href="asses.html" style="padding:10px 22px; background:linear-gradient(to right, #7c5cff, #a78bfa); color:white; border-radius:8px; text-decoration:none; font-weight:bold;">Take Assessment →</a>
+          <a href="asses.html" style="padding:10px 22px; background:var(--brand-gradient); color:white; border-radius:8px; text-decoration:none; font-weight:bold;">Take Assessment →</a>
         </div>
       `;
     }
@@ -596,20 +645,46 @@
       });
     }
 
-    let html = "";
+    let completedTotal = 0;
+    let firstIncompleteIdx = -1;
+    topics.forEach((t, idx) => {
+      const p = progressMap[t.topic_id];
+      const done = (t.status && t.status.toLowerCase() === "completed") ||
+                   (p && (p.completion_percentage === 100 || p.status === "Completed"));
+      if (done) completedTotal++;
+      else if (firstIncompleteIdx === -1) firstIncompleteIdx = idx;
+    });
+
+    const pct = topics.length > 0 ? Math.round((completedTotal / topics.length) * 100) : 0;
+    const nextTopic = firstIncompleteIdx >= 0 ? topics[firstIncompleteIdx] : null;
+
+    let html = `
+      <div class="roadmap-summary-bar">
+        <div class="roadmap-summary-info">
+          <h3>${pct}% Roadmap Complete (${completedTotal}/${topics.length} Topics)</h3>
+          <p>${nextTopic ? `Recommended next: <strong>${nextTopic.sequence_no}. ${nextTopic.topic_name}</strong>` : "All curriculum milestones completed!"}</p>
+        </div>
+        <div class="roadmap-summary-progress" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100" aria-label="Roadmap completion ${pct}%">
+          <div class="roadmap-progress-track">
+            <div class="roadmap-progress-fill" style="width: ${pct}%;"></div>
+          </div>
+        </div>
+      </div>
+    `;
+
     topics.forEach((t, idx) => {
       const p = progressMap[t.topic_id];
       const isCompleted = (t.status && t.status.toLowerCase() === "completed") ||
                           (p && (p.completion_percentage === 100 || p.status === "Completed"));
-      const isCurrent = !isCompleted && (idx === 0 || (t.status && t.status.toLowerCase() === "in progress"));
+      const isCurrent = !isCompleted && (idx === firstIncompleteIdx || (t.status && t.status.toLowerCase() === "in progress"));
 
       const itemClass = isCompleted ? "completed" : (isCurrent ? "current" : "upcoming");
       const markerSymbol = isCompleted ? "✓" : (isCurrent ? "●" : "○");
       const statusLabel = isCompleted ? "Completed" : (isCurrent ? "In Progress" : "Upcoming");
 
       html += `
-        <div class="timeline-item ${itemClass}" data-topic-id="${t.topic_id}" data-seq="${idx}">
-          <span class="timeline-marker">${markerSymbol}</span>
+        <div class="timeline-item ${itemClass}" data-topic-id="${t.topic_id}" data-seq="${idx}" role="button" tabindex="0" aria-expanded="false" aria-controls="lesson-${t.topic_id}">
+          <span class="timeline-marker" aria-hidden="true">${markerSymbol}</span>
           <div class="timeline-text">
             <h3>${t.sequence_no}. ${t.topic_name}</h3>
             <p>Phase ${idx + 1} • ${roadmap.career_path || "SkillPath"}</p>
@@ -622,15 +697,16 @@
 
     wrap.innerHTML = html;
 
-    // Attach click listeners to expand accordion
+    // Attach click & keyboard listeners to expand accordion
     wrap.querySelectorAll(".timeline-item").forEach((item) => {
-      item.addEventListener("click", () => {
+      const toggleItem = () => {
         const topicId = item.getAttribute("data-topic-id");
         const panel = document.getElementById("lesson-" + topicId);
         const isOpen = panel.classList.contains("open");
 
         // Close all
         wrap.querySelectorAll(".lesson-panel").forEach((p) => p.classList.remove("open"));
+        wrap.querySelectorAll(".timeline-item").forEach((el) => el.setAttribute("aria-expanded", "false"));
 
         if (!isOpen) {
           const topicObj = topics.find((x) => String(x.topic_id) === String(topicId));
@@ -644,12 +720,13 @@
             <h4>Key Concepts</h4>
             <ul>${lesson.concepts.map((c) => `<li>${c}</li>`).join("")}</ul>
             <div class="lesson-actions">
-              <a href="practice.html?topic_id=${topicId}&topic_name=${encodeURIComponent(topicName)}" class="quiz-btn">Take Quiz</a>
-              <a href="practice.html?topic_id=${topicId}&topic_name=${encodeURIComponent(topicName)}" class="practice-btn">Practice</a>
-              <button class="complete-btn" id="btn-complete-${topicId}">Mark Complete</button>
+              <a href="practice.html?tab=quiz&topic_id=${topicId}&topic_name=${encodeURIComponent(topicName)}" class="quiz-btn">Take Quiz</a>
+              <a href="practice.html?tab=practice&topic_id=${topicId}&topic_name=${encodeURIComponent(topicName)}" class="practice-btn">Practice</a>
+              <button type="button" class="complete-btn" id="btn-complete-${topicId}">Mark Complete</button>
             </div>
           `;
           panel.classList.add("open");
+          item.setAttribute("aria-expanded", "true");
 
           const markBtn = panel.querySelector(`#btn-complete-${topicId}`);
           if (markBtn) {
@@ -696,6 +773,14 @@
               }
             });
           }
+        }
+      };
+
+      item.addEventListener("click", toggleItem);
+      item.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          toggleItem();
         }
       });
     });
