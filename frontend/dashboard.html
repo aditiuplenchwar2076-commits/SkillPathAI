@@ -328,9 +328,33 @@
 
   <div class="right-panel">
 
-    <div class="progress-card">
-      <h3>Overall Progress</h3>
-      <div class="progress-ring-container" id="overallProgressCircle" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Overall curriculum progress: 0%">
+    <div class="progress-card" id="overallProgressCard">
+      <div class="progress-card-header">
+        <div class="progress-header-title">
+          <h3>Overall Progress</h3>
+          <span class="progress-badge" id="overallProgressBadge" aria-live="polite">0% Complete</span>
+        </div>
+        <div class="progress-filter-tabs" role="tablist" aria-label="Progress graph time range">
+          <button class="progress-filter-btn active" data-filter="weekly" role="tab" aria-selected="true">Week</button>
+          <button class="progress-filter-btn" data-filter="monthly" role="tab" aria-selected="false">Month</button>
+          <button class="progress-filter-btn" data-filter="all" role="tab" aria-selected="false">All</button>
+        </div>
+      </div>
+
+      <!-- Overall Progress Area/Line Graph -->
+      <div class="progress-graph-container" id="overallProgressGraphContainer" aria-label="Overall learning progress graph">
+        <!-- Rendered dynamically by renderOverallProgressGraph() -->
+      </div>
+
+      <!-- Floating Chart Tooltip -->
+      <div class="progress-chart-tooltip" id="progressChartTooltip" style="display: none;" role="tooltip" aria-hidden="true">
+        <div class="tooltip-date" id="tooltipDate">--</div>
+        <div class="tooltip-val" id="tooltipVal">0% Complete</div>
+        <div class="tooltip-sub" id="tooltipSub">0 topics</div>
+      </div>
+
+      <!-- Preserved Ring Container (for backwards compatibility) -->
+      <div class="progress-ring-container" id="overallProgressCircle" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Overall curriculum progress: 0%" style="display: none;">
         <svg class="progress-ring-svg" width="128" height="128" viewBox="0 0 128 128" aria-hidden="true">
           <defs>
             <linearGradient id="progressRingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
