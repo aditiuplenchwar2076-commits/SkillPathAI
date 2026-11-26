@@ -6,38 +6,37 @@
 <title>SkillPath AI | Project Workspace</title>
 <link rel="stylesheet" href="dashboard.css">
 <style>
-  .content-wrap { max-width: 900px; }
+  .content-wrap { max-width: 860px; }
   .project-header-card {
-    background: white;
-    border-radius: 16px;
-    padding: 28px;
-    margin-bottom: 24px;
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-bottom: 18px;
     border: 1px solid var(--border-default);
-    box-shadow: var(--shadow-sm);
   }
   .project-badge-row {
     display: flex;
     gap: 10px;
     align-items: center;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     flex-wrap: wrap;
   }
   .difficulty-badge {
     display: inline-block;
     font-size: 11px;
-    font-weight: 700;
-    padding: 4px 12px;
-    border-radius: 20px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
   }
-  .difficulty-badge.beginner { background: #dcfce7; color: #059669; }
-  .difficulty-badge.intermediate { background: #dbeafe; color: #2563eb; }
-  .difficulty-badge.advanced { background: #fee2e2; color: #dc2626; }
+  .difficulty-badge.beginner { background: var(--color-success-light); color: #047857; border: 1px solid #a7f3d0; }
+  .difficulty-badge.intermediate { background: var(--brand-primary-light); color: var(--brand-primary); border: 1px solid var(--brand-primary-border); }
+  .difficulty-badge.advanced { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
 
   .project-grid-two {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-bottom: 24px;
+    gap: 16px;
+    margin-bottom: 18px;
   }
   @media (max-width: 768px) {
     .project-header-card { padding: 20px 16px; }
@@ -47,96 +46,95 @@
   }
 
   .workspace-box {
-    background: white;
-    border-radius: 14px;
-    padding: 24px;
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 22px;
     border: 1px solid var(--border-default);
-    box-shadow: var(--shadow-xs);
   }
   .workspace-box h3 {
-    font-size: 16px;
+    font-family: var(--font-family-display);
+    font-size: 15px;
+    font-weight: 700;
     color: var(--text-primary);
     margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
   }
   .workspace-box ul {
-    margin-left: 20px;
+    margin-left: 18px;
     color: var(--text-secondary);
-    font-size: 14px;
+    font-size: 13.5px;
     line-height: 1.8;
   }
 
   .editor-area {
     width: 100%;
-    min-height: 180px;
-    border: 1px solid var(--border-default);
-    border-radius: 10px;
-    padding: 14px;
-    font-family: 'Consolas', monospace;
+    min-height: 160px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    font-family: var(--font-family-mono);
     font-size: 13px;
-    background: #f8fafc;
+    background: var(--bg-page);
     color: var(--text-primary);
     resize: vertical;
-    margin-top: 10px;
+    margin-top: 8px;
   }
   .editor-area:focus,
   .repo-input:focus {
     outline: none;
     border-color: var(--brand-primary);
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.14);
+    box-shadow: 0 0 0 3px rgba(67, 56, 202, 0.12);
   }
 
   .repo-input {
     width: 100%;
-    padding: 12px 14px;
-    border: 1px solid var(--border-default);
-    border-radius: 8px;
-    font-size: 14px;
-    margin: 10px 0 16px;
+    padding: 10px 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    font-size: 13.5px;
+    margin: 8px 0 14px;
     color: var(--text-primary);
   }
 
   .action-btn-row {
     display: flex;
-    gap: 12px;
-    margin-top: 16px;
+    gap: 10px;
+    margin-top: 14px;
   }
   .btn-submit {
-    background: var(--brand-gradient);
+    background: var(--brand-primary);
     color: white;
     border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: bold;
+    padding: 9px 18px;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 13.5px;
   }
+  .btn-submit:hover { background: var(--brand-primary-hover); }
   .btn-secondary {
-    background: white;
-    border: 1px solid var(--brand-primary);
-    color: var(--brand-primary);
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: bold;
+    background: var(--bg-card);
+    border: 1px solid var(--border-strong);
+    color: var(--text-primary);
+    padding: 9px 18px;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 13.5px;
   }
 
   .status-banner {
     display: none;
-    padding: 14px 18px;
-    border-radius: 8px;
-    margin-top: 16px;
-    font-size: 14px;
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    margin-top: 14px;
+    font-size: 13.5px;
     font-weight: 500;
   }
   .status-banner.success {
     display: block;
-    background: #dcfce7;
-    color: #166534;
-    border: 1px solid #86efac;
+    background: var(--color-success-light);
+    color: #065f46;
+    border: 1px solid #a7f3d0;
   }
 </style>
 </head>
@@ -235,7 +233,7 @@
 
       <div class="project-grid-two">
         <div class="workspace-box">
-          <h3>📋 Requirements & Rubric</h3>
+          <h3>Requirements &amp; Rubric</h3>
           <ul id="projectRequirements">
             <li>Responsive navigation bar with mobile hamburger menu</li>
             <li>Hero section highlighting your career track and skills</li>
@@ -245,20 +243,20 @@
         </div>
 
         <div class="workspace-box">
-          <h3>💡 Architecture & Guidance</h3>
-          <p style="font-size: 14px; color: #4b5563; line-height: 1.6; margin-bottom: 12px;">
-            Follow semantic HTML5 guidelines and modern CSS Flexbox/Grid for layout. Ensure accessibility and test on mobile viewports.
+          <h3>Architecture &amp; Guidance</h3>
+          <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.6; margin-bottom: 12px;">
+            Follow semantic HTML5 structure and responsive CSS Flexbox/Grid layouts. Verify accessibility and mobile viewports.
           </p>
-          <a href="practice.html?tab=practice" style="color: #7c5cff; font-weight: bold; font-size: 13px;">Review Relevant Practice Exercises →</a>
+          <a href="practice.html?tab=practice" style="color: var(--brand-primary); font-weight: 600; font-size: 13px;">Review Practice Exercises →</a>
         </div>
       </div>
 
       <div class="workspace-box">
-        <h3>🚀 Submit Project for Review</h3>
-        <label style="font-size: 13px; font-weight: bold; color: #374151;">GitHub Repository / Demo Link:</label>
+        <h3>Submit Project for Review</h3>
+        <label for="repoInput" style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">GitHub Repository / Demo Link</label>
         <input type="url" id="repoInput" class="repo-input" placeholder="https://github.com/username/my-project">
 
-        <label style="font-size: 13px; font-weight: bold; color: #374151;">Project Notes & Reflections:</label>
+        <label for="projectNotes" style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Project Notes &amp; Reflections</label>
         <textarea id="projectNotes" class="editor-area" placeholder="Briefly describe what you built, any challenges overcome, and key takeaways..."></textarea>
 
         <div class="action-btn-row">
@@ -267,7 +265,7 @@
         </div>
 
         <div id="submitSuccessBanner" class="status-banner">
-          🎉 <strong>Project Submitted Successfully!</strong> Your project has been logged in your learning records.
+          🎉 <strong>Project Submitted:</strong> Your project submission has been recorded.
         </div>
       </div>
     </div>

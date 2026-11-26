@@ -5,18 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SkillPath AI | Your Result</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700&display=swap');
   :root {
-    --brand-primary: #4f46e5;
-    --brand-primary-hover: #4338ca;
+    --brand-primary: #4338ca;
+    --brand-primary-hover: #3730a3;
     --brand-primary-light: #eef2ff;
     --brand-primary-border: #c7d2fe;
-    --brand-gradient: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
-    --bg-page: #f8fafc;
+    --bg-page: #f9fafb;
     --bg-card: #ffffff;
-    --border-default: #e2e8f0;
-    --text-primary: #0f172a;
-    --text-secondary: #334155;
-    --text-muted: #64748b;
+    --border-default: #e5e7eb;
+    --border-strong: #d1d5db;
+    --text-primary: #111827;
+    --text-secondary: #374151;
+    --text-muted: #6b7280;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background-color: var(--bg-page); color: var(--text-primary); -webkit-font-smoothing: antialiased; }
@@ -26,57 +27,56 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 40px;
+    padding: 14px 36px;
     background-color: var(--bg-card);
     border-bottom: 1px solid var(--border-default);
   }
   .simple-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit; cursor: pointer; }
   a.simple-logo, a.simple-logo:hover, a.simple-logo:visited, a.simple-logo:active, a.simple-logo:focus { text-decoration: none; color: inherit; }
-  .simple-logo-icon { display: inline-flex; align-items: center; font-size: 24px; }
-  .simple-logo-icon svg { width: 24px; height: 24px; stroke: var(--brand-primary); stroke-width: 2; fill: none; }
-  .simple-logo h2 { font-size: 20px; font-weight: 800; letter-spacing: -0.3px; }
+  .simple-logo-icon { display: inline-flex; align-items: center; }
+  .simple-logo-icon svg { width: 22px; height: 22px; stroke: var(--brand-primary); stroke-width: 2; fill: none; }
+  .simple-logo h2 { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
   .highlight-ai { color: var(--brand-primary); }
-  .nav-links { display: flex; gap: 25px; align-items: center; font-size: 14px; color: var(--text-secondary); font-weight: 500; }
+  .nav-links { display: flex; gap: 22px; align-items: center; font-size: 13.5px; color: var(--text-secondary); font-weight: 500; }
   .nav-links a:hover { color: var(--brand-primary); }
   .logout-btn {
     border: 1px solid var(--border-default);
-    padding: 7px 16px;
-    border-radius: 8px;
+    padding: 6px 14px;
+    border-radius: 6px;
     font-weight: 600;
-    transition: all 0.15s ease;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
   }
-  .logout-btn:hover { background: #f1f5f9; border-color: #cbd5e1; }
+  .logout-btn:hover { background: #f3f4f6; border-color: var(--border-strong); }
 
   .result-card {
     background: var(--bg-card);
-    border-radius: 16px;
-    padding: 42px 36px;
+    border-radius: 10px;
+    padding: 36px 32px;
     max-width: 600px;
-    margin: 46px auto;
-    text-align: center;
+    margin: 44px auto;
+    text-align: left;
     border: 1px solid var(--border-default);
-    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
   }
-  .result-card h1 { font-size: 24px; font-weight: 800; margin-bottom: 18px; color: var(--text-primary); }
+  .result-card h1 { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 16px; color: var(--text-primary); }
 
   .level-badge {
     display: inline-block;
-    background: var(--brand-gradient);
-    color: white;
-    padding: 10px 26px;
-    border-radius: 24px;
-    font-size: 16px;
+    background: var(--brand-primary-light);
+    color: var(--brand-primary);
+    border: 1px solid var(--brand-primary-border);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 13px;
     font-weight: 700;
-    letter-spacing: 0.8px;
-    margin-bottom: 16px;
-    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.22);
+    letter-spacing: 0.05em;
+    margin-bottom: 14px;
   }
 
   .result-card .desc {
     font-size: 14px;
     color: var(--text-secondary);
-    margin-bottom: 24px;
-    line-height: 1.65;
+    margin-bottom: 20px;
+    line-height: 1.6;
   }
 
   .result-split {
@@ -104,18 +104,17 @@
 
   .btn-primary {
     display: inline-block;
-    background: var(--brand-gradient);
+    background: var(--brand-primary);
     color: white;
-    padding: 13px 28px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 700;
+    padding: 11px 22px;
+    border-radius: 6px;
+    font-size: 13.5px;
+    font-weight: 600;
     border: none;
     cursor: pointer;
-    box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);
-    transition: all 0.18s ease;
+    transition: background-color 0.15s ease;
   }
-  .btn-primary:hover { background: linear-gradient(135deg, #4338ca, #4f46e5); transform: translateY(-1px); }
+  .btn-primary:hover { background: var(--brand-primary-hover); }
 
   a:focus-visible, button:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 2px; }
   @media (prefers-reduced-motion: reduce) {
@@ -142,16 +141,16 @@
     <h2>SkillPath <span class="highlight-ai">AI</span></h2>
   </a>
   <div class="nav-links">
-    <a href="home.html">Careers</a>
-    <a href="home.html#how">How it works</a>
+    <a href="index.html#careers">Careers</a>
+    <a href="index.html#how">How it works</a>
     <a href="#" class="logout-btn">Log out</a>
   </div>
 </div>
 
 <div class="result-card">
-  <h1 id="resultHeading">🎉 Assessment Complete!</h1>
+  <h1 id="resultHeading">Assessment Complete 🎉</h1>
 
-  <p style="font-size:13px; color:#888; margin-bottom:8px;">Your Current Skill Level</p>
+  <p style="font-size:12px; text-transform:uppercase; letter-spacing:0.05em; font-weight:600; color:var(--text-muted); margin-bottom:6px;">Calibrated Skill Level</p>
   <div class="level-badge" id="levelBadge">INTERMEDIATE</div>
 
   <p class="desc" id="levelDesc">
@@ -216,9 +215,9 @@
   }
 
   const headings = {
-    'Beginner': "🌱 Welcome, Beginner!",
-    'Intermediate': "🎉 Assessment Complete!",
-    'Advanced': "🚀 Impressive Skills!"
+    'Beginner': "Foundational Path Ready 🌱",
+    'Intermediate': "Assessment Complete 🎉",
+    'Advanced': "Advanced Path Calibrated 🚀"
   };
   if (resultHeading) {
     resultHeading.textContent = headings[savedLevel] || headings['Intermediate'];

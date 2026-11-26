@@ -79,28 +79,25 @@
   }
 
   .btn-save {
-    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    background: var(--brand-primary);
     color: white;
     border: none;
-    padding: 12px 28px;
-    border-radius: 8px;
-    font-weight: 700;
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
     cursor: pointer;
-    font-size: 14px;
-    transition: all 0.2s ease;
+    font-size: 13.5px;
+    transition: background-color 0.15s ease;
     display: inline-flex;
     align-items: center;
     gap: 8px;
   }
   .btn-save:hover {
-    opacity: 0.95;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+    background: var(--brand-primary-hover);
   }
   .btn-save:disabled {
     opacity: 0.65;
     cursor: not-allowed;
-    transform: none;
   }
 
   .save-alert {
@@ -303,15 +300,15 @@
     </div>
 
     <div class="content-wrap">
-      <div class="page-header" style="margin-bottom: 24px;">
-        <h1 style="font-size: 22px; margin-bottom: 6px;">Account & Preferences</h1>
-        <p style="font-size: 14px; color: #64748b;">Manage your profile avatar, target career track, and personal details.</p>
+      <div class="page-header" style="padding-bottom: 16px; border-bottom: 1px solid var(--border-default); margin-bottom: 22px;">
+        <h1 style="font-family: var(--font-family-display); font-size: 24px; font-weight: 700; letter-spacing: -0.02em; color: var(--text-primary); margin-bottom: 4px;">Account &amp; Preferences</h1>
+        <p style="font-size: 13.5px; color: var(--text-muted);">Manage your workspace avatar, profile display name, and active curriculum track.</p>
       </div>
 
       <!-- CARD 1: PROFILE AVATAR SELECTION -->
       <div class="settings-section settings-section-avatar">
-        <h2><span>👤</span> Profile Avatar Selection</h2>
-        <p class="sub">Select a learning persona for your dashboard, navigation, and community posts.</p>
+        <h2>Profile Avatar</h2>
+        <p class="sub">Select a workspace persona displayed across your navigation and community posts.</p>
 
         <div class="avatar-selection-grid" id="avatarGrid">
           <!-- Populated dynamically with 6 preset avatars -->
@@ -320,8 +317,8 @@
 
       <!-- CARD 2: PROFILE DETAILS -->
       <div class="settings-section settings-section-profile">
-        <h2><span>📝</span> Profile Details</h2>
-        <p class="sub">Your authenticated account identity and contact information.</p>
+        <h2>Profile Details</h2>
+        <p class="sub">Your authenticated account identity and display name.</p>
 
         <div class="form-group">
           <label for="settingEmail">Email Address</label>
@@ -335,8 +332,8 @@
 
       <!-- CARD 3: CAREER & LEARNING GOAL -->
       <div class="settings-section settings-section-goal">
-        <h2><span>🎯</span> Career & Learning Goal</h2>
-        <p class="sub">Update your active career curriculum or skill proficiency level.</p>
+        <h2>Career &amp; Learning Goal</h2>
+        <p class="sub">Update your active career track or target proficiency level.</p>
 
         <div class="form-group">
           <label for="settingCareer">Active Career Path</label>
@@ -359,10 +356,8 @@
           </select>
         </div>
 
-        <button type="button" id="saveSettingsBtn" class="btn-save">
-          <span>💾</span> Save Preferences
-        </button>
-        <div id="saveSuccessAlert" class="save-alert">✓ Preferences saved successfully!</div>
+        <button type="button" id="saveSettingsBtn" class="btn-save">Save Preferences</button>
+        <div id="saveSuccessAlert" class="save-alert">Preferences saved successfully! 😊</div>
         <div id="saveErrorAlert" class="error-alert"></div>
       </div>
     </div>
@@ -371,23 +366,22 @@
     <div id="careerSyncModalBackdrop" class="sync-modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="syncModalTitle">
       <div class="sync-modal-card">
         <div class="sync-modal-header">
-          <span class="sync-modal-icon">🔄</span>
           <h3 id="syncModalTitle">Career Track Updated</h3>
         </div>
         <div class="sync-modal-body">
           <p>Your target career goal is now set to <strong id="syncModalNewCareer"></strong>.</p>
-          <p class="sync-modal-sub">Your existing active roadmap was created for <strong id="syncModalOldCareer"></strong>. What would you like to do?</p>
+          <p class="sync-modal-sub">Your existing active roadmap was created for <strong id="syncModalOldCareer"></strong>. Choose how to proceed:</p>
           <div class="sync-modal-options">
             <button type="button" id="btnSyncAssessment" class="sync-option-btn primary">
-              <strong>📝 Take Diagnostic Assessment</strong>
+              <strong>Take Diagnostic Assessment</strong>
               <span>Evaluate your current knowledge and generate a calibrated roadmap for <span class="syncNewCareerName">this track</span>.</span>
             </button>
             <button type="button" id="btnSyncInstantRoadmap" class="sync-option-btn secondary">
-              <strong>⚡ Generate Instant Roadmap</strong>
+              <strong>Generate Instant Roadmap</strong>
               <span>Create an immediate curriculum for <span class="syncNewCareerName">this track</span> without taking a test.</span>
             </button>
             <button type="button" id="btnSyncKeepRoadmap" class="sync-option-btn outline">
-              <strong>📌 Keep Current Roadmap for Now</strong>
+              <strong>Keep Current Roadmap for Now</strong>
               <span>Retain your existing active roadmap. You can switch or regenerate anytime.</span>
             </button>
           </div>
@@ -515,7 +509,7 @@
   function showSuccess(msg) {
     hideAlerts();
     if (successAlert) {
-      successAlert.textContent = msg || "✓ Preferences saved successfully!";
+      successAlert.textContent = msg || "✓ Preferences saved successfully! 😊";
       successAlert.style.display = "block";
       setTimeout(() => { if (successAlert) successAlert.style.display = "none"; }, 3500);
     }
@@ -607,7 +601,7 @@
       if (isCareerChanged) {
         openCareerSyncModal(career, previousCareer, level);
       } else {
-        showSuccess("✓ Profile avatar and preferences saved successfully!");
+        showSuccess("✓ Profile avatar and preferences saved successfully! 😊");
       }
     } catch (err) {
       console.error("Save settings error:", err);
@@ -669,7 +663,7 @@
     if (btnSyncKeepRoadmap) {
       btnSyncKeepRoadmap.onclick = () => {
         syncModal.style.display = "none";
-        showSuccess(`✓ Preferences saved! Your active roadmap for ${oldCareer} has been preserved.`);
+        showSuccess(`✓ Preferences saved! Your active roadmap for ${oldCareer} has been preserved. 😊`);
       };
     }
   }
@@ -678,7 +672,7 @@
     btnSyncKeepRoadmap.addEventListener("click", () => {
       if (syncModal) syncModal.style.display = "none";
       const old = (syncModalOldCareer && syncModalOldCareer.textContent) ? syncModalOldCareer.textContent : "previous career";
-      showSuccess(`✓ Preferences saved! Your active roadmap for ${old} has been preserved.`);
+      showSuccess(`✓ Preferences saved! Your active roadmap for ${old} has been preserved. 😊`);
     });
   }
 

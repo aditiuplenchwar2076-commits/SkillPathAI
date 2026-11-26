@@ -13,7 +13,9 @@
   <header class="navbar">
     <div class="container nav-container">
       <a href="index.html" class="logo">
-        <span class="logo-icon">🚀</span>
+        <span class="logo-icon">
+          <svg class="logo-svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>
+        </span>
         <div class="logo-text">
           <h1>SkillPath <span class="highlight-ai">AI</span></h1>
           <p>Learn. Practice. Get Placed.</p>
@@ -38,130 +40,127 @@
     </div>
   </header>
 
-  <!-- Hero Section (#home - Requirement 6: clean hero background) -->
+  <!-- Hero Section (#home) -->
   <section class="hero-section" id="home">
     <div class="container hero-grid">
       <div class="hero-content">
-        <div class="hero-badge">
-          <span>✨</span> AI-Driven EdTech Platform
-        </div>
+        <p class="hero-eyebrow">Diagnostic Assessment &middot; Structured Curriculum</p>
         <h1 class="hero-title">
-          Your Career Goals. <br>
-          <span class="gradient-text">Your Personalized Learning Path.</span>
+          Your Career Goals.<br>
+          <span class="hero-accent">Your Personalized Learning Path.</span>
         </h1>
         <p class="hero-description">
-          SkillPath AI helps learners identify their target career, assess existing skills, follow custom step-by-step curriculum roadmaps, and practice with real-time AI guidance.
+          SkillPath AI calibrates your current technical level, maps your target engineering role, and builds a sequenced curriculum with focused quizzes, coding practice, and interview preparation.
         </p>
 
         <div class="hero-actions">
           <a href="#careers" class="btn btn-primary btn-lg">Explore Career Paths →</a>
-          <a href="#features" class="btn btn-secondary btn-lg">Platform Features</a>
+          <a href="#features" class="btn btn-secondary btn-lg">Platform Overview</a>
         </div>
 
         <div class="hero-features-list">
-          <span>✓ Skill Placement Checks</span>
-          <span>✓ Custom Roadmaps</span>
-          <span>✓ Interactive AI Tutoring</span>
+          <span>&#10003; 5-question skill calibration</span>
+          <span>&#10003; Sequenced topic roadmaps</span>
+          <span>&#10003; Concept clarifications &amp; quizzes</span>
         </div>
       </div>
 
-      <!-- Hero Visual Card -->
+      <!-- Authentic Product Workspace Preview -->
       <div class="hero-mockup-wrap">
-        <div class="mockup-card">
+        <div class="mockup-card" aria-label="Sample SkillPath AI curriculum preview">
           <div class="mockup-header">
-            <span class="mockup-dot red"></span>
-            <span class="mockup-dot yellow"></span>
-            <span class="mockup-dot green"></span>
-            <span style="font-size: 0.8rem; font-weight: 600; color: #64748b; margin-left: 8px;">skillpath.ai/dashboard</span>
+            <span>Workspace &middot; Curriculum</span>
+            <span>skillpath.ai</span>
           </div>
           <div class="mockup-body">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+            <div class="mockup-track-head">
               <div>
-                <h4 style="font-size: 1.1rem; color: #0f172a;">Web Development Track</h4>
-                <p style="font-size: 0.82rem; color: #64748b;">Intermediate Level • Personalized</p>
+                <h4>Web Development Track</h4>
+                <p>Calibrated at Intermediate Level</p>
               </div>
-              <span style="background: var(--color-primary-light); color: var(--color-primary); font-size: 0.8rem; font-weight: 700; padding: 4px 10px; border-radius: 6px;">Active Roadmap</span>
+              <span class="mockup-track-meta">2 / 3 Modules</span>
             </div>
 
             <div class="mockup-roadmap-step">
-              <span class="mockup-step-icon">📘</span>
-              <div class="mockup-step-info">
-                <h4>1. Modern Frontend Architecture</h4>
-                <p>Component hierarchy, state flows & modular design</p>
+              <div class="mockup-step-left">
+                <span class="mockup-step-dot done" aria-hidden="true"></span>
+                <div class="mockup-step-info">
+                  <h4>1. Modern Frontend Architecture</h4>
+                  <p>Semantic HTML, layout grids, and component state</p>
+                </div>
               </div>
+              <span class="mockup-step-status done">Completed</span>
             </div>
 
             <div class="mockup-roadmap-step active">
-              <span class="mockup-step-icon">⚡</span>
-              <div class="mockup-step-info">
-                <h4>2. Asynchronous State & APIs</h4>
-                <p>RESTful client calls, error boundaries & promises</p>
+              <div class="mockup-step-left">
+                <span class="mockup-step-dot active" aria-hidden="true"></span>
+                <div class="mockup-step-info">
+                  <h4>2. Asynchronous State &amp; APIs</h4>
+                  <p>REST integration, promises, and error handling</p>
+                </div>
               </div>
+              <span class="mockup-step-status active">In Progress</span>
             </div>
 
             <div class="mockup-roadmap-step">
-              <span class="mockup-step-icon">🚀</span>
-              <div class="mockup-step-info">
-                <h4>3. Full-Stack Data Integration</h4>
-                <p>FastAPI connection, relational models & deployment</p>
+              <div class="mockup-step-left">
+                <span class="mockup-step-dot" aria-hidden="true"></span>
+                <div class="mockup-step-info">
+                  <h4>3. Full-Stack Data Integration</h4>
+                  <p>FastAPI endpoints, relational schemas, and deployment</p>
+                </div>
               </div>
+              <span class="mockup-step-status">Upcoming</span>
             </div>
-          </div>
-        </div>
-
-        <div class="mockup-floating-badge">
-          <span class="badge-icon">🎯</span>
-          <div class="badge-text">
-            <h5>AI Diagnostic Score</h5>
-            <p>Adaptive Placement Ready</p>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- About Section (#about - Requirement 2: Subtle Blue Gradient) -->
-  <section class="section" id="about">
+  <!-- About Section (#about) -->
+  <section class="section" id="about" style="background: var(--bg-alt); border-bottom: 1px solid var(--border-color);">
     <div class="container">
       <div class="about-grid">
         <div class="about-content">
-          <span class="section-tag">About SkillPath AI</span>
-          <h2 class="section-title">Built for Students and Ambitious Career Starters</h2>
+          <span class="section-tag">Why SkillPath AI</span>
+          <h2 class="section-title">Structured Engineering Progression Without Tutorial Overload</h2>
           <p>
-            Self-taught developers and learners frequently face tutorial burnout and scattered video playlists that don't match their current abilities.
+            Self-taught learners lose months cycling through disconnected video playlists that either repeat fundamentals they already know or jump straight into advanced frameworks without prerequisites.
           </p>
           <p>
-            SkillPath AI solves the fragmentation problem by diagnosing what you already know and constructing a structured, sequential curriculum explicitly tailored to your target industry position.
+            SkillPath AI starts by measuring your baseline, then sequences the exact topics, practice exercises, and milestones required for your chosen role.
           </p>
           <ul class="about-points">
-            <li><span>✓</span> Diagnoses skill gaps with dynamic multiple-choice assessments.</li>
-            <li><span>✓</span> Replaces aimless browsing with step-by-step milestone progression.</li>
-            <li><span>✓</span> Explains intricate concepts on demand using conversational AI tutoring.</li>
-            <li><span>✓</span> Real-time streak tracking keeps daily study habits consistent.</li>
+            <li><span>&#10003;</span> Calibrates baseline level (Beginner, Intermediate, or Advanced) in minutes.</li>
+            <li><span>&#10003;</span> Sequences prerequisites ahead of frameworks and system integration.</li>
+            <li><span>&#10003;</span> Provides inline topic explanations and runnable syntax examples on demand.</li>
+            <li><span>&#10003;</span> Records topic completion and dated progress directly to your workspace.</li>
           </ul>
         </div>
 
         <div class="about-card-box">
-          <h3 class="box-title">Why SkillPath AI Works</h3>
+          <h3 class="box-title">How the Workspace Keeps You Moving</h3>
           <div class="box-item">
-            <div class="box-item-icon">🎯</div>
+            <span class="box-item-num">01</span>
             <div>
-              <h4 style="font-size: 1rem; color: #0f172a;">Focused Direction</h4>
-              <p style="font-size: 0.85rem; color: #64748b;">No more wondering what to learn next; every day has a defined topic.</p>
+              <h4 style="font-size: 0.95rem; color: var(--dark); margin-bottom: 2px;">Focused Next Step</h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">Always highlights the next incomplete topic instead of showing an overwhelming wall of links.</p>
             </div>
           </div>
           <div class="box-item">
-            <div class="box-item-icon">🧠</div>
+            <span class="box-item-num">02</span>
             <div>
-              <h4 style="font-size: 1rem; color: #0f172a;">Gemini-Powered Clarifications</h4>
-              <p style="font-size: 0.85rem; color: #64748b;">Get concise, pedagogical explanations with live code snippets.</p>
+              <h4 style="font-size: 0.95rem; color: var(--dark); margin-bottom: 2px;">Gemini Study Clarifications</h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">Ask targeted questions about any roadmap concept inside the workspace assistant.</p>
             </div>
           </div>
           <div class="box-item">
-            <div class="box-item-icon">📊</div>
+            <span class="box-item-num">03</span>
             <div>
-              <h4 style="font-size: 1rem; color: #0f172a;">Verifiable Milestones</h4>
-              <p style="font-size: 0.85rem; color: #64748b;">Topic quizzes confirm mastery before unlocking advanced curriculum.</p>
+              <h4 style="font-size: 0.95rem; color: var(--dark); margin-bottom: 2px;">Verified Module Checks</h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">Confirm topic comprehension with short quizzes and hands-on coding tasks.</p>
             </div>
           </div>
         </div>
@@ -169,207 +168,148 @@
     </div>
   </section>
 
-  <!-- Features Section (#features - Requirement 4: Professional Lucide Icons) -->
+  <!-- Features Section (#features) -->
   <section class="section" id="features">
     <div class="container">
-      <div class="section-header text-center">
-        <span class="section-tag">Platform Features</span>
-        <h2 class="section-title">Everything You Need to Master Your Tech Career</h2>
-        <p class="section-subtitle">Real capabilities designed to guide you from foundational knowledge to professional fluency.</p>
+      <div class="section-header">
+        <span class="section-tag">Capabilities</span>
+        <h2 class="section-title">Everything Built Into One Learning Workspace</h2>
+        <p class="section-subtitle">Practical tools organized around your target role, current baseline, and daily study cadence.</p>
       </div>
 
       <div class="features-grid">
-        <!-- 1. Career Exploration (globe) -->
         <div class="feature-card">
           <div class="feature-icon-wrap" aria-hidden="true">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
           </div>
-          <h3>Career Exploration</h3>
-          <p>Explore in-demand roles including Web Developer, Data Analyst, Cloud Engineer, Cybersecurity, and AI/ML Engineer with role-specific skill targets.</p>
+          <h3>Career Path Selection</h3>
+          <p>Choose from Web Development, Data Analytics, Data Science, Cloud, Cybersecurity, UI/UX, Mobile, or AI/ML Engineering.</p>
         </div>
 
-        <!-- 2. Diagnostic Skill Assessment (clipboard-check) -->
         <div class="feature-card">
           <div class="feature-icon-wrap" aria-hidden="true">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg>
           </div>
-          <h3>Diagnostic Skill Assessment</h3>
-          <p>Take an initial multi-topic assessment to determine whether your baseline is Beginner, Intermediate, or Advanced.</p>
+          <h3>Diagnostic Skill Check</h3>
+          <p>Take a role-specific 5-question baseline assessment to place at Beginner, Intermediate, or Advanced.</p>
         </div>
 
-        <!-- 3. Personalized Curriculum Roadmaps (map) -->
         <div class="feature-card">
           <div class="feature-icon-wrap" aria-hidden="true">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>
           </div>
-          <h3>Personalized Curriculum Roadmaps</h3>
-          <p>Follow a sequenced timeline of topics broken down into digestible phases, ensuring prerequisites are mastered first.</p>
+          <h3>Sequenced Curriculum</h3>
+          <p>Follow an ordered timeline with expandable topic notes, key takeaways, and prerequisite sequencing.</p>
         </div>
 
-        <!-- 4. AI Tutoring & Chat Assistant (bot) -->
         <div class="feature-card">
           <div class="feature-icon-wrap" aria-hidden="true">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
           </div>
-          <h3>AI Tutoring & Chat Assistant</h3>
-          <p>Stuck on an algorithm or concept? The integrated Gemini assistant breaks down complex code directly in your dashboard.</p>
+          <h3>AI Study Assistant</h3>
+          <p>Ask concept or syntax questions directly inside your dashboard when blocked on an exercise.</p>
         </div>
 
-        <!-- 5. Topic Quizzes & Knowledge Checks (book-check) -->
         <div class="feature-card">
           <div class="feature-icon-wrap" aria-hidden="true">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/><path d="m9 9.5 2 2 4-4"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/><path d="m9 9.5 2 2 4-4"/></svg>
           </div>
-          <h3>Topic Quizzes & Knowledge Checks</h3>
-          <p>Validate your understanding after completing modules with authentic quiz evaluations that record your progress.</p>
+          <h3>Quizzes &amp; Coding Practice</h3>
+          <p>Reinforce concepts immediately with topic quizzes, coding tasks, and portfolio project briefs.</p>
         </div>
 
-        <!-- 6. Streak Tracking & Progress Analytics (chart-no-axes-combined) -->
         <div class="feature-card">
           <div class="feature-icon-wrap" aria-hidden="true">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16v5"/><path d="M16 14v7"/><path d="M20 10v11"/><path d="m22 3-8.646 8.646a.5.5 0 0 1-.708 0L9.354 8.354a.5.5 0 0 0-.707 0L2 15"/><path d="M4 18v3"/><path d="M8 14v7"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16v5"/><path d="M16 14v7"/><path d="M20 10v11"/><path d="m22 3-8.646 8.646a.5.5 0 0 1-.708 0L9.354 8.354a.5.5 0 0 0-.707 0L2 15"/><path d="M4 18v3"/><path d="M8 14v7"/></svg>
           </div>
-          <h3>Streak Tracking & Progress Analytics</h3>
-          <p>Measure weekly learning consistency, consecutive active day streaks, and overall roadmap completion percentages.</p>
+          <h3>Dated Progress History</h3>
+          <p>Track genuine dated progress checkpoints across weekly, monthly, and all-time study views.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- How SkillPath AI Works Section (#how - Requirement 5: Pill Outline & 6 Steps Flow, Requirement 6: Clean light NO gradient) -->
-  <section class="section" id="how">
+  <!-- Consolidated Workflow Section (#how) -->
+  <section class="section" id="how" style="background: var(--bg-alt); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
     <div class="container">
-      <div class="section-header text-center">
-        <div class="pill-heading-wrap">
-          <span class="pill-tag">Visual Flow</span>
-          <h2 class="section-title">How SkillPath AI Works</h2>
-        </div>
-        <p class="section-subtitle">A proven 6-step journey from onboarding to career confidence.</p>
+      <div class="section-header">
+        <span class="section-tag">How It Works</span>
+        <h2 class="section-title">Four Steps From Role Selection to Readiness</h2>
+        <p class="section-subtitle">A direct workflow without manual playlist curation.</p>
       </div>
 
-      <div class="steps-flow-container">
-        <!-- Row 1: Steps 1, 2, 3, 4 -->
-        <div class="steps-row-top">
-          <div class="step-card" data-step="1">
-            <span class="step-number">1</span>
-            <h3>Create an Account</h3>
-            <p>Sign up securely with email or Google to initialize your personal learning database profile.</p>
-          </div>
-
-          <div class="step-connector" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-          </div>
-
-          <div class="step-card" data-step="2">
-            <span class="step-number">2</span>
-            <h3>Choose Target Career</h3>
-            <p>Select your goal from Web Development, Data Science, AI/ML, Cloud, Security, or Software Engineering.</p>
-          </div>
-
-          <div class="step-connector" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-          </div>
-
-          <div class="step-card" data-step="3">
-            <span class="step-number">3</span>
-            <h3>Skill Assessment</h3>
-            <p>Complete a tailored diagnostic check to pinpoint your existing strengths and knowledge level.</p>
-          </div>
-
-          <div class="step-connector" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-          </div>
-
-          <div class="step-card" data-step="4">
-            <span class="step-number">4</span>
-            <h3>Generate Roadmap</h3>
-            <p>Receive an authentic, phased roadmap customized specifically to fill your detected skill gaps.</p>
-          </div>
+      <div class="workflow-grid">
+        <div class="workflow-step">
+          <div class="workflow-num">01 / ROLE</div>
+          <h3>Choose Target Career</h3>
+          <p>Select your target engineering specialization and create or sign in to your workspace account.</p>
         </div>
 
-        <!-- Transition Connector from Step 4 to Step 5 -->
-        <div class="steps-row-transition" aria-hidden="true">
-          <div class="transition-badge">
-            <span>Next Phase</span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
-          </div>
+        <div class="workflow-step">
+          <div class="workflow-num">02 / CALIBRATE</div>
+          <h3>Take Skill Check</h3>
+          <p>Complete a short diagnostic quiz—or choose Beginner directly—to set your curriculum starting point.</p>
         </div>
 
-        <!-- Row 2: Steps 5, 6 (Centered) -->
-        <div class="steps-row-bottom">
-          <div class="step-card" data-step="5">
-            <span class="step-number">5</span>
-            <h3>Learn & Practice</h3>
-            <p>Study structured lessons, ask the AI assistant for guidance, and complete knowledge quizzes.</p>
-          </div>
+        <div class="workflow-step">
+          <div class="workflow-num">03 / LEARN</div>
+          <h3>Follow Your Roadmap</h3>
+          <p>Work through sequenced topics, explanations, quizzes, and coding tasks in recommended order.</p>
+        </div>
 
-          <div class="step-connector" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-          </div>
-
-          <div class="step-card" data-step="6">
-            <span class="step-number">6</span>
-            <h3>Track & Excel</h3>
-            <p>Watch your progress metrics rise, sustain daily streaks, and prepare for placement.</p>
-          </div>
+        <div class="workflow-step">
+          <div class="workflow-num">04 / VERIFY</div>
+          <h3>Prepare for Interviews</h3>
+          <p>Practice mock technical questions, track completion trends, and build portfolio deliverables.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Inside Platform Section (#preview - Requirement 6: Subtle Gradient) -->
+  <!-- Inside Platform Section (#preview) -->
   <section class="section" id="preview">
     <div class="container">
-      <div class="section-header text-center">
+      <div class="section-header">
         <span class="section-tag">Inside the Platform</span>
-        <h2 class="section-title">Designed for Everyday Productivity</h2>
-        <p class="section-subtitle">A cohesive interface providing full visibility into your learning momentum.</p>
+        <h2 class="section-title">Designed for Daily Study Focus</h2>
+        <p class="section-subtitle">One workspace uniting your curriculum, quiz scores, and upcoming milestones.</p>
       </div>
 
       <div class="preview-card">
         <div class="preview-nav">
-          <button type="button" class="preview-tab active">Overview Dashboard</button>
-          <a href="#careers" class="preview-tab" style="text-decoration: none; color: inherit;">Explore Career Catalog →</a>
+          <button type="button" class="preview-tab active">Learner Workspace</button>
+          <a href="#careers" class="preview-tab" style="text-decoration: none;">Explore Career Catalog →</a>
         </div>
         <div class="preview-content">
           <div class="preview-details">
-            <h3>Unified Student Dashboard</h3>
+            <h3>Clear Hierarchy From First Login</h3>
             <p>
-              Your personal hub consolidates active roadmap phases, today's focus goals, diagnostic recommendations, and verifiable completion rates calculated from your quiz submissions.
+              Every dashboard element ties directly to your active curriculum: current target career, completed topics, genuine dated progress history, and your next recommended module.
             </p>
-            <div class="preview-stats-row">
-              <div class="preview-stat-box">
-                <div class="stat-val">100%</div>
-                <div class="stat-label">Authentic Metrics</div>
-              </div>
-              <div class="preview-stat-box">
-                <div class="stat-val">Live</div>
-                <div class="stat-label">FastAPI Engine</div>
-              </div>
-              <div class="preview-stat-box">
-                <div class="stat-val">24/7</div>
-                <div class="stat-label">AI Tutor</div>
-              </div>
-            </div>
+            <ul class="preview-cap-list">
+              <li><span class="preview-cap-dot" aria-hidden="true"></span><span>Next recommended topic focus</span></li>
+              <li><span class="preview-cap-dot" aria-hidden="true"></span><span>Weekly, monthly &amp; all-time curves</span></li>
+              <li><span class="preview-cap-dot" aria-hidden="true"></span><span>Inline AI concept explanations</span></li>
+              <li><span class="preview-cap-dot" aria-hidden="true"></span><span>Mock interview readiness feedback</span></li>
+            </ul>
           </div>
           <div class="preview-visual-box">
-            <div class="vis-icon">📊</div>
-            <h4 style="color: #0f172a; margin-bottom: 6px;">Connected Experience</h4>
-            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 16px;">Seamless transition between roadmaps, interactive practice sessions, and interview preparation.</p>
-            <a href="login.html" class="btn btn-secondary">Preview In Action →</a>
+            <h4>Try It With Your Own Goal</h4>
+            <p>Pick a career track below to launch the 5-question diagnostic assessment and generate your curriculum.</p>
+            <a href="login.html" class="btn btn-primary">Sign In to Workspace →</a>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Career Selection Section (#careers - Requirements 7 & 8: 3D Career Cube, Semicircular Arc & Assessment Integration) -->
-  <section class="section" id="careers">
+  <!-- Career Selection Section (#careers - Interactive 3D Career Dice & Catalog) -->
+  <section class="section" id="careers" style="background: var(--bg-alt); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
     <div class="container careers-section-container">
-      <div class="section-header text-center">
-        <span class="section-tag">Career Placement Paths</span>
+      <div class="section-header">
+        <span class="section-tag">Career Tracks</span>
         <h2 class="section-title">Choose Your Career Path</h2>
-        <p class="section-subtitle">Select a target role to launch your adaptive skill diagnostic and generate a personalized curriculum roadmap.</p>
+        <p class="section-subtitle">Rotate the interactive career cube or pick a specialization chip below to inspect required skills and launch your assessment.</p>
       </div>
 
       <!-- Career Hub Grid: Interactive 3D Dice (Left) + Details Panel (Right) -->
@@ -381,7 +321,6 @@
             <div class="cube-stage">
               <div class="cube-viewport" id="cubeViewport" tabindex="0" role="application" aria-label="Interactive 3D Career Dice. Use arrow keys or drag to rotate. Press Enter or Space to roll." title="Drag with mouse or swipe touch to rotate the career dice">
                 <div class="cube-3d" id="cube3D">
-                  <!-- 6 Distinct Physical Faces (One Career Per Face) -->
                   <div class="cube-face cube-face-front" id="cubeFaceFront" data-face="front" role="button" tabindex="0" aria-label="Web Developer (Front Face)"></div>
                   <div class="cube-face cube-face-right" id="cubeFaceRight" data-face="right" role="button" tabindex="0" aria-label="Data Analyst (Right Face)"></div>
                   <div class="cube-face cube-face-back" id="cubeFaceBack" data-face="back" role="button" tabindex="0" aria-label="Cloud Engineer (Back Face)"></div>
@@ -390,35 +329,32 @@
                   <div class="cube-face cube-face-bottom" id="cubeFaceBottom" data-face="bottom" role="button" tabindex="0" aria-label="Software Engineer (Bottom Face)"></div>
                 </div>
               </div>
-              <!-- Realistic Ground Shadow Disk -->
               <div class="cube-shadow" aria-hidden="true"></div>
             </div>
 
             <!-- Cube Rotation & Roll Controls -->
             <div class="cube-controls" aria-label="Dice Rotation Controls">
-              <button type="button" class="cube-btn" id="btnRotateLeft" title="Rotate Left (⟲)">⟲ Left</button>
-              <button type="button" class="cube-btn" id="btnRotateUp" title="Tilt Up (⬆)">⬆ Up</button>
-              <button type="button" class="cube-btn cube-btn-roll" id="btnRollDice" title="Roll Random Career (🎲)">🎲 Roll Dice</button>
-              <button type="button" class="cube-btn" id="btnRotateDown" title="Tilt Down (⬇)">⬇ Down</button>
-              <button type="button" class="cube-btn" id="btnRotateRight" title="Rotate Right (⟳)">Right ⟳</button>
-              <button type="button" class="cube-btn cube-btn-reset" id="btnResetCube" title="Reset View (⌖)">⌖ Reset</button>
+              <button type="button" class="cube-btn" id="btnRotateLeft" title="Rotate Left">Left</button>
+              <button type="button" class="cube-btn" id="btnRotateUp" title="Tilt Up">Up</button>
+              <button type="button" class="cube-btn cube-btn-roll" id="btnRollDice" title="Select Random Career">Randomize</button>
+              <button type="button" class="cube-btn" id="btnRotateDown" title="Tilt Down">Down</button>
+              <button type="button" class="cube-btn" id="btnRotateRight" title="Rotate Right">Right</button>
+              <button type="button" class="cube-btn cube-btn-reset" id="btnResetCube" title="Reset View">Reset</button>
             </div>
-            <p class="cube-hint">💡 Drag or swipe to rotate • Snaps to face • Click any face or chip to select</p>
+            <p class="cube-hint">🎯 Drag to rotate &middot; Click any face or specialization chip to preview</p>
 
             <!-- Secondary Career Selection Tray: All 9 Career Tracks -->
             <div class="all-careers-tray" id="allCareersTray" aria-label="Explore All 9 Specializations">
               <div class="all-careers-tray-header">
-                <span class="all-careers-tray-title">Explore All 9 Specializations</span>
-                <span class="all-careers-tray-badge">6 on Dice • 3 Additional Tracks</span>
+                <span class="all-careers-tray-title">All 9 Specializations</span>
+                <span class="all-careers-tray-badge">6 on Cube &middot; 3 Additional Tracks</span>
               </div>
-              <div class="all-careers-chips" id="allCareersChips">
-                <!-- Populated dynamically by landing-page.js with all 9 career chips -->
-              </div>
+              <div class="all-careers-chips" id="allCareersChips"></div>
             </div>
           </div>
         </div>
 
-        <!-- Right: Career Details Panel (Requirement 8.3 & 8.4) -->
+        <!-- Right: Career Details Panel -->
         <div class="career-details-column">
           <div class="career-details-panel" id="careerDetailsPanel">
             <div class="career-details-header">
@@ -446,7 +382,7 @@
             <div class="career-outcome-box">
               <div class="career-outcome-label">Placement Readiness Outcome</div>
               <p class="career-outcome-text" id="panelOutcome">
-                Job-ready frontend & full-stack development fluency with verifiable portfolio projects.
+                Job-ready frontend &amp; full-stack development fluency with verifiable portfolio projects.
               </p>
             </div>
 
@@ -460,104 +396,50 @@
     </div>
   </section>
 
-  <!-- Pathway Section (#pathway - Requirement 9: Separate 4-Card How It Works Section) -->
-  <section class="section" id="pathway">
-    <div class="container">
-      <div class="section-header text-center">
-        <span class="section-tag">Learning Framework</span>
-        <h2 class="section-title">Your Step-by-Step Path to Placement</h2>
-        <p class="section-subtitle">A seamless four-stage progression from skill evaluation to job readiness.</p>
-      </div>
-
-      <div class="pathway-flow">
-        <!-- Card 1 -->
-        <div class="pathway-card">
-          <div class="pathway-step-num">Step 01</div>
-          <h3>Take the assessment</h3>
-          <p>A short quiz shows where you stand today.</p>
-        </div>
-
-        <!-- Arrow 1 -> 2 -->
-        <div class="pathway-arrow" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-        </div>
-
-        <!-- Card 2 -->
-        <div class="pathway-card">
-          <div class="pathway-step-num">Step 02</div>
-          <h3>See your level</h3>
-          <p>You're placed at Beginner, Intermediate or Advanced.</p>
-        </div>
-
-        <!-- Arrow 2 -> 3 -->
-        <div class="pathway-arrow" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-        </div>
-
-        <!-- Card 3 -->
-        <div class="pathway-card">
-          <div class="pathway-step-num">Step 03</div>
-          <h3>Follow your roadmap</h3>
-          <p>Learn, practise and build projects in order.</p>
-        </div>
-
-        <!-- Arrow 3 -> 4 -->
-        <div class="pathway-arrow" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-        </div>
-
-        <!-- Card 4 -->
-        <div class="pathway-card">
-          <div class="pathway-step-num">Step 04</div>
-          <h3>Get job-ready</h3>
-          <p>Practise interviews and track your readiness.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Benefits Section (#benefits - Requirement 6: Clean White Background) -->
+  <!-- Benefits Section (#benefits) -->
   <section class="section" id="benefits">
     <div class="container">
-      <div class="section-header text-center">
-        <span class="section-tag">Tangible Advantages</span>
-        <h2 class="section-title">Why Learners Choose SkillPath AI</h2>
-        <p class="section-subtitle">Real structure leads to real placement outcomes.</p>
+      <div class="section-header">
+        <span class="section-tag">Learning Principles</span>
+        <h2 class="section-title">Why Learners Stay Consistent on SkillPath AI</h2>
+        <p class="section-subtitle">Focused curriculum decisions that remove ambiguity from self-paced study.</p>
       </div>
 
       <div class="benefits-grid">
         <div class="benefit-card">
-          <h4>🎯 No Resource Overload</h4>
-          <p>Curated learning sequences replace fragmented YouTube searches and conflicting tutorials.</p>
+          <h4>No Resource Overload</h4>
+          <p>Curated learning sequences replace fragmented video searches and conflicting tutorials.</p>
         </div>
 
         <div class="benefit-card">
-          <h4>⏱️ Fast-Tracked Progression</h4>
-          <p>Diagnostic testing allows intermediate students to bypass basics and start right at their growth edge.</p>
+          <h4>Calibrated Starting Point</h4>
+          <p>Diagnostic checks let experienced learners skip fundamentals and start at their growth edge.</p>
         </div>
 
         <div class="benefit-card">
-          <h4>🤖 Instant Clarifications</h4>
-          <p>Interactive AI explanations mean you never spend hours blocked on a single tricky syntax or design pattern.</p>
+          <h4>Direct Concept Help</h4>
+          <p>Ask targeted questions about any roadmap topic directly inside your workspace.</p>
         </div>
 
         <div class="benefit-card">
-          <h4>📈 Proof of Consistency</h4>
-          <p>Activity streaks and completed topic analytics provide verifiable records of continuous learning.</p>
+          <h4>Genuine Activity Tracking</h4>
+          <p>Progress curves and streaks reflect real completed topics and saved quiz submissions.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Final Call to Action (.cta-section - Requirement 6: Soft Gradient) -->
+  <!-- Final Call to Action (.cta-section) -->
   <section class="cta-section">
     <div class="container">
       <div class="cta-box">
-        <h2>Ready to Build Your Career Path?</h2>
-        <p>Join SkillPath AI today. Choose your target role, take your quick skill assessment, and unlock your personal learning roadmap.</p>
+        <div class="cta-copy">
+          <h2>Ready to Map Your Next Role?</h2>
+          <p>Choose your target track, complete the 5-question diagnostic, and generate your step-by-step curriculum.</p>
+        </div>
         <div class="cta-actions">
-          <a href="login.html?signup=true" class="btn btn-primary btn-lg">Get Started Free →</a>
-          <a href="#careers" class="btn btn-secondary btn-lg">Browse In-App Careers</a>
+          <a href="login.html?signup=true" class="btn btn-primary btn-lg">Create Free Account →</a>
+          <a href="#careers" class="btn btn-secondary btn-lg">Browse Career Tracks</a>
         </div>
       </div>
     </div>
@@ -568,12 +450,14 @@
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
-          <div class="logo">
-            <span class="logo-icon">🚀</span>
+          <a href="index.html" class="logo">
+            <span class="logo-icon">
+              <svg class="logo-svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>
+            </span>
             <div class="logo-text">
               <h2>SkillPath <span class="highlight-ai">AI</span></h2>
             </div>
-          </div>
+          </a>
           <p>Personalized learning roadmaps, adaptive skill assessments, and AI guidance to help learners fast-track their tech careers.</p>
         </div>
 
@@ -603,7 +487,7 @@
           <h4>Technology</h4>
           <ul>
             <li><a href="#">FastAPI Backend</a></li>
-            <li><a href="#">Aiven Cloud MySQL</a></li>
+            <li><a href="#">TiDB Cloud</a></li>
             <li><a href="#">Firebase Authentication</a></li>
             <li><a href="#">Google Gemini AI</a></li>
           </ul>

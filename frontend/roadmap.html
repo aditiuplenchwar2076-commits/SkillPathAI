@@ -6,18 +6,17 @@
 <title>SkillPath AI | Roadmap & Learning</title>
 <link rel="stylesheet" href="dashboard.css">
 <style>
-  .content-wrap { max-width: 820px; width: 100%; }
-  .roadmap-page-header { margin-bottom: 22px; }
-  .roadmap-page-header h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; color: #0f172a; }
-  .roadmap-page-header p { font-size: 13.5px; color: #64748b; }
+  .content-wrap { max-width: 840px; width: 100%; }
+  .roadmap-page-header { padding-bottom: 18px; border-bottom: 1px solid var(--border-default); margin-bottom: 22px; }
+  .roadmap-page-header h1 { font-family: var(--font-family-display); font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; color: var(--text-primary); }
+  .roadmap-page-header p { font-size: 13.5px; color: var(--text-muted); }
 
   .timeline-wrap {
-    background: white;
-    border-radius: 16px;
-    padding: 26px;
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 24px;
     min-height: 200px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    border: 1px solid var(--border-default);
   }
   /* Coordinated SkillPathAI Palette: Emerald (Completed), Indigo (Current), Slate (Upcoming) */
   .roadmap-summary-bar {
@@ -25,58 +24,59 @@
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    padding: 16px 20px;
+    padding: 16px 18px;
     margin-bottom: 20px;
-    background: linear-gradient(135deg, #eef2ff 0%, #f8faff 100%);
-    border: 1px solid var(--brand-primary-border);
-    border-radius: 14px;
+    background: var(--bg-page);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
     flex-wrap: wrap;
   }
   .roadmap-summary-info h3 {
-    font-size: 14px;
+    font-family: var(--font-family-display);
+    font-size: 14.5px;
     font-weight: 700;
-    color: var(--color-slate-900);
-    margin-bottom: 4px;
+    color: var(--text-primary);
+    margin-bottom: 3px;
   }
   .roadmap-summary-info p {
-    font-size: 12.5px;
-    color: var(--color-slate-600);
+    font-size: 13px;
+    color: var(--text-secondary);
   }
   .roadmap-summary-progress {
     flex: 1;
     min-width: 180px;
-    max-width: 280px;
+    max-width: 260px;
   }
   .roadmap-progress-track {
-    height: 8px;
-    background: var(--color-slate-200);
+    height: 6px;
+    background: var(--border-default);
     border-radius: 9999px;
     overflow: hidden;
   }
   .roadmap-progress-fill {
     height: 100%;
-    background: var(--brand-gradient);
+    background: var(--brand-primary);
     border-radius: 9999px;
-    transition: width 0.35s ease;
+    transition: width 0.3s ease;
   }
   .timeline-item {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 16px 10px;
-    border-bottom: 1px solid #f1f5f9;
+    gap: 14px;
+    padding: 14px 10px;
+    border-bottom: 1px solid var(--bg-subtle);
     cursor: pointer;
-    border-radius: 10px;
-    transition: background-color 0.15s ease;
+    border-radius: var(--radius-md);
+    transition: background-color 0.14s ease;
   }
-  .timeline-item:hover { background-color: #f8fafc; }
+  .timeline-item:hover { background-color: var(--bg-page); }
   .timeline-item:last-child { border-bottom: none; }
   .timeline-marker {
-    width: 32px; height: 32px; min-width: 32px;
+    width: 28px; height: 28px; min-width: 28px;
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 13px; font-weight: 700; color: white;
-    transition: all 0.2s ease;
+    font-size: 12px; font-weight: 700; color: white;
+    transition: background-color 0.15s ease;
   }
 
   .timeline-item.completed .timeline-marker {
@@ -84,37 +84,35 @@
     color: #ffffff;
   }
   .timeline-item.current .timeline-marker {
-    background: var(--brand-gradient);
+    background: var(--brand-primary);
     color: #ffffff;
-    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.18);
+    box-shadow: none;
   }
   .timeline-item.upcoming .timeline-marker {
-    background-color: #e2e8f0;
-    color: #64748b;
+    background-color: var(--border-default);
+    color: var(--text-muted);
   }
 
   .timeline-text { flex: 1; min-width: 0; }
   .timeline-text h3 {
-    font-size: 15px;
-    font-weight: 700;
-    margin-bottom: 3px;
-    color: #0f172a;
+    font-size: 14.5px;
+    font-weight: 600;
+    margin-bottom: 2px;
+    color: var(--text-primary);
   }
   .timeline-text p {
-    font-size: 13px;
-    color: #64748b;
+    font-size: 12.5px;
+    color: var(--text-muted);
     line-height: 1.5;
   }
 
   .timeline-status {
     font-size: 11px;
-    font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 20px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: var(--radius-sm);
     height: fit-content;
     white-space: nowrap;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
   }
   .timeline-item.completed .timeline-status {
     background: var(--color-success-light);
@@ -127,42 +125,43 @@
     border: 1px solid var(--brand-primary-border);
   }
   .timeline-item.upcoming .timeline-status {
-    background: #f8fafc;
-    color: #64748b;
-    border: 1px solid #e2e8f0;
+    background: var(--bg-page);
+    color: var(--text-muted);
+    border: 1px solid var(--border-default);
   }
 
   .lesson-panel {
     display: none;
-    background: #fafbff;
-    border: 1px solid var(--brand-primary-border);
-    border-radius: 12px;
-    padding: 22px;
-    margin: 4px 0 16px 48px;
+    background: var(--bg-page);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    margin: 4px 0 14px 42px;
     font-size: 13.5px;
   }
   .lesson-panel.open { display: block; }
   .lesson-panel h4 {
-    font-size: 14.5px;
+    font-family: var(--font-family-display);
+    font-size: 14px;
     font-weight: 700;
     margin-bottom: 8px;
-    color: #0f172a;
+    color: var(--text-primary);
   }
-  .lesson-panel p { color: #334155; margin-bottom: 12px; line-height: 1.6; }
+  .lesson-panel p { color: var(--text-secondary); margin-bottom: 12px; line-height: 1.65; max-width: 65ch; }
   .lesson-panel code {
     display: block;
-    background: #0f172a;
-    color: #c7d2fe;
+    background: #111827;
+    color: #e5e7eb;
     padding: 14px;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     font-size: 12.5px;
     margin: 10px 0;
     white-space: pre-wrap;
     word-break: break-word;
-    font-family: 'Consolas', monospace;
-    border: 1px solid #1e293b;
+    font-family: var(--font-family-mono);
+    border: 1px solid #1f2937;
   }
-  .lesson-panel ul { margin: 0 0 14px 20px; color: #334155; line-height: 1.8; }
+  .lesson-panel ul { margin: 0 0 14px 20px; color: var(--text-secondary); line-height: 1.75; }
   .lesson-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
   .lesson-actions button, .lesson-actions a {
     flex: 1;
@@ -567,7 +566,7 @@
     if (wrap) {
       wrap.innerHTML = `
         <div style="text-align:center; padding:50px 20px;">
-          <div style="font-size:38px; margin-bottom:14px;">✨ 🤖 ✨</div>
+          <div style="font-size:38px; margin-bottom:14px;">🤖</div>
           <h3 style="font-size:18px; margin-bottom:8px; color:#1a1a2e;">Generating Your Personalized AI Roadmap...</h3>
           <p style="color:#666; font-size:13px; max-width:460px; margin:0 auto 18px; line-height:1.6;">
             Gemini AI is analyzing your assessment results and designing your tailored curriculum milestones.
@@ -662,7 +661,7 @@
       <div class="roadmap-summary-bar">
         <div class="roadmap-summary-info">
           <h3>${pct}% Roadmap Complete (${completedTotal}/${topics.length} Topics)</h3>
-          <p>${nextTopic ? `Recommended next: <strong>${nextTopic.sequence_no}. ${nextTopic.topic_name}</strong>` : "All curriculum milestones completed!"}</p>
+          <p>${nextTopic ? `Recommended next: <strong>${nextTopic.sequence_no}. ${nextTopic.topic_name}</strong>` : "All curriculum milestones completed! 🎉"}</p>
         </div>
         <div class="roadmap-summary-progress" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100" aria-label="Roadmap completion ${pct}%">
           <div class="roadmap-progress-track">

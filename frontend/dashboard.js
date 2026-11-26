@@ -802,7 +802,7 @@ export function renderOverallProgressGraph(filterType = currentProgressFilter) {
         </svg>
       </div>
       <h4 class="empty-state-title">No Learning Activity Yet</h4>
-      <p class="empty-state-desc">Complete roadmap topics or quizzes to start tracking your learning curve over time.</p>
+      <p class="empty-state-desc">Complete roadmap topics or quizzes to start tracking your learning curve over time! 😊</p>
       <a href="roadmap.html" class="empty-state-btn">View Roadmap →</a>
     `;
     return;
@@ -1223,7 +1223,7 @@ export function renderUpcomingMilestones(topics, progressMap, overallPercent, ro
   if (!Array.isArray(topics) || topics.length === 0) {
     container.innerHTML = `
       <div class="milestone-empty-state">
-        <p>No active milestones. Choose a career goal or take an assessment to generate your personalized learning milestones.</p>
+        <p>🎯 No active milestones yet. Choose a career goal or take an assessment to generate your personalized learning milestones!</p>
       </div>
     `;
     return;

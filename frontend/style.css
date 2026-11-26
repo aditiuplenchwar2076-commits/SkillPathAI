@@ -1,24 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700&display=swap');
+
 /* SkillPathAI - Authentication Page Stylesheet */
 :root {
-  --brand-primary: #4f46e5;
-  --brand-primary-hover: #4338ca;
+  --brand-primary: #4338ca;
+  --brand-primary-hover: #3730a3;
   --brand-primary-light: #eef2ff;
   --brand-primary-border: #c7d2fe;
-  --brand-gradient: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
-  --brand-gradient-hover: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%);
 
-  --bg-page: #f8fafc;
+  --bg-page: #f9fafb;
   --bg-card: #ffffff;
-  --border-default: #e2e8f0;
-  --border-focus: #4f46e5;
+  --border-default: #e5e7eb;
+  --border-focus: #4338ca;
 
-  --text-primary: #0f172a;
-  --text-secondary: #334155;
-  --text-muted: #64748b;
+  --text-primary: #111827;
+  --text-secondary: #374151;
+  --text-muted: #6b7280;
   --text-inverse: #ffffff;
 
-  --shadow-card: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
-  --shadow-input-focus: 0 0 0 3px rgba(79, 70, 229, 0.14);
+  --shadow-card: 0 4px 16px -2px rgba(17, 24, 39, 0.06), 0 1px 3px 0 rgba(17, 24, 39, 0.04);
+  --shadow-input-focus: 0 0 0 3px rgba(67, 56, 202, 0.14);
 }
 
 * {
@@ -28,7 +28,7 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   background-color: var(--bg-page);
   color: var(--text-primary);
   min-height: 100vh;
@@ -42,20 +42,20 @@ body {
 .login-container {
   display: flex;
   background-color: var(--bg-card);
-  border-radius: 20px;
+  border-radius: 12px;
   border: 1px solid var(--border-default);
   box-shadow: var(--shadow-card);
   overflow: hidden;
-  max-width: 1040px;
+  max-width: 980px;
   width: 100%;
-  min-height: 580px;
+  min-height: 560px;
 }
 
-/* Left Section: Rich Brand Identity */
+/* Left Section: Editorial Brand Brief */
 .left-section {
-  flex: 1.1;
-  background: linear-gradient(150deg, #0f172a 0%, #1e1b4b 55%, #312e81 100%);
-  padding: 48px;
+  flex: 1.05;
+  background: #111827;
+  padding: 44px;
   color: var(--text-inverse);
   display: flex;
   flex-direction: column;
@@ -63,21 +63,10 @@ body {
   position: relative;
 }
 
-.left-section::after {
-  content: "";
-  position: absolute;
-  top: -50px;
-  right: -50px;
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, transparent 70%);
-  pointer-events: none;
-}
-
 .brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   margin-bottom: 24px;
   text-decoration: none;
   color: inherit;
@@ -94,11 +83,11 @@ a.brand:focus {
 }
 
 .brand-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -106,9 +95,10 @@ a.brand:focus {
 }
 
 .brand-name {
-  font-size: 20px;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-size: 18px;
   font-weight: 700;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.02em;
   color: #ffffff;
 }
 
@@ -117,25 +107,24 @@ a.brand:focus {
 }
 
 .main-heading {
-  font-size: 28px;
-  font-weight: 800;
-  line-height: 1.25;
-  margin: 12px 0 16px;
-  letter-spacing: -0.5px;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-size: 27px;
+  font-weight: 700;
+  line-height: 1.22;
+  margin: 12px 0 14px;
+  letter-spacing: -0.025em;
   color: #ffffff;
 }
 
 .highlight {
-  background: linear-gradient(135deg, #a5b4fc 0%, #818cf8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #a5b4fc;
 }
 
 .sub-text {
-  color: #cbd5e1;
+  color: #9ca3af;
   font-size: 14px;
   line-height: 1.6;
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 
 .features {
@@ -309,22 +298,19 @@ a.brand:focus {
 
 .login-btn {
   width: 100%;
-  padding: 12px;
+  padding: 11px 14px;
   border: none;
-  border-radius: 8px;
-  background: var(--brand-gradient);
+  border-radius: 7px;
+  background: var(--brand-primary);
   color: #ffffff;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
-  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  transition: background-color 0.15s ease;
 }
 
 .login-btn:hover {
-  background: var(--brand-gradient-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+  background: var(--brand-primary-hover);
 }
 
 .login-btn:active {

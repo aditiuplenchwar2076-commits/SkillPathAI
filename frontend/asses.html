@@ -5,19 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SkillPath AI | Skill Assessment</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700&display=swap');
   :root {
-    --brand-primary: #4f46e5;
-    --brand-primary-hover: #4338ca;
+    --brand-primary: #4338ca;
+    --brand-primary-hover: #3730a3;
     --brand-primary-light: #eef2ff;
     --brand-primary-border: #c7d2fe;
-    --brand-gradient: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
-    --bg-page: #f8fafc;
+    --bg-page: #f9fafb;
     --bg-card: #ffffff;
-    --border-default: #e2e8f0;
-    --text-primary: #0f172a;
-    --text-secondary: #334155;
-    --text-muted: #64748b;
-    --shadow-card: 0 4px 20px rgba(15, 23, 42, 0.05);
+    --border-default: #e5e7eb;
+    --border-strong: #d1d5db;
+    --text-primary: #111827;
+    --text-secondary: #374151;
+    --text-muted: #6b7280;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background-color: var(--bg-page); color: var(--text-primary); -webkit-font-smoothing: antialiased; }
@@ -27,22 +27,22 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 40px;
+    padding: 14px 36px;
     background-color: var(--bg-card);
     border-bottom: 1px solid var(--border-default);
   }
   .simple-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit; cursor: pointer; }
   a.simple-logo, a.simple-logo:hover, a.simple-logo:visited, a.simple-logo:active, a.simple-logo:focus { text-decoration: none; color: inherit; }
-  .simple-logo-icon { display: inline-flex; align-items: center; font-size: 24px; }
-  .simple-logo-icon svg { width: 24px; height: 24px; stroke: var(--brand-primary); stroke-width: 2; fill: none; }
-  .simple-logo h2 { font-size: 20px; font-weight: 800; letter-spacing: -0.3px; }
+  .simple-logo-icon { display: inline-flex; align-items: center; }
+  .simple-logo-icon svg { width: 22px; height: 22px; stroke: var(--brand-primary); stroke-width: 2; fill: none; }
+  .simple-logo h2 { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
   .highlight-ai { color: var(--brand-primary); }
-  .nav-links { display: flex; gap: 25px; align-items: center; font-size: 14px; color: var(--text-secondary); font-weight: 500; }
+  .nav-links { display: flex; gap: 22px; align-items: center; font-size: 13.5px; color: var(--text-secondary); font-weight: 500; }
   .nav-links a:hover { color: var(--brand-primary); }
-  .logout-btn { border: 1px solid var(--border-default); padding: 7px 16px; border-radius: 8px; font-weight: 600; transition: all 0.15s ease; }
-  .logout-btn:hover { background: #f1f5f9; border-color: #cbd5e1; }
+  .logout-btn { border: 1px solid var(--border-default); padding: 6px 14px; border-radius: 6px; font-weight: 600; transition: background-color 0.15s ease, border-color 0.15s ease; }
+  .logout-btn:hover { background: #f3f4f6; border-color: var(--border-strong); }
 
-  .page-wrap { max-width: 660px; margin: 44px auto; padding: 0 20px; }
+  .page-wrap { max-width: 640px; margin: 44px auto; padding: 0 20px; }
 
   /* Stepper */
   .assess-stepper {
@@ -51,10 +51,10 @@
     justify-content: space-between;
     gap: 8px;
     margin-bottom: 24px;
-    padding: 12px 16px;
-    background: #f8fafc;
+    padding: 10px 14px;
+    background: var(--bg-page);
     border: 1px solid var(--border-default);
-    border-radius: 12px;
+    border-radius: 8px;
     font-size: 12px;
     font-weight: 600;
     color: var(--text-muted);
@@ -64,106 +64,105 @@
     width: 20px; height: 20px; border-radius: 50%;
     display: inline-flex; align-items: center; justify-content: center;
     font-size: 11px; font-weight: 700;
-    background: #e2e8f0; color: var(--text-muted);
+    background: #e5e7eb; color: var(--text-muted);
   }
-  .step-pill.done .step-num { background: #10b981; color: white; }
+  .step-pill.done .step-num { background: #059669; color: white; }
   .step-pill.active { color: var(--brand-primary); }
   .step-pill.active .step-num { background: var(--brand-primary); color: white; }
   .step-sep { flex: 1; height: 1px; background: var(--border-default); max-width: 36px; }
 
   /* ===== INTRO SCREEN ===== */
-  #introScreen h1 { font-size: 26px; font-weight: 800; margin-bottom: 8px; color: var(--text-primary); }
+  #introScreen h1 { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 8px; color: var(--text-primary); }
   #introScreen .career-line {
     display: inline-block;
-    font-size: 13px; color: var(--brand-primary); font-weight: 700;
+    font-size: 12.5px; color: var(--brand-primary); font-weight: 600;
     background: var(--brand-primary-light); border: 1px solid var(--brand-primary-border);
-    padding: 4px 12px; border-radius: 9999px; margin-bottom: 14px;
+    padding: 3px 10px; border-radius: 6px; margin-bottom: 14px;
   }
-  #introScreen p.sub { font-size: 14.5px; color: var(--text-secondary); margin-bottom: 26px; line-height: 1.6; }
-  .intro-buttons { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+  #introScreen p.sub { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.6; }
+  .intro-buttons { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
   .btn-primary {
-    background: var(--brand-gradient);
+    background: var(--brand-primary);
     color: white;
-    padding: 13px 26px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 700;
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 2px 6px rgba(79, 70, 229, 0.24);
-    transition: all 0.18s ease;
-  }
-  .btn-primary:hover { background: linear-gradient(135deg, #4338ca, #4f46e5); transform: translateY(-1px); }
-  .btn-text {
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    font-size: 14px;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 13.5px;
     font-weight: 600;
-    text-decoration: underline;
+    border: none;
     cursor: pointer;
-    padding: 8px 4px;
+    transition: background-color 0.15s ease;
   }
-  .btn-text:hover { color: var(--brand-primary); }
+  .btn-primary:hover { background: var(--brand-primary-hover); }
+  .btn-text {
+    background: #ffffff;
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 10px 18px;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+  }
+  .btn-text:hover { background: #f3f4f6; border-color: var(--text-primary); }
 
   /* ===== QUIZ SCREEN ===== */
   #quizScreen { display: none; }
   .quiz-card {
     background: var(--bg-card);
-    border-radius: 16px;
-    padding: 32px;
+    border-radius: 10px;
+    padding: 28px;
     border: 1px solid var(--border-default);
-    box-shadow: var(--shadow-card);
   }
   .quiz-top {
     display: flex;
     justify-content: space-between;
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 600;
     color: var(--text-muted);
     margin-bottom: 10px;
   }
   .progress-track {
-    height: 8px;
-    background-color: #f1f5f9;
-    border-radius: 10px;
+    height: 6px;
+    background-color: #e5e7eb;
+    border-radius: 9999px;
     overflow: hidden;
-    margin-bottom: 28px;
+    margin-bottom: 24px;
   }
   .progress-track-fill {
     height: 100%;
-    background: var(--brand-gradient);
-    border-radius: 10px;
-    transition: width 0.3s ease;
+    background: var(--brand-primary);
+    border-radius: 9999px;
+    transition: width 0.25s ease;
   }
-  .assessment-question { font-size: 17.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; line-height: 1.45; }
-  .assessment-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+  .assessment-question { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-size: 17px; font-weight: 600; color: var(--text-primary); margin-bottom: 18px; line-height: 1.45; }
+  .assessment-options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
   .assessment-option {
-    background: #f8fafc;
-    border: 2px solid var(--border-default);
-    border-radius: 10px;
-    padding: 14px 16px;
+    background: #ffffff;
+    border: 1px solid var(--border-default);
+    border-radius: 8px;
+    padding: 12px 15px;
     font-size: 14px;
     color: var(--text-primary);
     cursor: pointer;
     text-align: left;
-    transition: all 0.15s ease;
+    transition: border-color 0.14s ease, background-color 0.14s ease;
   }
-  .assessment-option:hover { border-color: var(--brand-primary-border); background: #fafbff; }
-  .assessment-option.selected { border-color: var(--brand-primary); background: var(--brand-primary-light); font-weight: 600; }
+  .assessment-option:hover { border-color: var(--border-strong); background: var(--bg-page); }
+  .assessment-option.selected { border-color: var(--brand-primary); background: var(--brand-primary-light); color: var(--brand-primary-hover); font-weight: 600; }
   .assessment-nav { display: flex; justify-content: space-between; gap: 12px; }
   .btn-outline {
     background: white;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--border-strong);
     color: var(--text-secondary);
-    padding: 11px 22px;
-    border-radius: 8px;
+    padding: 9px 18px;
+    border-radius: 6px;
     font-size: 13.5px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
   }
-  .btn-outline:hover:not(:disabled) { background: #f8fafc; border-color: #94a3b8; }
+  .btn-outline:hover:not(:disabled) { background: #f3f4f6; border-color: #9ca3af; }
   .btn-outline:disabled { opacity: 0.45; cursor: not-allowed; }
 
   a:focus-visible, button:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 2px; }
@@ -198,8 +197,8 @@
     <h2>SkillPath <span class="highlight-ai">AI</span></h2>
   </a>
   <div class="nav-links">
-    <a href="home.html">Careers</a>
-    <a href="home.html#how">How it works</a>
+    <a href="index.html#careers">Careers</a>
+    <a href="index.html#how">How it works</a>
     <a href="#" class="logout-btn">Log out</a>
   </div>
 </div>
@@ -209,17 +208,17 @@
   <!-- ===== SAVING / PROCESSING STATUS SCREEN ===== -->
   <div id="savingStatusCard" style="display: none;">
     <div class="quiz-card" style="text-align: center; padding: 40px 24px;">
-      <div id="savingStatusIcon" style="font-size: 44px; margin-bottom: 16px;">🚀</div>
+      <div id="savingStatusIcon" style="font-size: 13px; font-weight: 600; color: var(--brand-primary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px;">🚀 Calibrating Track</div>
       <h2 id="savingStatusTitle" style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">Saving your assessment and building your personalized roadmap...</h2>
-      <p id="savingStatusMessage" style="font-size: 14px; color: #555; max-width: 480px; margin: 0 auto 20px; line-height: 1.6;">
+      <p id="savingStatusMessage" style="font-size: 14px; color: var(--text-muted); max-width: 480px; margin: 0 auto 20px; line-height: 1.6;">
         Analyzing your responses, recording your score, and creating your custom learning path...
       </p>
-      <div id="savingSpinner" style="display: inline-block; width: 36px; height: 36px; border: 3px solid #e0e7ff; border-top-color: #4f46e5; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 8px;"></div>
+      <div id="savingSpinner" style="display: inline-block; width: 32px; height: 32px; border: 3px solid #e5e7eb; border-top-color: var(--brand-primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 8px;"></div>
       <div id="savingDelayedNotice" style="display: none; background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 8px; padding: 12px 16px; font-size: 13px; color: #3730a3; max-width: 480px; margin: 16px auto 0; text-align: left; line-height: 1.5;">
-        ⏱️ <strong>Still generating your roadmap:</strong> Your assessment score has been saved. We're still crafting your AI-personalized learning modules, almost ready...
+        <strong>⏳ Still generating your roadmap:</strong> Your assessment score has been saved. Finalizing your AI-personalized learning modules...
       </div>
       <div id="savingRetryWrap" style="display: none; margin-top: 20px;">
-        <button id="savingRetryBtn" class="btn-primary" style="padding: 11px 24px; font-size: 14px; cursor: pointer;">Retry Submission</button>
+        <button id="savingRetryBtn" class="btn-primary" style="padding: 10px 20px; font-size: 13.5px; cursor: pointer;">Retry Submission</button>
       </div>
     </div>
   </div>
@@ -227,12 +226,12 @@
   <!-- ===== BEGINNER PROCESSING SCREEN (COMPATIBILITY ALIAS) ===== -->
   <div id="beginnerStatusCard" style="display: none;">
     <div class="quiz-card" style="text-align: center; padding: 40px 24px;">
-      <div style="font-size: 44px; margin-bottom: 16px;">🌱</div>
+      <div style="font-size: 13px; font-weight: 600; color: var(--brand-primary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px;">🌱 Foundational Setup</div>
       <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">Configuring Your Beginner Path</h2>
-      <p id="beginnerStatusMessage" style="font-size: 14px; color: #555; max-width: 460px; margin: 0 auto 24px; line-height: 1.6;">
+      <p id="beginnerStatusMessage" style="font-size: 14px; color: var(--text-muted); max-width: 460px; margin: 0 auto 24px; line-height: 1.6;">
         Setting up your customized foundational curriculum and generating your step-by-step roadmap...
       </p>
-      <div style="display: inline-block; width: 36px; height: 36px; border: 3px solid #e0e7ff; border-top-color: #4f46e5; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+      <div style="display: inline-block; width: 32px; height: 32px; border: 3px solid #e5e7eb; border-top-color: var(--brand-primary); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
     </div>
   </div>
 

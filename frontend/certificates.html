@@ -6,57 +6,77 @@
 <title>SkillPath AI | Certificates & Credentials</title>
 <link rel="stylesheet" href="dashboard.css">
 <style>
-  .content-wrap { max-width: 900px; }
-  .cert-card {
-    background: white;
-    border-radius: 16px;
-    padding: 28px;
-    border: 1px solid var(--border-default);
-    box-shadow: var(--shadow-sm);
+  .content-wrap { max-width: 880px; }
+  .page-header {
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--border-default);
     margin-bottom: 24px;
-    display: flex;
-    gap: 24px;
-    align-items: center;
   }
+  .page-header h1 { font-family: var(--font-family-display); font-size: 24px; font-weight: 700; letter-spacing: -0.02em; color: var(--text-primary); margin-bottom: 4px; }
+  .page-header p { font-size: 14px; color: var(--text-muted); }
+
+  .cert-ledger {
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .cert-card {
+    padding: 24px;
+    border-bottom: 1px solid var(--border-default);
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .cert-card:last-child { border-bottom: none; }
   @media (max-width: 768px) {
-    .cert-card { flex-direction: column; text-align: center; padding: 22px 18px; }
+    .cert-card { flex-direction: column; padding: 20px 18px; }
   }
   .cert-icon {
-    font-size: 48px;
-    background: var(--brand-primary-light);
-    width: 96px;
-    height: 96px;
-    min-width: 96px;
-    border-radius: 20px;
+    background: var(--bg-page);
+    color: var(--brand-primary);
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px dashed var(--brand-primary-border);
+    border: 1px solid var(--border-default);
   }
-  .cert-info h3 { font-size: 18px; color: var(--text-primary); margin-bottom: 6px; }
-  .cert-info p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+  .cert-info { flex: 1; }
+  .cert-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .cert-info h3 { font-family: var(--font-family-display); font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+  .cert-info p { font-size: 13.5px; color: var(--text-muted); line-height: 1.6; margin-bottom: 14px; }
   .cert-status-badge {
     display: inline-block;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: var(--radius-sm);
+    font-size: 11.5px;
+    font-weight: 600;
   }
-  .cert-status-badge.locked { background: #f1f5f9; color: var(--text-muted); }
-  .cert-status-badge.unlocked { background: #dcfce7; color: #166534; }
+  .cert-status-badge.locked { background: var(--bg-subtle); color: var(--text-muted); border: 1px solid var(--border-default); }
+  .cert-status-badge.unlocked { background: var(--color-success-light); color: #047857; border: 1px solid #a7f3d0; }
   .cert-action-btn {
     display: inline-block;
-    margin-top: 10px;
-    padding: 10px 20px;
-    background: var(--brand-gradient);
-    color: white;
-    border-radius: 8px;
-    font-weight: 700;
+    padding: 8px 14px;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    font-weight: 600;
     font-size: 13px;
     text-decoration: none;
-    transition: all 0.18s ease;
+    transition: border-color var(--transition-fast), background-color var(--transition-fast);
   }
-  .cert-action-btn:hover { background: var(--brand-gradient-hover); box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25); }
+  .cert-action-btn:hover { border-color: var(--brand-primary); color: var(--brand-primary); background: var(--brand-primary-light); }
 </style>
 </head>
 <body>
@@ -126,28 +146,34 @@
     </div>
 
     <div class="content-wrap">
-      <div class="page-header" style="margin-bottom: 24px;">
-        <h1 style="font-size: 22px; margin-bottom: 6px;">Certificates of Completion</h1>
-        <p style="font-size: 14px; color: #6b7280;">Earn industry-aligned credentials by mastering your personalized career curriculum.</p>
+      <div class="page-header">
+        <h1>Credential Requirements</h1>
+        <p>Completion criteria for verifiable track and readiness credentials.</p>
       </div>
 
-      <div class="cert-card">
-        <div class="cert-icon">🏆</div>
-        <div class="cert-info">
-          <span class="cert-status-badge locked">In Progress (60% Needed)</span>
-          <h3 style="margin-top: 10px;">Foundational Software Engineering Track</h3>
-          <p>Awarded upon completing 100% of core curriculum topics, quizzes with score &ge; 75%, and project submission.</p>
-          <a href="roadmap.html" class="cert-action-btn">View Unfinished Milestones →</a>
+      <div class="cert-ledger">
+        <div class="cert-card">
+          <div class="cert-icon" aria-hidden="true">🏆</div>
+          <div class="cert-info">
+            <div class="cert-meta-row">
+              <h3>Curriculum Track Credential</h3>
+              <span class="cert-status-badge locked">Requirements Pending</span>
+            </div>
+            <p>Issued once 100% of assigned curriculum topics are marked completed alongside passing topic quizzes (&ge; 75%) and a submitted project repository.</p>
+            <a href="roadmap.html" class="cert-action-btn">Review Roadmap Milestones →</a>
+          </div>
         </div>
-      </div>
 
-      <div class="cert-card">
-        <div class="cert-icon">🎖️</div>
-        <div class="cert-info">
-          <span class="cert-status-badge locked">Locked</span>
-          <h3 style="margin-top: 10px;">AI Mock Interview & Placement Readiness</h3>
-          <p>Awarded upon scoring &ge; 4.0 in AI technical mock interviews, problem solving rounds, and aptitude readiness.</p>
-          <a href="interview.html" class="cert-action-btn">Launch Mock Interview →</a>
+        <div class="cert-card">
+          <div class="cert-icon" aria-hidden="true">🎯</div>
+          <div class="cert-info">
+            <div class="cert-meta-row">
+              <h3>Interview Readiness Credential</h3>
+              <span class="cert-status-badge locked">Locked</span>
+            </div>
+            <p>Requires completing mock technical and behavioral interview evaluations and fulfilling core track milestones.</p>
+            <a href="interview.html" class="cert-action-btn">Launch Mock Interview →</a>
+          </div>
         </div>
       </div>
     </div>

@@ -6,106 +6,116 @@
 <title>SkillPath AI | Quiz, Practice & Projects</title>
 <link rel="stylesheet" href="dashboard.css">
 <style>
-  .content-wrap { max-width: 800px; }
-  .page-header { margin-bottom: 20px; }
-  .page-header h1 { font-size: 22px; margin-bottom: 4px; }
-  .page-header p { font-size: 13px; color: #888; }
+  .content-wrap { max-width: 840px; }
+  .page-header { padding-bottom: 16px; border-bottom: 1px solid var(--border-default); margin-bottom: 20px; }
+  .page-header h1 { font-family: var(--font-family-display); font-size: 24px; font-weight: 700; letter-spacing: -0.02em; color: var(--text-primary); margin-bottom: 4px; }
+  .page-header p { font-size: 13.5px; color: var(--text-muted); }
 
-  .tab-switcher { display: flex; gap: 8px; margin-bottom: 20px; }
-  .tab-switcher-btn {
-    background: white;
-    border: 1px solid #eee;
-    color: #888;
-    padding: 10px 22px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: bold;
-    cursor: pointer;
+  .tab-switcher {
+    display: inline-flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-default);
+    padding: 4px;
+    border-radius: var(--radius-md);
   }
+  .tab-switcher-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+  }
+  .tab-switcher-btn:hover { color: var(--text-primary); }
   .tab-switcher-btn.active {
-    background: var(--brand-gradient);
-    color: white;
-    border-color: transparent;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    box-shadow: var(--shadow-xs);
   }
   .tab-panel { display: none; }
   .tab-panel.active { display: block; }
 
   /* ===== QUIZ TAB ===== */
-  .quiz-card { background: white; border-radius: 16px; padding: 30px; border: 1px solid var(--border-default); box-shadow: var(--shadow-sm); }
-  .quiz-top { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-muted); margin-bottom: 15px; font-weight: 500; }
-  .quiz-progress { height: 8px; background: var(--color-slate-100); border-radius: 10px; overflow: hidden; margin-bottom: 25px; }
-  .quiz-progress-fill { height: 100%; background: var(--brand-gradient); border-radius: 10px; transition: width 0.3s; }
-  .quiz-question { font-size: 16.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; line-height: 1.45; }
-  .quiz-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
-  .quiz-option { background: #f8fafc; border: 2px solid var(--border-default); border-radius: 10px; padding: 13px 16px; font-size: 14px; color: var(--text-primary); cursor: pointer; text-align: left; transition: all 0.15s ease; }
-  .quiz-option:hover { border-color: var(--brand-primary-border); background: #f8faff; }
-  .quiz-option.selected { border-color: var(--brand-primary); background: var(--brand-primary-light); font-weight: 600; }
-  .quiz-option.correct { border-color: #10b981; background: #ecfdf5; color: #065f46; }
-  .quiz-option.incorrect { border-color: #ef4444; background: #fef2f2; color: #991b1b; }
-  .quiz-feedback { font-size: 13px; font-weight: bold; margin-bottom: 15px; display: none; }
+  .quiz-card { background: var(--bg-card); border-radius: var(--radius-lg); padding: 28px; border: 1px solid var(--border-default); }
+  .quiz-top { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; }
+  .quiz-progress { height: 6px; background: var(--bg-subtle); border-radius: 9999px; overflow: hidden; margin-bottom: 22px; }
+  .quiz-progress-fill { height: 100%; background: var(--brand-primary); border-radius: 9999px; transition: width 0.25s; }
+  .quiz-question { font-family: var(--font-family-display); font-size: 16.5px; font-weight: 600; color: var(--text-primary); margin-bottom: 18px; line-height: 1.45; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 22px; }
+  .quiz-option { background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius-md); padding: 12px 15px; font-size: 14px; color: var(--text-primary); cursor: pointer; text-align: left; transition: border-color 0.14s ease, background-color 0.14s ease; }
+  .quiz-option:hover { border-color: var(--border-strong); background: var(--bg-page); }
+  .quiz-option.selected { border-color: var(--brand-primary); background: var(--brand-primary-light); color: var(--brand-primary-hover); font-weight: 600; }
+  .quiz-option.correct { border-color: var(--color-success); background: var(--color-success-light); color: #065f46; }
+  .quiz-option.incorrect { border-color: var(--color-danger); background: #fef2f2; color: #991b1b; }
+  .quiz-feedback { font-size: 13px; font-weight: 600; margin-bottom: 14px; display: none; }
   .quiz-feedback.show { display: block; }
   .quiz-feedback.good { color: #059669; }
-  .quiz-feedback.retry { color: #d97706; }
+  .quiz-feedback.retry { color: #b45309; }
   .quiz-next-btn {
-    background: var(--brand-gradient);
-    color: white; border: none; padding: 12px 24px; border-radius: 8px;
-    font-size: 13.5px; font-weight: 700; cursor: pointer; transition: all 0.18s ease;
+    background: var(--brand-primary);
+    color: white; border: none; padding: 10px 20px; border-radius: var(--radius-sm);
+    font-size: 13.5px; font-weight: 600; cursor: pointer; transition: background-color 0.15s ease;
   }
-  .quiz-next-btn:hover:not(:disabled) { background: var(--brand-gradient-hover); box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25); }
-  .quiz-next-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
+  .quiz-next-btn:hover:not(:disabled) { background: var(--brand-primary-hover); }
+  .quiz-next-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
   /* ===== PRACTICE TAB ===== */
-  .practice-card { background: white; border-radius: 16px; padding: 30px; border: 1px solid var(--border-default); box-shadow: var(--shadow-sm); }
-  .practice-card h3 { font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; }
-  .practice-task { background: #fafbff; border: 1px solid var(--brand-primary-border); border-radius: 10px; padding: 18px; font-size: 14px; color: var(--text-secondary); margin-bottom: 18px; line-height: 1.6; }
+  .practice-card { background: var(--bg-card); border-radius: var(--radius-lg); padding: 28px; border: 1px solid var(--border-default); }
+  .practice-card h3 { font-family: var(--font-family-display); font-size: 15.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; }
+  .practice-task { background: var(--bg-page); border: 1px solid var(--border-default); border-left: 3px solid var(--brand-primary); border-radius: var(--radius-md); padding: 16px; font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.6; }
   .practice-card textarea {
-    width: 100%; min-height: 160px;
-    border: 1px solid var(--border-default); border-radius: 10px;
-    padding: 14px; font-family: 'Consolas', monospace; font-size: 13px;
-    resize: vertical; margin-bottom: 15px; color: var(--text-primary);
+    width: 100%; min-height: 180px;
+    border: 1px solid var(--border-strong); border-radius: var(--radius-md);
+    padding: 14px; font-family: var(--font-family-mono); font-size: 13px;
+    resize: vertical; margin-bottom: 14px; color: var(--text-primary); background: var(--bg-card);
   }
-  .practice-card textarea:focus { outline: none; border-color: var(--brand-primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.14); }
+  .practice-card textarea:focus { outline: none; border-color: var(--brand-primary); box-shadow: 0 0 0 3px rgba(67, 56, 202, 0.12); }
   .practice-submit-btn {
-    background: var(--brand-gradient);
-    color: white; border: none; padding: 12px 24px; border-radius: 8px;
-    font-size: 13.5px; font-weight: 700; cursor: pointer; transition: all 0.18s ease;
+    background: var(--brand-primary);
+    color: white; border: none; padding: 10px 20px; border-radius: var(--radius-sm);
+    font-size: 13.5px; font-weight: 600; cursor: pointer; transition: background-color 0.15s ease;
   }
-  .practice-submit-btn:hover:not(:disabled) { background: var(--brand-gradient-hover); box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25); }
+  .practice-submit-btn:hover:not(:disabled) { background: var(--brand-primary-hover); }
 
   /* ===== PROJECTS TAB ===== */
-  .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
-  .project-card { background: white; border-radius: 14px; padding: 20px; border: 1px solid var(--border-default); transition: transform 0.2s ease, box-shadow 0.2s ease; }
-  .project-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-  .difficulty-badge { display: inline-block; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 20px; margin-bottom: 10px; }
-  .difficulty-badge.beginner { background: #dcfce7; color: #059669; }
-  .difficulty-badge.intermediate { background: #dbeafe; color: #2563eb; }
-  .difficulty-badge.advanced { background: #fee2e2; color: #dc2626; }
-  .project-card h3 { font-size: 15px; margin-bottom: 6px; color: var(--text-primary); }
-  .project-card .skills-line { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; }
-  .project-card p { font-size: 13px; color: var(--text-secondary); margin-bottom: 15px; line-height: 1.5; }
+  .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+  .project-card { background: var(--bg-card); border-radius: var(--radius-lg); padding: 20px; border: 1px solid var(--border-default); transition: border-color 0.15s ease; display: flex; flex-direction: column; justify-content: space-between; }
+  .project-card:hover { border-color: var(--border-strong); }
+  .difficulty-badge { display: inline-block; width: fit-content; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: var(--radius-sm); margin-bottom: 10px; border: 1px solid transparent; }
+  .difficulty-badge.beginner { background: var(--color-success-light); color: #047857; border-color: #a7f3d0; }
+  .difficulty-badge.intermediate { background: var(--brand-primary-light); color: var(--brand-primary); border-color: var(--brand-primary-border); }
+  .difficulty-badge.advanced { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+  .project-card h3 { font-family: var(--font-family-display); font-size: 15px; font-weight: 600; margin-bottom: 4px; color: var(--text-primary); }
+  .project-card .skills-line { font-family: var(--font-family-mono); font-size: 11px; color: var(--text-muted); margin-bottom: 10px; }
+  .project-card p { font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.55; }
   .project-start-btn {
-    width: 100%; background: white; border: 1.5px solid var(--brand-primary); color: var(--brand-primary);
-    padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s ease;
+    width: 100%; background: var(--bg-card); border: 1px solid var(--border-strong); color: var(--text-primary);
+    padding: 8px 12px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; transition: border-color 0.14s ease, background-color 0.14s ease, color 0.14s ease;
   }
-  .project-start-btn:hover { background: var(--brand-primary-light); }
+  .project-start-btn:hover { background: var(--brand-primary-light); border-color: var(--brand-primary); color: var(--brand-primary); }
 
   .topic-notice-badge {
     display: inline-block;
     padding: 4px 10px;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     font-size: 12px;
-    margin-bottom: 12px;
+    font-weight: 500;
+    margin-bottom: 14px;
   }
   .topic-notice-badge.linked {
-    background: #eef2ff;
-    color: #4f46e5;
+    background: var(--brand-primary-light);
+    color: var(--brand-primary);
+    border: 1px solid var(--brand-primary-border);
   }
   .topic-notice-badge.standalone {
-    background: #fef3c7;
+    background: #fffbeb;
     color: #92400e;
+    border: 1px solid #fde68a;
   }
   @media (max-width: 768px) {
     .quiz-card, .practice-card { padding: 20px 16px; }
@@ -235,7 +245,7 @@
           <textarea id="practiceCodeInput" placeholder="Write or paste your code here..."></textarea>
           <div style="display: flex; gap: 12px; align-items: center; margin-top: 10px;">
             <button type="button" id="submitPracticeBtn" class="practice-submit-btn">Submit Practice</button>
-            <span id="practiceSaveStatus" style="display: none; font-size: 13px; font-weight: bold; color: #166534;">✓ Solution submitted & saved!</span>
+            <span id="practiceSaveStatus" style="display: none; font-size: 13px; font-weight: bold; color: #166534;">✓ Solution submitted & saved! 😊</span>
           </div>
         </div>
       </div>
